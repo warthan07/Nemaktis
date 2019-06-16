@@ -1,0 +1,9 @@
+RayTracingSolver/rt-solver
+BeamPropagationSolver/bpm-solver
+**/bin
+**/data
+**/results
+**/settings
+**/doc
+**/Session.vim
+**/*.*~

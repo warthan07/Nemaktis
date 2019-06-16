@@ -1,0 +1,47 @@
+package:
+    name: nemaktis 
+    version: 1.0
+
+source:
+    - path: ../BeamPropagationSolver
+      folder: bpm
+    - path: ../RayTracingSolver
+      folder: rtm
+    - path: ../HighLevelPythonInterface
+      folder: nemaktis
+    - git_url: https://github.com/IJSComplexMatter/dtmm.git
+      folder: dtmm
+
+requirements:
+    build:
+        - cmake
+        - {{ compiler('cxx') }}
+    host:
+        - pkgconfig
+        - muparser
+        - pyfftw
+        - fftw
+        - boost
+        - openmp
+        - vtk
+        - eigen
+        - tbb-devel
+        - swig
+        - numpy-devel
+        - setuptools
+        - python
+    run:
+        - muparser
+        - pyfftw
+        - fftw
+        - libboost
+        - openmp
+        - vtk
+        - eigen
+        - numpy
+        - numba
+        - scipy
+        - matplotlib
+        - python
+        - traits
+        - traitsui

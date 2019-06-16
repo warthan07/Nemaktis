@@ -1,0 +1,2 @@
+cd ..
+file ./LCDeal
