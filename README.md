@@ -17,7 +17,7 @@ The three backends implemented in ``nemaktis`` correspond to:
    of ordinary and extraordinary rays (therefore being limited to uniaxial media). This module
    allows to propagate rays through any media with a sufficiently regular orientational field (i.e.
    with *C1* regularity). Optical fields can be reconstructed along rays or interpolated on a
-   cartesian mesh using an advanced homotopy continuation algorithm. 
+   regular mesh using an advanced homotopy continuation algorithm. 
 
 2. ``bpm-solver``, a beam propagation C++ code which simply propagates optical fields through any
    birefringent layers (no limitation on the regularity of the orientational field, although
@@ -26,7 +26,7 @@ The three backends implemented in ``nemaktis`` correspond to:
    expressions of the operators for the beam walk-off, anisotropic diffraction, and phase evolution.
 
 3. ``dtmm``, a diffractive transfer matrix python code which offer similar functionalities as
-   ``bpm-solver`` but relies on a less acurate scheme (the diffraction is assumed to be isotropic,
+   ``bpm-solver`` but relies on a less accurate scheme (the diffraction is assumed to be isotropic,
    and the beam walk-off is neglected). The main advantages of this backend is that it is
    incredibly well optimized (it allows to get results in far less time than with the other
    schemes) and that it supports advanced simulations (Köhler illumination setup, iterative
@@ -55,12 +55,12 @@ repository](https://github.com/IJSComplexMatter/dtmm).
 ### Simple method (conda package, linux-64)
 
 The simplest way of installing this package is through the *conda* package manager (no
-compilation and no dependency to install manually). You just need a linux machine with conda
-or miniconda installed on it (it should be available on the native package manager of your linux
+compilation and no dependency to install manually). You just need a Linux machine with conda
+or miniconda installed on it (it should be available on the native package manager of your Linux
 distribution, if not see [Installing miniconda on
 Linux](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)).
 
-First, open a terminal and create a new environment for nemaktis (of course you can adjust the
+First, open a terminal and create a new environment for ``nemaktis`` (of course you can adjust the
 name of this environment):
 ```
 conda create -n nemaktis
@@ -71,7 +71,7 @@ conda activate nemaktis
 conda install -c warthan07 nemaktis
 ```
 
-After this, all dependencies for nemaktis will be available in the environment you just
+After this, all dependencies for ``nemaktis`` will be available in the environment you just
 created, which means you just need to run ``conda activate nemaktis`` in any terminal
 window to start using this package.
 
@@ -81,7 +81,7 @@ window to start using this package.
 If you want to be able to modify the code (perhaps you found a bug, or want to implement
 yourselves a new feature), but still want to enjoy the simplicity of conda packages
 (no relative paths to manage, everything works as with a system package), you can build 
-yourselve the ``nemaktis`` package for linux:
+yourselves the ``nemaktis`` package for Linux:
 
 1. Get the code of this repository (``git clone git@github.com:warthan07/Nemaktis.git``) and
    implements the changes that you want. For the C++ codes, compilation steps are provided
@@ -116,7 +116,7 @@ yourselve the ``nemaktis`` package for linux:
 
 ### Complex method (conda-build, any platform)
 
-If you don't want to use linux but still want to use conda, you will have to build yourself the
+If you don't want to use Linux but still want to use conda, you will have to build yourself the
 conda package. This means that you need to be familiar with the
 [conda-build](https://docs.conda.io/projects/conda-build/en/latest/) framework. You can take a
 look in the subfolder [conda_recipe](conda_recipe) to see how the compilation recipe was written
