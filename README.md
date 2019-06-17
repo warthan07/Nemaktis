@@ -27,9 +27,10 @@ The three backends implemented in ``nemaktis`` correspond to:
 
 3. ``dtmm``, a diffractive transfer matrix python code which offer similar functionalities as
    ``bpm-solver`` but relies on a less acurate scheme (the diffraction is assumed to be isotropic,
-   and the beam walk-off is neglected). The main advantage of this scheme is that it is
-   incredibly well optimized and allows to get results in far less time than with the other
-   schemes.
+   and the beam walk-off is neglected). The main advantages of this backend is that it is
+   incredibly well optimized (it allows to get results in far less time than with the other
+   schemes) and that it supports advanced simulations (Köhler illumination setup, iterative
+   scheme for reflections...).
 
 The high-level interface corresponds to a python package named ``nemaktis`` and allows to set-up
 a director field for a LC sample (non-trivial shapes for the LC domain are supported), define
@@ -41,8 +42,8 @@ bright-field micrographs. A graphical user interface allows the user to quickly 
 Note that the ``rt-solver`` backend is not interfaced in the high-level python package and have to
 be used directly. The reason for this is that the algorithm used to reconstruct fields is quite
 complex and necessitates some tweaking from the user to get the best results. In order to keep
-things simple in the high-level interface, we decided not to include ray-tracing support at the
-moment.
+things simple in the high-level interface, we decided not to include ray-tracing support in
+the python package at the moment.
 
 The first two codes and the high-level interface were written by G. Poy and are hosted on this
 repository, while the third code was written by A. Petelin is hosted in [another
@@ -53,8 +54,8 @@ repository](https://github.com/IJSComplexMatter/dtmm).
 
 ### Simple method (conda package, linux-64)
 
-The simplest way of installing this package (no compilation and no dependency to install
-manually) is through the *conda* package manager. You just need a linux machine with conda
+The simplest way of installing this package is through the *conda* package manager (no
+compilation and no dependency to install manually). You just need a linux machine with conda
 or miniconda installed on it (it should be available on the native package manager of your linux
 distribution, if not see [Installing miniconda on
 Linux](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)).
