@@ -152,4 +152,5 @@ can be found on a [separate documentation](http://dtmm.readthedocs.io/).
 encouraged to cite the following papers if you use this package for published research:
 
 G. Poy, S. Žumer, Soft Matter **15**, 3659-3670 (2019).
+
 A. Petelin *et al.*, in preparation.
