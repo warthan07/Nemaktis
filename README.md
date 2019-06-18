@@ -6,7 +6,7 @@ implementing advanced numerical methods for light propagation, as well as an eas
 level interface in python allowing to quickly setup a simulation and visualize optical
 micrographs of a LC structure as in a real microscope. 
 
-![Graphical user interface of nemaktis](gui.png)
+![Graphical user interface of nemaktis](doc/gui.png)
 
 
 ## Quick introduction of the backends and python interface
@@ -28,9 +28,8 @@ The three backends implemented in ``nemaktis`` correspond to:
 3. ``dtmm``, a diffractive transfer matrix python code which offer similar functionalities as
    ``bpm-solver`` but relies on a less accurate scheme (the diffraction is assumed to be isotropic,
    and the beam walk-off is neglected). The main advantages of this backend is that it is
-   incredibly well optimized (it allows to get results in far less time than with the other
-   schemes) and that it supports advanced simulations (Köhler illumination setup, iterative
-   scheme for reflections...).
+   much faster than the other schemes and that it supports advanced simulations (Köhler
+   illumination setup, iterative scheme for reflections...).
 
 The high-level interface corresponds to a python package named ``nemaktis`` and allows to set-up
 a director field for a LC sample (non-trivial shapes for the LC domain are supported), define
@@ -46,8 +45,8 @@ things simple in the high-level interface, we decided not to include ray-tracing
 the python package at the moment.
 
 The first two codes and the high-level interface were written by G. Poy and are hosted on this
-repository, while the third code was written by A. Petelin is hosted in [another
-repository](https://github.com/IJSComplexMatter/dtmm).
+repository, while the third code was written by A. Petelin is hosted in another
+repository: <https://github.com/IJSComplexMatter/dtmm>.
 
 
 ## Installation
@@ -65,10 +64,10 @@ name of this environment):
 ```
 conda create -n nemaktis
 ```
-Then, activate the environment and install the [``nemaktis`` package](https://anaconda.org/warthan07/nemaktis):
+Then, activate the environment and install the ``nemaktis`` package]:
 ```
 conda activate nemaktis
-conda install -c warthan07 nemaktis
+conda install -c anaconda -c conda-forge -c warthan07 nemaktis
 ```
 
 After this, all dependencies for ``nemaktis`` will be available in the environment you just
@@ -133,17 +132,19 @@ anaconda cloud so that anyone can install it with ``conda install``).
 
 If you are impatient, you can take a look at the [examples](HighLevelPythonInterface/examples)
 folder to see basic usage of the high-level interface. Else, you can start reading the
-[wiki](https://github.com/warthan07/Nemaktis/wiki) of this repository to learn the fine
-details of this software.
+documentation to learn the fine details of this software:
+
+<https://nemaktis.readthedocs.io>
 
 Note that the high-level interface does not give you access to the full range of features
 offered by the backends. For example, ``bpm-solver`` supports transparent boundary conditions,
 but periodic boundary conditions are always assumed in the high-level interface; *dtmm-solver*
 supports Köhler illumination setup, while in the high-level interface, only input beams with a
 single propagation direction are supported. If you want to use such advanced features, you will
-have to learn how to use directly the backends. For ``rt-solver`` and ``bpm-solver``, documentation
-is included in the [wiki](https://github.com/warthan07/Nemaktis/wiki). For ``dtmm``, documentation
-can be found on a [separate documentation](http://dtmm.readthedocs.io/).
+have to learn how to use directly the backends. The documentation of the backends is available
+in a dedicated section of the nemaktis wiki:
+
+<https://nemaktis.readthedocs.io/en/latest/backends>
 
 
 ## License

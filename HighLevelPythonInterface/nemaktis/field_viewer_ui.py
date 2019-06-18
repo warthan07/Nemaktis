@@ -2,10 +2,9 @@ import six
 from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt4'
 
-import matplotlib
-matplotlib.use("Qt4Agg", warn=False, force=True)
+import matplotlib as mpl
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvas
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from traits.api import *
 from traitsui.api import *
@@ -289,7 +288,6 @@ class FieldViewerUI(HasTraits):
         self.figure_panel = FigurePanel(figure)
 
         self.edit_traits()
-        app = QtGui.QApplication.instance()
         app = QtGui.QApplication.instance()
         for c in range(0,len(app.topLevelWidgets())):
             if hasattr(app.topLevelWidgets()[c], "_mw"):

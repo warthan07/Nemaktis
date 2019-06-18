@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: 1.0
+    version: "1.0.1"
 
 source:
     - path: ../BeamPropagationSolver
@@ -43,5 +43,6 @@ requirements:
         - scipy
         - matplotlib
         - python
+        - ipython
         - traits
         - traitsui
