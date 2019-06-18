@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>API Reference &#8212; Nemaktis 1.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="../backends/rtm/index.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-nemaktis.field_viewer">
+<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-nemaktis.field_viewer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="nemaktis.field_viewer.FieldViewer">
+<em class="property">class </em><code class="sig-prename descclassname">nemaktis.field_viewer.</code><code class="sig-name descname">FieldViewer</code><span class="sig-paren">(</span><em class="sig-param">optical_fields</em>, <em class="sig-param">cmf=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class allowing to recombine optical fields to generate optical micrographs like in a real
+microscope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optical_fields</strong> (<em>OpticalFields object</em>) – Can be created either by a LightPropagator or directly by importing a vti file
+exported in a previous simulation.</p></li>
+<li><p><strong>cmf</strong> (<em>numpy ndarray</em>) – A color matching array created with the <cite>dtmm</cite> package,
+see <a class="reference external" href="https://dtmm.readthedocs.io/en/latest/reference.html#module-dtmm.color">https://dtmm.readthedocs.io/en/latest/reference.html#module-dtmm.color</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.analyser">
+<code class="sig-name descname">analyser</code><em class="property"> = True</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.analyser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there an analyser in the optical setup?</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.analyser_angle">
+<code class="sig-name descname">analyser_angle</code><em class="property"> = 90</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.analyser_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angle (in degree) between the privileged axis of the analyser and the x-axis</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.compensator">
+<code class="sig-name descname">compensator</code><em class="property"> = 'No'</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.compensator" title="Permalink to this definition">¶</a></dt>
+<dd><p>If “No”, remove the compensator from the optical setup. Other values set the type of
+compensator:</p>
+<ul class="simple">
+<li><p>“Quarter-wave”: An achromatic quarter-wave compensator</p></li>
+<li><p>“Half-wave”: An achromatic half-wave compensator</p></li>
+<li><p>“Tint-sensitive”: a full-wave compensator at 540 nm.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.compensator_angle">
+<code class="sig-name descname">compensator_angle</code><em class="property"> = 0</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.compensator_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angle (in degree) between the fast axis of the compensator and the x-axis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.field_viewer.FieldViewer.get_image">
+<code class="sig-name descname">get_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.get_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current micrograph as a numpy array of shape (Ny,Nx,3|1),
+(last dim=3 if in color mode, 1 if in grayscale mode).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.grayscale">
+<code class="sig-name descname">grayscale</code><em class="property"> = False</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.grayscale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should we calculate a grayscale micrograph (True) or a color micrograph (False)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.intensity">
+<code class="sig-name descname">intensity</code><em class="property"> = 1</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intensity factor of the micrograph</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.n_tiles_x">
+<code class="sig-name descname">n_tiles_x</code><em class="property"> = 1</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.n_tiles_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of repetitions of the micrograph in the x-direction</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.n_tiles_y">
+<code class="sig-name descname">n_tiles_y</code><em class="property"> = 1</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.n_tiles_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of repetitions of the micrograph in the y-direction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.field_viewer.FieldViewer.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the graphical user interface for real-time visualisation of micrographs</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.polariser">
+<code class="sig-name descname">polariser</code><em class="property"> = True</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.polariser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there a polariser in the optical setup?</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.polariser_angle">
+<code class="sig-name descname">polariser_angle</code><em class="property"> = 0</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.polariser_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angle (in degree) between the privileged axis of the polariser and the x-axis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.field_viewer.FieldViewer.update_image">
+<code class="sig-name descname">update_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.update_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recompute the micrograph from the optical fields data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.field_viewer.FieldViewer.z_focus">
+<em class="property">property </em><code class="sig-name descname">z_focus</code><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.z_focus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current vertical position of the focal plane</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nemaktis</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">High-level python interface</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">Tutorial</a></li>
+      <li>Next: <a href="../backends/rtm/index.html" title="next chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Guilhem Poy, Andrej Petelin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/high_level/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

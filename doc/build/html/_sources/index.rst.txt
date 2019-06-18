@@ -7,8 +7,24 @@ Welcome to Nemaktis's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :hidden:
+    :glob:
+    :caption: High-level python interface
+
+    high_level/tutorial.rst
+    high_level/api.rst
+
+.. _backends:
+
+.. toctree::
+    :maxdepth: 2
+    :glob:
+    :caption: Backends
+
+    backends/rtm/*
+    backends/bpm/*
+    backends/dtmm/*
 
 
 

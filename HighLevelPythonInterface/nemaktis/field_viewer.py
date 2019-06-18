@@ -12,19 +12,51 @@ from matplotlib.figure import Figure
 from scipy.interpolate import RectBivariateSpline
 
 class FieldViewer:
+    """A class allowing to recombine optical fields to generate optical micrographs like in a real
+    microscope.
+
+    Parameters
+    ----------
+    optical_fields : OpticalFields object
+        Can be created either by a LightPropagator or directly by importing a vti file
+        exported in a previous simulation.
+    cmf : numpy ndarray
+        A color matching array created with the `dtmm` package, 
+        see `<https://dtmm.readthedocs.io/en/latest/reference.html#module-dtmm.color>`_
+
+    """
+
     polariser = True 
+    """Is there a polariser in the optical setup?"""
     analyser = True 
+    """Is there an analyser in the optical setup?"""
     compensator = "No"
+    """
+    If "No", remove the compensator from the optical setup. Other values set the type of
+    compensator:
+
+    * "Quarter-wave": An achromatic quarter-wave compensator
+    * "Half-wave": An achromatic half-wave compensator
+    * "Tint-sensitive": a full-wave compensator at 540 nm.
+    """
 
     polariser_angle = 0
+    """Angle (in degree) between the privileged axis of the polariser and the x-axis"""
     analyser_angle = 90
+    """Angle (in degree) between the privileged axis of the analyser and the x-axis"""
     compensator_angle = 0
+    """Angle (in degree) between the fast axis of the compensator and the x-axis"""
 
+    
     n_tiles_x = 1
+    """Number of repetitions of the micrograph in the x-direction"""
     n_tiles_y = 1
+    """Number of repetitions of the micrograph in the y-direction"""
     grayscale = False
+    """Should we calculate a grayscale micrograph (True) or a color micrograph (False)"""
 
     intensity = 1
+    """Intensity factor of the micrograph"""
 
     _slider_spans = {
         "intensity": [0, 2],
@@ -44,6 +76,8 @@ class FieldViewer:
             self._cmf = cmf
 
     def plot(self):
+        """Run the graphical user interface for real-time visualisation of micrographs"""
+
         print("{ Running field viewer graphical interface }")
         mpl.rcParams["toolbar"] = "None"
         self._fig = Figure(tight_layout=True)
@@ -147,6 +181,7 @@ class FieldViewer:
 
     @property
     def z_focus(self):
+        """Current vertical position of the focal plane"""
         return self._optical_fields.z_focus
 
 
@@ -156,11 +191,13 @@ class FieldViewer:
 
 
     def get_image(self):
+        """Returns the current micrograph as a numpy array of shape (Ny,Nx,3|1),
+        (last dim=3 if in color mode, 1 if in grayscale mode)."""
         return np.flip(np.tile(self._image,(self.n_tiles_y,self.n_tiles_x,1)), axis=0)
 
 
     def update_image(self):
-        """Recompute the image from the optical fields data"""
+        """Recompute the micrograph from the optical fields data"""
         fields_vals = self._optical_fields.vals
 
         if self.polariser:

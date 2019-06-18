@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tutorial &#8212; Nemaktis 1.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Welcome to Nemaktis’s documentation!" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorial">
+<span id="id1"></span><h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial provides a hands-on introduction to the python package <code class="docutils literal notranslate"><span class="pre">nemaktis</span></code>.
+You will learn the different ways of creating director field data,
+how to define the sample geometry and material constants, and how to propagate and
+visualise optical fields.</p>
+<p>First of all, open your favorite text/code editor and create a new python file
+(which we will call <code class="docutils literal notranslate"><span class="pre">script.py</span></code> in the following). The script can be tested at any
+moment in a terminal on condition that the conda environment in which you installed
+<code class="docutils literal notranslate"><span class="pre">nemaktis</span></code> is activated (<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">[environment</span> <span class="pre">name]</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="p">[</span><span class="n">path</span> <span class="n">to</span> <span class="n">your</span> <span class="n">script</span><span class="p">]</span>
+<span class="n">python</span> <span class="n">script</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Alternatively, you can work interactively with ipython (which must be run from a terminal in
+which the conda environment for <code class="docutils literal notranslate"><span class="pre">nemaktis</span></code> is activated).</p>
+<div class="section" id="defining-a-directorfield">
+<span id="nfield"></span><h2>Defining a DirectorField<a class="headerlink" href="#defining-a-directorfield" title="Permalink to this headline">¶</a></h2>
+<p>Before starting using <code class="docutils literal notranslate"><span class="pre">nemaktis</span></code>, we of course need to import the associated python package.
+We will also import numpy, which will be needed to define arrays:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nemaktis</span> <span class="kn">as</span> <span class="nn">nm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<p>Next, we need to define a director field. In <code class="docutils literal notranslate"><span class="pre">nemaktis</span></code>, any vector field is represented
+internally on a cartesian regular mesh as a numpy array of shape <code class="docutils literal notranslate"><span class="pre">(Nz,Ny,Nx,Nv)</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">Nv</span></code> is the dimension of the vector data (3 for a director field, 6 for a symmétric tensor)
+and <code class="docutils literal notranslate"><span class="pre">Nx</span></code>, <code class="docutils literal notranslate"><span class="pre">Ny</span></code> and <code class="docutils literal notranslate"><span class="pre">Nz</span></code> are the number of mesh points in each spatial direction. In
+addition to these variables, one needs to specify the total lengths of the mesh in each spatial
+direction, which we will call <code class="docutils literal notranslate"><span class="pre">Lx</span></code>, <code class="docutils literal notranslate"><span class="pre">Ly</span></code> and <code class="docutils literal notranslate"><span class="pre">Lz</span></code> in the following. All lengths are
+in micrometer in <code class="docutils literal notranslate"><span class="pre">nemaktis</span></code>, and the mesh for the director field is always centerered on the
+origin (which means that the spatial coordinate <code class="docutils literal notranslate"><span class="pre">u=x,y,z</span></code> is always running from <code class="docutils literal notranslate"><span class="pre">-Lu/2</span></code>
+to <code class="docutils literal notranslate"><span class="pre">Lu/2</span></code>).</p>
+<p>Here, we will start by defining an empty director field object on a mesh of dimensions <code class="docutils literal notranslate"><span class="pre">80x80x80</span></code>
+and lengths <code class="docutils literal notranslate"><span class="pre">10x10x10</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">DirectorField</span><span class="p">(</span>
+    <span class="n">mesh_lengths</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">mesh_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="mi">80</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Next, we need to specify numerical values for the director field. Two methods are possible:
+either you already have a numpy array containing the values of your director field, in which
+case you can directly give this array to the <code class="docutils literal notranslate"><span class="pre">DirectorField</span></code> object (remember, you need to
+make sure that this array is of shape <code class="docutils literal notranslate"><span class="pre">(Nz,Ny,Nx,3)</span></code>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">my_director_vals_numpy_array</span>
+</pre></div>
+</div>
+<p>Or you have an analytical formula for the director field, in which case you can define three
+python functions and give these to the <code class="docutils literal notranslate"><span class="pre">DirectorField</span></code> object. In this tutorial, we will
+assume the latter option and define the director field of a double twist cylinder:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">20</span>
+<span class="k">def</span> <span class="nf">nx</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">q</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">q</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ny</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">q</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">q</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">nz</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">q</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+<span class="n">nfield</span><span class="o">.</span><span class="n">init_from_funcs</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nz</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the analytical formula for the director components do not give a normalized director values,
+you can still normalize manually the director values after importing them:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Finally, you can apply geometric transformation to the director field with the methods
+<code class="docutils literal notranslate"><span class="pre">rotate_90deg</span></code>, <code class="docutils literal notranslate"><span class="pre">rotate_180deg</span></code> and <code class="docutils literal notranslate"><span class="pre">extend</span></code>,
+as well as specify a non-trivial domain for the LC phase with the method <code class="docutils literal notranslate"><span class="pre">set_mask</span></code>.
+All these methods are documented in the API section of this wiki. Here, we will simply
+demonstrate the capabilities of the <code class="docutils literal notranslate"><span class="pre">DirectorField</span></code> object by applying a 90° rotation around
+the axis <code class="docutils literal notranslate"><span class="pre">x</span></code>, extending the mesh in the <code class="docutils literal notranslate"><span class="pre">xy</span></code> plane with a scale factor of 2, and defining a
+droplet mask centered on the mesh with a diameter equal to the mesh height:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span><span class="o">.</span><span class="n">rotate_90deg</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">nfield</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">nfield</span><span class="o">.</span><span class="n">set_mask</span><span class="p">(</span><span class="n">mask_type</span><span class="o">=</span><span class="s2">&quot;droplet&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that extending the mesh in the xy direction is essential if you define a non-trivial
+LC mask, because you need to leave enough room for the optical fields to propagate around the LC
+domain.</p>
+<p>And that’s it! If you want to save this director file to a XML VTK file (the standard format
+used by the excellent visualisation software <a class="reference external" href="https://www.paraview.org/">Paraview</a>), you can
+add the following command to your script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span><span class="o">.</span><span class="n">save_to_vti</span><span class="p">(</span><span class="s2">&quot;double_twist_droplet&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can import back the generated file in any script by directly constructing the DirectorField
+object with the path to this file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">DirectorField</span><span class="p">(</span><span class="n">vti_file</span><span class="o">=</span><span class="s2">&quot;double_twist_droplet.vti&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This functionality is especially useful if generating the director field values takes a lot of
+time.</p>
+</div>
+<div class="section" id="defining-a-lcmaterial">
+<span id="lcmat"></span><h2>Defining a LCMaterial<a class="headerlink" href="#defining-a-lcmaterial" title="Permalink to this headline">¶</a></h2>
+<p>The next step is to define possible isotropic layers above the LC layer (which can distort the
+optical fields on the focal plane), as well as the refractive indices of all the materials in the
+sampe. Since our system here consists of a droplet embedded in another fluid, we need to specify
+both extraordinay and ordinary indices for the LC droplet and the refractive index of the host
+fluid. All these informations are stored in the class LCMaterial:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mat</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">LCMaterial</span><span class="p">(</span>
+    <span class="n">director_field</span><span class="o">=</span><span class="n">nfield</span><span class="p">,</span> <span class="n">ne</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">no</span><span class="o">=</span><span class="mf">1.7</span><span class="p">,</span> <span class="n">nhost</span><span class="o">=</span><span class="mf">1.55</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that you can also specify refractive indices with a string expression depending on the
+wavelength variable “lambda”, in case you want to take into account the dispersivity of the
+materials of you sample.</p>
+<p>We also want to add a glass plate above the sample and additional space for the host fluid
+between the droplet and the glass plate:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mat</span><span class="o">.</span><span class="n">add_isotropic_layer</span><span class="p">(</span><span class="n">nlayer</span><span class="o">=</span><span class="mf">1.55</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># 5 µm space between the droplet and glass plate</span>
+<span class="n">mat</span><span class="o">.</span><span class="n">add_isotropic_layer</span><span class="p">(</span><span class="n">nlayer</span><span class="o">=</span><span class="mf">1.51</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="c1"># 1mm-thick glass plate</span>
+</pre></div>
+</div>
+<p>We don’t specify isotropic layers below the sample because the high-level interface only support
+input optical fields propagating in the <code class="docutils literal notranslate"><span class="pre">z</span></code> direction (in which case the amplitude of the
+fields is uniformly affected by any isotropic layers orthogonal to <code class="docutils literal notranslate"><span class="pre">z</span></code>). This may change in
+the future, since the backend <code class="docutils literal notranslate"><span class="pre">dtmm</span></code> does support multiple plane-wave source as in a real
+Köhler illumination setup.</p>
+</div>
+<div class="section" id="propagating-optical-fields-through-the-sample">
+<span id="prop"></span><h2>Propagating optical fields through the sample<a class="headerlink" href="#propagating-optical-fields-through-the-sample" title="Permalink to this headline">¶</a></h2>
+<p>Now that the sample geometry is fully caracterized, we can propagate fields through the sample
+and back to the central focal plane. This is simple as defining an array of wavelengths defining
+the spectrum extent of the light source, creating a <code class="docutils literal notranslate"><span class="pre">LightPropagator</span></code> object, and calling the
+method <code class="docutils literal notranslate"><span class="pre">propagate_field</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">LightPropagator</span><span class="p">(</span>
+    <span class="n">material</span><span class="o">=</span><span class="n">mat</span><span class="p">,</span> <span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">numerical_aperture</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="n">output_fields</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">propagate_fields</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;bpm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The numerical aperture defined in this code snippet corresponds to the one of the microscope
+objective. The <code class="docutils literal notranslate"><span class="pre">propagate_fields</span></code> method uses the specified backend to propagate fields (here,
+<code class="docutils literal notranslate"><span class="pre">bpm-solver</span></code>) and returns an <code class="docutils literal notranslate"><span class="pre">OpticalFields</span></code> object containing the results of the simulation.
+Periodic boundary conditions in the <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> directions are always assumed, so you should
+always extend apropriately your director field in order to have a uniform field near the mesh
+boundaries.</p>
+<p>Note that internally two simulations are run, one with an input light source polarised along
+<code class="docutils literal notranslate"><span class="pre">x</span></code> and the other with an input light source polarised along <code class="docutils literal notranslate"><span class="pre">y</span></code>. This allows us to
+fully caracterize the transmission matrix of the sample and reconstruct any type of micrographs
+(bright field, crossed polariser…), as we will see in the next section.</p>
+<p>Similaryly to the <code class="docutils literal notranslate"><span class="pre">DirectorField</span></code> object, you can save the output fields to a XML VTK file, and
+reimport them in other scripts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you want to save the simulation results</span>
+<span class="n">output_fields</span><span class="o">.</span><span class="n">save_to_vti</span><span class="p">(</span><span class="s2">&quot;optical_fields&quot;</span><span class="p">)</span>
+
+<span class="c1"># If you want to reimport saved simulation results</span>
+<span class="n">output_fields</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">OpticalFields</span><span class="p">(</span><span class="n">vti_file</span><span class="o">=</span><span class="s2">&quot;optical_fields.vti&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualising-optical-micrographs">
+<span id="viz"></span><h2>Visualising optical micrographs<a class="headerlink" href="#visualising-optical-micrographs" title="Permalink to this headline">¶</a></h2>
+<p>To help the user visualise optical micrographs as in a real microscope, <code class="docutils literal notranslate"><span class="pre">nemaktis</span></code> includes
+a graphical user interface allowing to generate any type of micrograph in real-time. Once
+you have generated/imported optical fields in you script, you can start using this interface
+with the following lines of code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">FieldViewer</span><span class="p">(</span><span class="n">output_fields</span><span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>All parameters in this user interface should be pretty self-explanatory. We will simply mention
+here that the quarter and half wavelengths compensators are assumed to be achromatic, while the
+full-wave “tint sensitive” compensator is aproximated with a slab of wavelength-independent
+refractive index with a full-wave shift only at a wavelength of 540 nm.</p>
+<p>Concerning color management, we assume a D65 light source and project the output light spectrum
+first on the XYZ space, then on the sRGB color space, to finally obtain a usual RGB picture.
+For more details, see <a class="reference external" href="https://dtmm.readthedocs.io/en/latest/tutorial.html#color-conversion">https://dtmm.readthedocs.io/en/latest/tutorial.html#color-conversion</a>.</p>
+<p>Finally, refocalisation of the optical micrographs is done by switching to Fourrier space and
+using the exact propagator for the Helmholtz equation in free space.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nemaktis</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">High-level python interface</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#defining-a-directorfield">Defining a DirectorField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#defining-a-lcmaterial">Defining a LCMaterial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#propagating-optical-fields-through-the-sample">Propagating optical fields through the sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualising-optical-micrographs">Visualising optical micrographs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to Nemaktis’s documentation!</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Guilhem Poy, Andrej Petelin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/high_level/tutorial.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
