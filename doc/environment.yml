@@ -1,0 +1,8 @@
+name: build 
+channels:
+    - anaconda
+    - conda-forge
+    - warthan07
+    - nodefaults
+dependencies:
+    - nemaktis
