@@ -6,3 +6,4 @@ channels:
     - nodefaults
 dependencies:
     - nemaktis
+    - sphinx
