@@ -1,36 +1,164 @@
 
-<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>Tutorial &#8212; Nemaktis 1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; Nemaktis 1.0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API Reference" href="api.html" />
-    <link rel="prev" title="Welcome to Nemaktis’s documentation!" href="../index.html" />
+    <link rel="prev" title="Welcome to Nemaktis’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="../index.html" class="icon icon-home"> Nemaktis
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">High-level python interface</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#defining-a-directorfield">Defining a DirectorField</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#defining-a-lcmaterial">Defining a LCMaterial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#propagating-optical-fields-through-the-sample">Propagating optical fields through the sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualising-optical-micrographs">Visualising optical micrographs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Backends</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../backends/rtm.html">Ray-tracing backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends/bpm.html">Beam propagation backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends/dtmm.html">Diffractive transfer matrix backend</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Nemaktis</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/high_level/tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="tutorial">
 <span id="id1"></span><h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
@@ -66,7 +194,7 @@ in micrometer in <code class="docutils literal notranslate"><span class="pre">ne
 origin (which means that the spatial coordinate <code class="docutils literal notranslate"><span class="pre">u=x,y,z</span></code> is always running from <code class="docutils literal notranslate"><span class="pre">-Lu/2</span></code>
 to <code class="docutils literal notranslate"><span class="pre">Lu/2</span></code>).</p>
 <p>Here, we will start by defining an empty
-<a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField" title="nemaktis.lc_material.DirectorField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code></a> object on a mesh of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code> object on a mesh of
 dimensions <code class="docutils literal notranslate"><span class="pre">80x80x80</span></code> and lengths <code class="docutils literal notranslate"><span class="pre">10x10x10</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">DirectorField</span><span class="p">(</span>
     <span class="n">mesh_lengths</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">mesh_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="mi">80</span><span class="p">))</span>
@@ -75,13 +203,13 @@ dimensions <code class="docutils literal notranslate"><span class="pre">80x80x80
 <p>Next, we need to specify numerical values for the director field. Two methods are possible:
 either you already have a numpy array containing the values of your director field, in which
 case you can directly give this array to the
-<a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField" title="nemaktis.lc_material.DirectorField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code></a> object (remember, you need
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code> object (remember, you need
 to make sure that this array is of shape <code class="docutils literal notranslate"><span class="pre">(Nz,Ny,Nx,3)</span></code>):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfield</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">my_director_vals_numpy_array</span>
 </pre></div>
 </div>
 <p>Or you have an analytical formula for the director field, in which case you can define three
-python functions and give these to the <a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField" title="nemaktis.lc_material.DirectorField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code></a> object. In
+python functions and give these to the <code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code> object. In
 this tutorial, we will assume the latter option and define the director field of a double
 twist cylinder:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">20</span>
@@ -103,11 +231,11 @@ you can still normalize manually the director values after importing them:</p>
 </pre></div>
 </div>
 <p>Finally, you can apply geometric transformation to the director field with the methods
-<a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField.rotate_90deg" title="nemaktis.lc_material.DirectorField.rotate_90deg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rotate_90deg()</span></code></a>,
-<a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField.rotate_180deg" title="nemaktis.lc_material.DirectorField.rotate_180deg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rotate_180deg()</span></code></a>,
-<a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField.extend" title="nemaktis.lc_material.DirectorField.extend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">extend()</span></code></a>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">rotate_90deg()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">rotate_180deg()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">extend()</span></code>,
 as well as specify a non-trivial domain for the LC phase with the method
-<a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField.set_mask" title="nemaktis.lc_material.DirectorField.set_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_mask()</span></code></a>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">set_mask()</span></code>,
 All these methods are documented in the API section of this wiki. Here, we will simply
 demonstrate the capabilities of the director field object by applying a 90° rotation around
 the axis <code class="docutils literal notranslate"><span class="pre">x</span></code>, extending the mesh in the <code class="docutils literal notranslate"><span class="pre">xy</span></code> plane with a scale factor of 2, and defining a
@@ -140,7 +268,7 @@ time.</p>
 optical fields on the focal plane), as well as the refractive indices of all the materials in the
 sampe. Since our system here consists of a droplet embedded in another fluid, we need to specify
 both extraordinay and ordinary indices for the LC droplet and the refractive index of the host
-fluid. All these informations are stored in the class <a class="reference internal" href="api.html#nemaktis.lc_material.LCMaterial" title="nemaktis.lc_material.LCMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">LCMaterial</span></code></a>:</p>
+fluid. All these informations are stored in the class <code class="xref py py-class docutils literal notranslate"><span class="pre">LCMaterial</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mat</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">LCMaterial</span><span class="p">(</span>
     <span class="n">director_field</span><span class="o">=</span><span class="n">nfield</span><span class="p">,</span> <span class="n">ne</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">no</span><span class="o">=</span><span class="mf">1.7</span><span class="p">,</span> <span class="n">nhost</span><span class="o">=</span><span class="mf">1.55</span><span class="p">)</span>
 </pre></div>
@@ -165,8 +293,8 @@ Köhler illumination setup.</p>
 <p>Now that the sample geometry is fully caracterized, we can propagate fields through the sample
 and back to the central focal plane. This is simple as defining an array of wavelengths defining
 the spectrum extent of the light source, creating a
-<a class="reference internal" href="api.html#nemaktis.light_propagator.LightPropagator" title="nemaktis.light_propagator.LightPropagator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightPropagator</span></code></a> object, and calling the method
-<a class="reference internal" href="api.html#nemaktis.light_propagator.LightPropagator.propagate_fields" title="nemaktis.light_propagator.LightPropagator.propagate_fields"><code class="xref py py-class docutils literal notranslate"><span class="pre">propagate_fields</span></code></a>:</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">LightPropagator</span></code> object, and calling the method
+<code class="xref py py-class docutils literal notranslate"><span class="pre">propagate_fields</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
 <span class="n">sim</span> <span class="o">=</span> <span class="n">nm</span><span class="o">.</span><span class="n">LightPropagator</span><span class="p">(</span>
     <span class="n">material</span><span class="o">=</span><span class="n">mat</span><span class="p">,</span> <span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">numerical_aperture</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
@@ -174,9 +302,9 @@ the spectrum extent of the light source, creating a
 </pre></div>
 </div>
 <p>The numerical aperture defined in this code snippet corresponds to the one of the microscope
-objective. The <a class="reference internal" href="api.html#nemaktis.light_propagator.LightPropagator.propagate_fields" title="nemaktis.light_propagator.LightPropagator.propagate_fields"><code class="xref py py-class docutils literal notranslate"><span class="pre">propagate_fields</span></code></a> method uses
+objective. The <code class="xref py py-class docutils literal notranslate"><span class="pre">propagate_fields</span></code> method uses
 the specified backend to propagate fields (here, <code class="docutils literal notranslate"><span class="pre">bpm-solver</span></code>) and returns an
-<a class="reference internal" href="api.html#nemaktis.light_propagator.OpticalFields" title="nemaktis.light_propagator.OpticalFields"><code class="xref py py-class docutils literal notranslate"><span class="pre">OpticalFields</span></code></a> object containing the results of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OpticalFields</span></code> object containing the results of the
 simulation.  Periodic boundary conditions in the <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> directions are always
 assumed, so you should always extend apropriately your director field in order to have a
 uniform field near the mesh boundaries.</p>
@@ -184,7 +312,7 @@ uniform field near the mesh boundaries.</p>
 source polarised along <code class="docutils literal notranslate"><span class="pre">x</span></code> and the other with an input light source polarised along <code class="docutils literal notranslate"><span class="pre">y</span></code>.
 This allows us to fully caracterize the transmission matrix of the sample and reconstruct any
 type of micrographs (bright field, crossed polariser…), as we will see in the next section.</p>
-<p>Similaryly to the <a class="reference internal" href="api.html#nemaktis.lc_material.DirectorField" title="nemaktis.lc_material.DirectorField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code></a> object, you can save the output
+<p>Similaryly to the <code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code> object, you can save the output
 fields to a XML VTK file, and reimport them in other scripts:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you want to save the simulation results</span>
 <span class="n">output_fields</span><span class="o">.</span><span class="n">save_to_vti</span><span class="p">(</span><span class="s2">&quot;optical_fields&quot;</span><span class="p">)</span>
@@ -217,85 +345,52 @@ using the exact propagator for the Helmholtz equation in free space.</p>
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">Nemaktis</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">High-level python interface</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#defining-a-directorfield">Defining a DirectorField</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#defining-a-lcmaterial">Defining a LCMaterial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#propagating-optical-fields-through-the-sample">Propagating optical fields through the sample</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#visualising-optical-micrographs">Visualising optical micrographs</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Backends</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../backends/rtm.html">Ray-tracing backend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../backends/bpm.html">Beam propagation backend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../backends/dtmm.html">Diffractive transfer matrix backend</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to Nemaktis’s documentation!</a></li>
-      <li>Next: <a href="api.html" title="next chapter">API Reference</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to Nemaktis’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Guilhem Poy, Andrej Petelin
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Guilhem Poy, Andrej Petelin.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../_sources/high_level/tutorial.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>
