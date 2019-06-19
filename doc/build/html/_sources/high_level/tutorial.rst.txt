@@ -43,8 +43,9 @@ in micrometer in ``nemaktis``, and the mesh for the director field is always cen
 origin (which means that the spatial coordinate ``u=x,y,z`` is always running from ``-Lu/2``
 to ``Lu/2``).
 
-Here, we will start by defining an empty director field object on a mesh of dimensions ``80x80x80``
-and lengths ``10x10x10``:
+Here, we will start by defining an empty
+:class:`~nemaktis.lc_material.DirectorField` object on a mesh of
+dimensions ``80x80x80`` and lengths ``10x10x10``:
 
 .. code-block:: python
 
@@ -53,16 +54,18 @@ and lengths ``10x10x10``:
 
 Next, we need to specify numerical values for the director field. Two methods are possible:
 either you already have a numpy array containing the values of your director field, in which
-case you can directly give this array to the ``DirectorField`` object (remember, you need to
-make sure that this array is of shape ``(Nz,Ny,Nx,3)``):
+case you can directly give this array to the
+:class:`~nemaktis.lc_material.DirectorField` object (remember, you need
+to make sure that this array is of shape ``(Nz,Ny,Nx,3)``):
 
 .. code-block:: python
 
     nfield.vals = my_director_vals_numpy_array
 
 Or you have an analytical formula for the director field, in which case you can define three
-python functions and give these to the ``DirectorField`` object. In this tutorial, we will
-assume the latter option and define the director field of a double twist cylinder:
+python functions and give these to the :class:`~nemaktis.lc_material.DirectorField` object. In
+this tutorial, we will assume the latter option and define the director field of a double
+twist cylinder:
 
 .. code-block:: python
 
@@ -86,10 +89,13 @@ you can still normalize manually the director values after importing them:
     nfield.normalize()
 
 Finally, you can apply geometric transformation to the director field with the methods
-``rotate_90deg``, ``rotate_180deg`` and ``extend``,
-as well as specify a non-trivial domain for the LC phase with the method ``set_mask``.
+:meth:`~nemaktis.lc_material.DirectorField.rotate_90deg`,
+:meth:`~nemaktis.lc_material.DirectorField.rotate_180deg`,
+:meth:`~nemaktis.lc_material.DirectorField.extend`,
+as well as specify a non-trivial domain for the LC phase with the method
+:meth:`~nemaktis.lc_material.DirectorField.set_mask`,
 All these methods are documented in the API section of this wiki. Here, we will simply
-demonstrate the capabilities of the ``DirectorField`` object by applying a 90° rotation around
+demonstrate the capabilities of the director field object by applying a 90° rotation around
 the axis ``x``, extending the mesh in the ``xy`` plane with a scale factor of 2, and defining a
 droplet mask centered on the mesh with a diameter equal to the mesh height:
 
@@ -133,7 +139,7 @@ The next step is to define possible isotropic layers above the LC layer (which c
 optical fields on the focal plane), as well as the refractive indices of all the materials in the
 sampe. Since our system here consists of a droplet embedded in another fluid, we need to specify
 both extraordinay and ordinary indices for the LC droplet and the refractive index of the host
-fluid. All these informations are stored in the class LCMaterial:
+fluid. All these informations are stored in the class :class:`~nemaktis.lc_material.LCMaterial`:
 
 .. code-block:: python
 
@@ -165,8 +171,9 @@ Propagating optical fields through the sample
 
 Now that the sample geometry is fully caracterized, we can propagate fields through the sample
 and back to the central focal plane. This is simple as defining an array of wavelengths defining
-the spectrum extent of the light source, creating a ``LightPropagator`` object, and calling the 
-method ``propagate_field``:
+the spectrum extent of the light source, creating a
+:class:`~nemaktis.light_propagator.LightPropagator` object, and calling the method
+:class:`~nemaktis.light_propagator.LightPropagator.propagate_fields`:
 
 .. code-block:: python
 
@@ -176,19 +183,20 @@ method ``propagate_field``:
     output_fields = sim.propagate_fields(method="bpm")
 
 The numerical aperture defined in this code snippet corresponds to the one of the microscope
-objective. The ``propagate_fields`` method uses the specified backend to propagate fields (here,
-``bpm-solver``) and returns an ``OpticalFields`` object containing the results of the simulation.
-Periodic boundary conditions in the ``x`` and ``y`` directions are always assumed, so you should
-always extend apropriately your director field in order to have a uniform field near the mesh
-boundaries.
+objective. The :class:`~nemaktis.light_propagator.LightPropagator.propagate_fields` method uses
+the specified backend to propagate fields (here, ``bpm-solver``) and returns an
+:class:`~nemaktis.light_propagator.OpticalFields` object containing the results of the
+simulation.  Periodic boundary conditions in the ``x`` and ``y`` directions are always
+assumed, so you should always extend apropriately your director field in order to have a
+uniform field near the mesh boundaries.
 
-Note that internally two simulations are run, one with an input light source polarised along
-``x`` and the other with an input light source polarised along ``y``. This allows us to
-fully caracterize the transmission matrix of the sample and reconstruct any type of micrographs
-(bright field, crossed polariser...), as we will see in the next section.
+Note that internally two simulations are run for each wavelength, one with an input light
+source polarised along ``x`` and the other with an input light source polarised along ``y``.
+This allows us to fully caracterize the transmission matrix of the sample and reconstruct any
+type of micrographs (bright field, crossed polariser...), as we will see in the next section.
 
-Similaryly to the ``DirectorField`` object, you can save the output fields to a XML VTK file, and
-reimport them in other scripts:
+Similaryly to the :class:`~nemaktis.lc_material.DirectorField` object, you can save the output
+fields to a XML VTK file, and reimport them in other scripts:
 
 .. code-block:: python
 

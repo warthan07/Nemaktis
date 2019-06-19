@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ray-tracing backend &#8212; Nemaktis 1.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Beam propagation backend" href="bpm.html" />
+    <link rel="prev" title="API Reference" href="../high_level/api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="ray-tracing-backend">
+<h1>Ray-tracing backend<a class="headerlink" href="#ray-tracing-backend" title="Permalink to this headline">¶</a></h1>
+<p>The executable of the ray tracing backend is named <code class="docutils literal notranslate"><span class="pre">rt-solver</span></code> and
+can be called in any terminal with the conda environment for nemaktis
+activated.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rt-solver</span></code> relies on json-like configuration file, so you don’t have
+to touch to any C++ code if you just want to use the method. To generate
+a default configuration file, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rt</span><span class="o">-</span><span class="n">solver</span> <span class="o">-</span><span class="n">c</span> <span class="p">[</span><span class="n">Name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">configuration</span> <span class="n">file</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>All parameters in this configuration file are fully documented, so you
+should be able to understand how to make the code working just by
+reading and ajusting the parameters in this file. More information on
+the subtleties of this code will be added later on this wiki, for now we
+will just mention that the input vti file for the director field can be
+created directly with the high-level interface (see
+<a class="reference internal" href="../high_level/api.html#nemaktis.lc_material.DirectorField" title="nemaktis.lc_material.DirectorField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorField</span></code></a>).</p>
+<p>Once you are satisfied with the change you made to your configuration
+file, you can actually run the code by typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rt</span><span class="o">-</span><span class="n">solver</span> <span class="o">-</span><span class="n">x</span> <span class="p">[</span><span class="n">Name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">configuration</span> <span class="n">file</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nemaktis</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">High-level python interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../high_level/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../high_level/api.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Backends</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ray-tracing backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bpm.html">Beam propagation backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dtmm.html">Diffractive transfer matrix backend</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../high_level/api.html" title="previous chapter">API Reference</a></li>
+      <li>Next: <a href="bpm.html" title="next chapter">Beam propagation backend</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Guilhem Poy, Andrej Petelin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/backends/rtm.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

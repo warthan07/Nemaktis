@@ -6,9 +6,10 @@
 Welcome to Nemaktis's documentation!
 ====================================
 
+.. _high_level:
+
 .. toctree::
     :maxdepth: 2
-    :hidden:
     :glob:
     :caption: High-level python interface
 
@@ -22,15 +23,6 @@ Welcome to Nemaktis's documentation!
     :glob:
     :caption: Backends
 
-    backends/rtm/*
-    backends/bpm/*
-    backends/dtmm/*
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    backends/rtm.rst
+    backends/bpm.rst
+    backends/dtmm.rst

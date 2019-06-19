@@ -21,6 +21,27 @@ simplefilter(action='ignore', category=FutureWarning)
 
 
 class LightPropagator:
+    """The LightPropagator class allows to propagate optical fields through a LC sample.
+    The simulation and choice of backend is done by calling the method ``propagate_field``. 
+    For each wavelength specified at construction, two simulations are done: one with a light
+    source polarised along x, and one with a light source polarised along y. This allows us to
+    fully caracterize the transmission of the LC sample and reconstruct any kind of optical
+    micrograph.
+
+    Currently, we only support single plane-wave source with input fields propagating along
+    ``z``. If you want to take into account input numerical aperture effect, you need to use
+    the ``dtmm`` backend directly (this may change in a future version). However, we do
+    support numerical aperture effect due to the microscope objective (i.e. on the output
+    side).
+
+    Parameters
+    ----------
+    material : :class:`~nemaktis.lc_material.LCMaterial` object
+    wavelengths : array-like object
+        An array containing all the wavelengths of the spectrum for the light source.
+    numerical_aperture : float
+        Sets the numerical aperture for the microscope objective.
+    """
     def __init__(self, *, material, wavelengths, numerical_aperture):
         if not isinstance(material, LCMaterial):
             raise TypeError("material should be a LCMaterial object")
@@ -34,6 +55,21 @@ class LightPropagator:
         return self._material
 
     def propagate_fields(self, *, method, bulk_filename=None):
+        """Propagate optical fields through the LC sample using the specified backend.
+
+        Parameters
+        ----------
+        method : "bpm" | "dtmm"
+            If equal to "bpm", the beam propagation backend will be used. Should be used
+            if accuracy is priviliged over speed.
+
+            If equal to "dtmm", the diffractive transfer matrix backend will be used. Should
+            be used if speed is priviliged over accuracy.
+        bulk_filename : None or string
+            If none, the backend will not export the bulk value of the optical fields in the
+            LC layer.  Else, the bulk fields values will be exported to a vti file whose
+            basename is set by this parameter.
+        """
         if method=="bpm":
             return self._bpm_propagation(bulk_filename)
         elif method=="dtmm":
@@ -186,26 +222,38 @@ class LightPropagator:
 
 
 class OpticalFields:
-    def __init__(self, **kwargs):
-        """Initialize an OpticalFields object given either a wavelength array and
-        the lengths and dimensions of the 2D mesh for the transverse fields or a
-        path to a vti file containing previously calculated optical fields and
-        mesh details.
+    """The OpticalFields object stores the mesh information of the transverse mesh (plane mesh
+    orthogonal to the z-direction, default altitude of 0) and the optical fields values on
+    this mesh.  Since this python package is mainly used to reconstruct micrographs, we only
+    store internally the complex horizontal electric field for two simulation: one with a
+    light source polarised along ``x``, and the other with a light source polarised along
+    ``y``.  In case multiple wavelengths were used in the simulation, we store these
+    quantities separately for each wavelength.
+
+    This class is initialised given either a wavelength array and the lengths and dimensions
+    of the 2D mesh for the transverse fields or a path to a vti file containing previously
+    calculated optical fields and mesh details.
     
-        In the first version of this constructor, the actual values of the
-        transverse fields needs to be provided later using the raw setter method
-        fields_vals (shape (N_wavelengths,4,Ny,Nx)).
+    In the first version of this constructor:
 
-        In the second version of this constructor, the values of the
-        wavelengths and transverse fields are automatically assigned from the
-        vti file.
+    .. code-block:: python
+    
+        optical_fields = OpticalFields(
+            wavelengths=[l0,l1,...,lN], mesh_lengths=(Lx,Ly), mesh_dimensions=(Nx,Ny))
 
-        Examples
-        --------
-        optical_fields = OpticalFields(wavelengths=..., mesh_lengths=(Lx,Ly), mesh_dimensions=(Nx,Ny))
+    the actual values of the transverse fields needs to be provided later using the raw
+    setter method fields_vals (shape (N_wavelengths,4,Ny,Nx)).
+
+    In the second version of this constructor:
+
+    .. code-block:: python
+    
         optical_fields = OpticalFields(vti_file="path to vti file")
-    
-        """
+
+    the values of the wavelengths and transverse fields are automatically assigned from the
+    vti file.
+    """
+    def __init__(self, **kwargs):
         if len(kwargs)==1:
             if not os.path.isfile(kwargs["vti_file"]):
                 raise Exception("VTI file does not exists")
@@ -318,6 +366,17 @@ class OpticalFields:
 
     @property
     def vals(self):
+        """Numpy array for the optical fields values, of shape (N_wavelengths,4,Ny,Nx).
+
+        If you want to initialize by hand the optical fields, the four components in the
+        second dimension correspond to:
+        
+        * complex Ex field for an input polarisation//x
+        * complex Ey field for an input polarisation//x
+        * complex Ex field for an input polarisation//y
+        * complex Ey field for an input polarisation//y
+
+        """
         return self._vals
 
 
@@ -335,6 +394,9 @@ class OpticalFields:
 
 
     def propagate(self, new_z):
+        """Propagate the optical fields to a new transverse plane at altitude ``new_z``
+        by switching to Fourier space and using the exact propagator for the Helmholtz
+        equation in free space."""
         filt = self._propag_filter**np.abs(new_z-self._z)
         filt = np.conj(filt) if new_z<self._z else filt
 
@@ -345,10 +407,10 @@ class OpticalFields:
 
 
     def save_to_vti(self, filename):
-        """Save the optical field into a vti file
+        """Save the optical fields into a vti file.
 
-        The ".vti" extension is automatically appended, no need to include it
-        in the filename parameter
+        The ".vti" extension is automatically appended, no need to include it in the filename
+        parameter (but in case you do only one extension will be added)
         """
         if filename[-4:]==".vti":
             path = filename
@@ -387,7 +449,7 @@ class OpticalFields:
         writer.Write()
 
 
-    def get_pos(ix, iy):
+    def get_pos(self, ix, iy):
         """Returns the position associated with the mesh indices (ix,iy)
 
         It is assumed that the mesh is centered on the origin (0,0).

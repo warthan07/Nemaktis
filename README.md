@@ -17,13 +17,16 @@ The three backends implemented in ``nemaktis`` correspond to:
    of ordinary and extraordinary rays (therefore being limited to uniaxial media). This module
    allows to propagate rays through any media with a sufficiently regular orientational field (i.e.
    with *C1* regularity). Optical fields can be reconstructed along rays or interpolated on a
-   regular mesh using an advanced homotopy continuation algorithm. 
+   regular mesh using an advanced homotopy continuation algorithm. The main advantage of this
+   scheme is the ability to access ray trajectories.
 
 2. ``bpm-solver``, a beam propagation C++ code which simply propagates optical fields through any
    birefringent layers (no limitation on the regularity of the orientational field, although
    accurate results are expected only when the orientational fields vary over lengths greater than
    a few wavelengths). This module relies on a novel operator-splitting scheme and accurate
    expressions of the operators for the beam walk-off, anisotropic diffraction, and phase evolution.
+   The main advantage of this scheme is its accuracy (2-5\% of relative error in comparison
+   to a full resolution of Maxwell equations in a system with paraxial propagation).
 
 3. ``dtmm``, a diffractive transfer matrix python code which offer similar functionalities as
    ``bpm-solver`` but relies on a less accurate scheme (the diffraction is assumed to be isotropic,

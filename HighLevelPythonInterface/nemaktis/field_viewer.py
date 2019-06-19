@@ -17,7 +17,7 @@ class FieldViewer:
 
     Parameters
     ----------
-    optical_fields : OpticalFields object
+    optical_fields : :class:`~nemaktis.light_propagator.OpticalFields` object
         Can be created either by a LightPropagator or directly by importing a vti file
         exported in a previous simulation.
     cmf : numpy ndarray
@@ -76,7 +76,9 @@ class FieldViewer:
             self._cmf = cmf
 
     def plot(self):
-        """Run the graphical user interface for real-time visualisation of micrographs"""
+        """Run a graphical user interface allowing to dynamically adjust
+        the attributes of this class and visualize the associated
+        micrographs in real-time."""
 
         print("{ Running field viewer graphical interface }")
         mpl.rcParams["toolbar"] = "None"
@@ -192,7 +194,7 @@ class FieldViewer:
 
     def get_image(self):
         """Returns the current micrograph as a numpy array of shape (Ny,Nx,3|1),
-        (last dim=3 if in color mode, 1 if in grayscale mode)."""
+        (last dim is 3 if in color mode, 1 if in grayscale mode)."""
         return np.flip(np.tile(self._image,(self.n_tiles_y,self.n_tiles_x,1)), axis=0)
 
 
