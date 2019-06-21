@@ -61,10 +61,10 @@ class LightPropagator:
         ----------
         method : "bpm" | "dtmm"
             If equal to "bpm", the beam propagation backend will be used. Should be used
-            if accuracy is priviliged over speed.
+            if accuracy is privileged over speed.
 
             If equal to "dtmm", the diffractive transfer matrix backend will be used. Should
-            be used if speed is priviliged over accuracy.
+            be used if speed is privileged over accuracy.
         bulk_filename : None or string
             If none, the backend will not export the bulk value of the optical fields in the
             LC layer.  Else, the bulk fields values will be exported to a vti file whose
