@@ -6,5 +6,5 @@ channels:
     - nodefaults
 dependencies:
     - nemaktis
-    - sphinx
+    - sphinx=1.7.5
     - sphinx_rtd_theme
