@@ -13,7 +13,7 @@
 
 import sys, os
 sys.path.insert(0, os.path.abspath("../../HighLevelPythonInterface/"))
-import nemaktis
+#  import nemaktis
 
 # -- Project information -----------------------------------------------------
 
@@ -57,5 +57,6 @@ pygments_style = 'sphinx'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
-autodoc_mock_imports = ['sip', 'PyQt5', 'PyQt5.QtGui', 'PyQt5.QtCore', 'PyQt5.QtWidgets', 'PyQt4', 'PyQt4.QtGui', 'PyQt4.QtCore', 'PyQt4.QtWidgets']
+autodoc_mock_imports = ['dtmm', 'matplotlib', 'scipy', 'numpy',
+        'vtk', 'bpm_backend', 'pyfftw']
     

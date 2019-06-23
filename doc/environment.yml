@@ -2,9 +2,10 @@ name: build
 channels:
     - anaconda
     - conda-forge
-    - warthan07
     - nodefaults
 dependencies:
-    - nemaktis
     - sphinx=1.7.5
     - sphinx_rtd_theme
+    - traits
+    - traitsui
+    - matplotlib
