@@ -145,9 +145,7 @@ but periodic boundary conditions are always assumed in the high-level interface;
 supports Köhler illumination setup, while in the high-level interface, only input beams with a
 single propagation direction are supported. If you want to use such advanced features, you will
 have to learn how to use directly the backends. The documentation of the backends is available
-in a dedicated section of the nemaktis wiki:
-
-<https://nemaktis.readthedocs.io/en/latest/backends>
+in a dedicated section of the nemaktis wiki (link above).
 
 
 ## License

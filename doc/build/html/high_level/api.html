@@ -188,128 +188,6 @@ specified in micrometer.</p>
 <p>the values of the director field and the details of the mesh are
 automatically assigned from the vti file.</p>
 <dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.delete_mask">
-<code class="sig-name descname">delete_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.delete_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete the current LC mask.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.extend">
-<code class="sig-name descname">extend</code><span class="sig-paren">(</span><em class="sig-param">scale_x</em>, <em class="sig-param">scale_y</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extend the computational mesh in the <code class="docutils literal notranslate"><span class="pre">xy</span></code> plane by padding new points near the <code class="docutils literal notranslate"><span class="pre">x</span></code>
-and <code class="docutils literal notranslate"><span class="pre">y</span></code> boundaries. These new points are initialized with the edge value of the
-director field on the <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> boundaries.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scale_x</strong> (<em>float</em>) – The mesh length in the x-direction will be scaled by this factor.</p></li>
-<li><p><strong>scale_y</strong> (<em>float</em>) – The mesh length in the y-direction will be scaled by this factor.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.get_mesh_dimensions">
-<code class="sig-name descname">get_mesh_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_mesh_dimensions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the dimensions (Nx,Ny,Nz) of the simulation mesh</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.get_mesh_lengths">
-<code class="sig-name descname">get_mesh_lengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_mesh_lengths" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the lengths (Lx,Ly,Lz) of the simulation mesh</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.get_mesh_spacings">
-<code class="sig-name descname">get_mesh_spacings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_mesh_spacings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the spacings (dx,dy,dz) of the simulation mesh</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.get_n_vertices">
-<code class="sig-name descname">get_n_vertices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_n_vertices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the number of vertices in the simulation mesh</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.get_pos">
-<code class="sig-name descname">get_pos</code><span class="sig-paren">(</span><em class="sig-param">ix</em>, <em class="sig-param">iy</em>, <em class="sig-param">iz</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the spatial position associated with the mesh indices (ix,iy,iz)</p>
-<p>It is assumed that the mesh is centered on the origin (0,0,0).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.init_from_funcs">
-<code class="sig-name descname">init_from_funcs</code><span class="sig-paren">(</span><em class="sig-param">nx_func</em>, <em class="sig-param">ny_func</em>, <em class="sig-param">nz_func</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.init_from_funcs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the director field from three functions for each of its component. The
-functions must depends on the space variables <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">z</span></code>. We recall that
-the mesh is centered on the origin.</p>
-<p>If the given function are numpy-vectorizable, this function should be pretty fast. If
-not, a warning will be printed and the given function will be vectorized with the
-numpy method <code class="docutils literal notranslate"><span class="pre">vectorize</span></code> (in which case you should expect a much slower execution
-time).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.mask_formula">
-<em class="property">property </em><code class="sig-name descname">mask_formula</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.mask_formula" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the LC mask formula if it was set, else returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.mask_type">
-<em class="property">property </em><code class="sig-name descname">mask_type</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.mask_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the mask type: “droplet”, “formula” or “raw”.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.mask_vals">
-<em class="property">property </em><code class="sig-name descname">mask_vals</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.mask_vals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the LC mask boolean array.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.normalize">
-<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalize the director field values to 1.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.rotate_180deg">
-<code class="sig-name descname">rotate_180deg</code><span class="sig-paren">(</span><em class="sig-param">axis</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.rotate_180deg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rotate the director field by 180 degrees around the specified axis.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>axis</strong> (<em>str</em>) – Axis around which to perform the rotation. Need to be under the form ‘A’ where
-‘A’=’x’, ‘y’ or ‘z’ defines the rotation axis.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.rotate_90deg">
-<code class="sig-name descname">rotate_90deg</code><span class="sig-paren">(</span><em class="sig-param">axis</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.rotate_90deg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rotate the director field by 90 degrees around the specified axis.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>axis</strong> (<em>str</em>) – Axis around which to perform the rotation. Need to be under the form ‘[s]A’ where
-the optional parameter ‘s’=’+’ or ‘-‘ decribes the sign of rotation and ‘A’=’x’,
-‘y’ or ‘z’ defines the rotation axis.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.lc_material.DirectorField.save_to_vti">
-<code class="sig-name descname">save_to_vti</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.save_to_vti" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the director field into a vti file.</p>
-<p>The “.vti” extension is automatically appended, no need to include it in the filename
-parameter (but in case you do only one extension will be added)</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="nemaktis.lc_material.DirectorField.set_mask">
 <code class="sig-name descname">set_mask</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">mask_type</em>, <em class="sig-param">mask_formula=None</em>, <em class="sig-param">mask_ndarray=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.set_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set a boolean mask for the LC domain. This method allows to specifify complex shape
@@ -335,9 +213,131 @@ else False:</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.delete_mask">
+<code class="sig-name descname">delete_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.delete_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the current LC mask.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.mask_type">
+<em class="property">property </em><code class="sig-name descname">mask_type</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.mask_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mask type: “droplet”, “formula” or “raw”.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.mask_formula">
+<em class="property">property </em><code class="sig-name descname">mask_formula</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.mask_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the LC mask formula if it was set, else returns None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.mask_vals">
+<em class="property">property </em><code class="sig-name descname">mask_vals</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.mask_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the LC mask boolean array.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.extend">
+<code class="sig-name descname">extend</code><span class="sig-paren">(</span><em class="sig-param">scale_x</em>, <em class="sig-param">scale_y</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend the computational mesh in the <code class="docutils literal notranslate"><span class="pre">xy</span></code> plane by padding new points near the <code class="docutils literal notranslate"><span class="pre">x</span></code>
+and <code class="docutils literal notranslate"><span class="pre">y</span></code> boundaries. These new points are initialized with the edge value of the
+director field on the <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> boundaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scale_x</strong> (<em>float</em>) – The mesh length in the x-direction will be scaled by this factor.</p></li>
+<li><p><strong>scale_y</strong> (<em>float</em>) – The mesh length in the y-direction will be scaled by this factor.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.rotate_90deg">
+<code class="sig-name descname">rotate_90deg</code><span class="sig-paren">(</span><em class="sig-param">axis</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.rotate_90deg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the director field by 90 degrees around the specified axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>axis</strong> (<em>str</em>) – Axis around which to perform the rotation. Need to be under the form ‘[s]A’ where
+the optional parameter ‘s’=’+’ or ‘-‘ decribes the sign of rotation and ‘A’=’x’,
+‘y’ or ‘z’ defines the rotation axis.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.rotate_180deg">
+<code class="sig-name descname">rotate_180deg</code><span class="sig-paren">(</span><em class="sig-param">axis</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.rotate_180deg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the director field by 180 degrees around the specified axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>axis</strong> (<em>str</em>) – Axis around which to perform the rotation. Need to be under the form ‘A’ where
+‘A’=’x’, ‘y’ or ‘z’ defines the rotation axis.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="nemaktis.lc_material.DirectorField.vals">
 <em class="property">property </em><code class="sig-name descname">vals</code><a class="headerlink" href="#nemaktis.lc_material.DirectorField.vals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Numpy array for the director values, of shape (Nz,Ny,Nx,3).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.init_from_funcs">
+<code class="sig-name descname">init_from_funcs</code><span class="sig-paren">(</span><em class="sig-param">nx_func</em>, <em class="sig-param">ny_func</em>, <em class="sig-param">nz_func</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.init_from_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the director field from three functions for each of its component. The
+functions must depends on the space variables <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">z</span></code>. We recall that
+the mesh is centered on the origin.</p>
+<p>If the given function are numpy-vectorizable, this function should be pretty fast. If
+not, a warning will be printed and the given function will be vectorized with the
+numpy method <code class="docutils literal notranslate"><span class="pre">vectorize</span></code> (in which case you should expect a much slower execution
+time).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.normalize">
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize the director field values to 1.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.save_to_vti">
+<code class="sig-name descname">save_to_vti</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.save_to_vti" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the director field into a vti file.</p>
+<p>The “.vti” extension is automatically appended, no need to include it in the filename
+parameter (but in case you do only one extension will be added)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.get_pos">
+<code class="sig-name descname">get_pos</code><span class="sig-paren">(</span><em class="sig-param">ix</em>, <em class="sig-param">iy</em>, <em class="sig-param">iz</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the spatial position associated with the mesh indices (ix,iy,iz)</p>
+<p>It is assumed that the mesh is centered on the origin (0,0,0).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.get_mesh_dimensions">
+<code class="sig-name descname">get_mesh_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_mesh_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensions (Nx,Ny,Nz) of the simulation mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.get_mesh_lengths">
+<code class="sig-name descname">get_mesh_lengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_mesh_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lengths (Lx,Ly,Lz) of the simulation mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.get_mesh_spacings">
+<code class="sig-name descname">get_mesh_spacings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_mesh_spacings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the spacings (dx,dy,dz) of the simulation mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.lc_material.DirectorField.get_n_vertices">
+<code class="sig-name descname">get_n_vertices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.lc_material.DirectorField.get_n_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of vertices in the simulation mesh</p>
 </dd></dl>
 
 </dd></dl>
@@ -470,6 +470,49 @@ vti file.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="nemaktis.light_propagator.OpticalFields.vals">
+<em class="property">property </em><code class="sig-name descname">vals</code><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numpy array for the optical fields values, of shape (N_wavelengths,4,Ny,Nx).</p>
+<p>If you want to initialize by hand the optical fields, the four components in the
+second dimension correspond to:</p>
+<ul class="simple">
+<li><p>complex Ex field for an input polarisation//x</p></li>
+<li><p>complex Ey field for an input polarisation//x</p></li>
+<li><p>complex Ex field for an input polarisation//y</p></li>
+<li><p>complex Ey field for an input polarisation//y</p></li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.light_propagator.OpticalFields.propagate">
+<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param">new_z</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.propagate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate the optical fields to a new transverse plane at altitude <code class="docutils literal notranslate"><span class="pre">new_z</span></code>
+by switching to Fourier space and using the exact propagator for the Helmholtz
+equation in free space.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.light_propagator.OpticalFields.save_to_vti">
+<code class="sig-name descname">save_to_vti</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.save_to_vti" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the optical fields into a vti file.</p>
+<p>The “.vti” extension is automatically appended, no need to include it in the filename
+parameter (but in case you do only one extension will be added)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.light_propagator.OpticalFields.get_pos">
+<code class="sig-name descname">get_pos</code><span class="sig-paren">(</span><em class="sig-param">ix</em>, <em class="sig-param">iy</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.get_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the position associated with the mesh indices (ix,iy)</p>
+<p>It is assumed that the mesh is centered on the origin (0,0).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nemaktis.light_propagator.OpticalFields.get_wavelengths">
+<code class="sig-name descname">get_wavelengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.get_wavelengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the wavelength array</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="nemaktis.light_propagator.OpticalFields.get_mesh_dimensions">
 <code class="sig-name descname">get_mesh_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.get_mesh_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the dimensions (Nx,Ny) of the transverse mesh</p>
@@ -493,49 +536,6 @@ vti file.</p>
 <dd><p>Returns the number of vertices in the transverse mesh</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="nemaktis.light_propagator.OpticalFields.get_pos">
-<code class="sig-name descname">get_pos</code><span class="sig-paren">(</span><em class="sig-param">ix</em>, <em class="sig-param">iy</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.get_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the position associated with the mesh indices (ix,iy)</p>
-<p>It is assumed that the mesh is centered on the origin (0,0).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.light_propagator.OpticalFields.get_wavelengths">
-<code class="sig-name descname">get_wavelengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.get_wavelengths" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the wavelength array</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.light_propagator.OpticalFields.propagate">
-<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param">new_z</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.propagate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Propagate the optical fields to a new transverse plane at altitude <code class="docutils literal notranslate"><span class="pre">new_z</span></code>
-by switching to Fourier space and using the exact propagator for the Helmholtz
-equation in free space.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.light_propagator.OpticalFields.save_to_vti">
-<code class="sig-name descname">save_to_vti</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.save_to_vti" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the optical fields into a vti file.</p>
-<p>The “.vti” extension is automatically appended, no need to include it in the filename
-parameter (but in case you do only one extension will be added)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.light_propagator.OpticalFields.vals">
-<em class="property">property </em><code class="sig-name descname">vals</code><a class="headerlink" href="#nemaktis.light_propagator.OpticalFields.vals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Numpy array for the optical fields values, of shape (N_wavelengths,4,Ny,Nx).</p>
-<p>If you want to initialize by hand the optical fields, the four components in the
-second dimension correspond to:</p>
-<ul class="simple">
-<li><p>complex Ex field for an input polarisation//x</p></li>
-<li><p>complex Ey field for an input polarisation//x</p></li>
-<li><p>complex Ex field for an input polarisation//y</p></li>
-<li><p>complex Ey field for an input polarisation//y</p></li>
-</ul>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -557,15 +557,15 @@ see <a class="reference external" href="https://dtmm.readthedocs.io/en/latest/re
 </dd>
 </dl>
 <dl class="attribute">
-<dt id="nemaktis.field_viewer.FieldViewer.analyser">
-<code class="sig-name descname">analyser</code><em class="property"> = True</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.analyser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Is there an analyser in the optical setup?</p>
+<dt id="nemaktis.field_viewer.FieldViewer.polariser">
+<code class="sig-name descname">polariser</code><em class="property"> = True</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.polariser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there a polariser in the optical setup?</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="nemaktis.field_viewer.FieldViewer.analyser_angle">
-<code class="sig-name descname">analyser_angle</code><em class="property"> = 90</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.analyser_angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Angle (in degree) between the privileged axis of the analyser and the x-axis</p>
+<dt id="nemaktis.field_viewer.FieldViewer.analyser">
+<code class="sig-name descname">analyser</code><em class="property"> = True</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.analyser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there an analyser in the optical setup?</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -581,28 +581,21 @@ compensator:</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.polariser_angle">
+<code class="sig-name descname">polariser_angle</code><em class="property"> = 0</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.polariser_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angle (in degree) between the privileged axis of the polariser and the x-axis</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.analyser_angle">
+<code class="sig-name descname">analyser_angle</code><em class="property"> = 90</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.analyser_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angle (in degree) between the privileged axis of the analyser and the x-axis</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="nemaktis.field_viewer.FieldViewer.compensator_angle">
 <code class="sig-name descname">compensator_angle</code><em class="property"> = 0</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.compensator_angle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Angle (in degree) between the fast axis of the compensator and the x-axis</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.field_viewer.FieldViewer.get_image">
-<code class="sig-name descname">get_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.get_image" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the current micrograph as a numpy array of shape (Ny,Nx,3|1),
-(last dim is 3 if in color mode, 1 if in grayscale mode).</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="nemaktis.field_viewer.FieldViewer.grayscale">
-<code class="sig-name descname">grayscale</code><em class="property"> = False</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.grayscale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Should we calculate a grayscale micrograph (True) or a color micrograph (False)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="nemaktis.field_viewer.FieldViewer.intensity">
-<code class="sig-name descname">intensity</code><em class="property"> = 1</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.intensity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Intensity factor of the micrograph</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -617,6 +610,18 @@ compensator:</p>
 <dd><p>Number of repetitions of the micrograph in the y-direction</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.grayscale">
+<code class="sig-name descname">grayscale</code><em class="property"> = False</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.grayscale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should we calculate a grayscale micrograph (True) or a color micrograph (False)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nemaktis.field_viewer.FieldViewer.intensity">
+<code class="sig-name descname">intensity</code><em class="property"> = 1</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intensity factor of the micrograph</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="nemaktis.field_viewer.FieldViewer.plot">
 <code class="sig-name descname">plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.plot" title="Permalink to this definition">¶</a></dt>
@@ -625,28 +630,23 @@ the attributes of this class and visualize the associated
 micrographs in real-time.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="nemaktis.field_viewer.FieldViewer.polariser">
-<code class="sig-name descname">polariser</code><em class="property"> = True</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.polariser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Is there a polariser in the optical setup?</p>
+<dl class="method">
+<dt id="nemaktis.field_viewer.FieldViewer.z_focus">
+<em class="property">property </em><code class="sig-name descname">z_focus</code><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.z_focus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current vertical position of the focal plane</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="nemaktis.field_viewer.FieldViewer.polariser_angle">
-<code class="sig-name descname">polariser_angle</code><em class="property"> = 0</em><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.polariser_angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Angle (in degree) between the privileged axis of the polariser and the x-axis</p>
+<dl class="method">
+<dt id="nemaktis.field_viewer.FieldViewer.get_image">
+<code class="sig-name descname">get_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.get_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current micrograph as a numpy array of shape (Ny,Nx,3|1),
+(last dim is 3 if in color mode, 1 if in grayscale mode).</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="nemaktis.field_viewer.FieldViewer.update_image">
 <code class="sig-name descname">update_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.update_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recompute the micrograph from the optical fields data</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="nemaktis.field_viewer.FieldViewer.z_focus">
-<em class="property">property </em><code class="sig-name descname">z_focus</code><a class="headerlink" href="#nemaktis.field_viewer.FieldViewer.z_focus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Current vertical position of the focal plane</p>
 </dd></dl>
 
 </dd></dl>

@@ -33,15 +33,23 @@ We will also import numpy, which will be needed to define arrays:
     import nemaktis as nm
     import numpy as np
 
-Next, we need to define a director field. In ``nemaktis``, any vector field is represented
-internally on a cartesian regular mesh as a numpy array of shape ``(Nz,Ny,Nx,Nv)``, where
-``Nv`` is the dimension of the vector data (3 for a director field, 6 for a symmétric tensor)
-and ``Nx``, ``Ny`` and ``Nz`` are the number of mesh points in each spatial direction. In
-addition to these variables, one needs to specify the total lengths of the mesh in each spatial
-direction, which we will call ``Lx``, ``Ly`` and ``Lz`` in the following. All lengths are
-in micrometer in ``nemaktis``, and the mesh for the director field is always centerered on the
-origin (which means that the spatial coordinate ``u=x,y,z`` is always running from ``-Lu/2``
-to ``Lu/2``).
+Next, we need to define the permittivity tensor of the LC structure.
+Currently, only uniaxial media is supported in the high-level interface
+(which means we only need to specify the director field associated with
+the privileged axis of the birefringence medium), but support for
+arbitrary permittivity tensor should be added soon (the low-level
+backends ``dtmm`` and ``bpm-solver`` are already fully compatible with
+biaxial media). In ``nemaktis``, any vector field is represented
+internally on a cartesian regular mesh as a numpy array of shape
+``(Nz,Ny,Nx,Nv)``, where ``Nv`` is the dimension of the vector data (3
+for a director field, 6 for a symmetric tensor) and ``Nx``, ``Ny`` and
+``Nz`` are the number of mesh points in each spatial direction. In
+addition to these variables, one needs to specify the total lengths of
+the mesh in each spatial direction, which we will call ``Lx``, ``Ly``
+and ``Lz`` in the following. All lengths are in micrometer in
+``nemaktis``, and the mesh for the director field is always centerered
+on the origin (which means that the spatial coordinate ``u=x,y,z`` are
+always running from ``-Lu/2`` to ``Lu/2``).
 
 Here, we will start by defining an empty
 :class:`~nemaktis.lc_material.DirectorField` object on a mesh of
@@ -52,11 +60,12 @@ dimensions ``80x80x80`` and lengths ``10x10x10``:
     nfield = nm.DirectorField(
         mesh_lengths=(10,10,10), mesh_dimensions=(80,80,80))
 
-Next, we need to specify numerical values for the director field. Two methods are possible:
-either you already have a numpy array containing the values of your director field, in which
-case you can directly give this array to the
-:class:`~nemaktis.lc_material.DirectorField` object (remember, you need
-to make sure that this array is of shape ``(Nz,Ny,Nx,3)``):
+Next, we need to specify numerical values for the director field. Two
+methods are possible: either you already have a numpy array containing
+the values of your director field, in which case you can directly give
+this array to the :class:`~nemaktis.lc_material.DirectorField` object
+(remember, you need to make sure that this array is of shape
+``(Nz,Ny,Nx,3)``):
 
 .. code-block:: python
 
@@ -81,7 +90,7 @@ twist cylinder:
         return np.cos(q*r)
     nfield.init_from_funcs(nx,ny,nz)
 
-If the analytical formula for the director components do not give a normalized director values,
+If the analytical formula for the director components do not give normalized director values,
 you can still normalize manually the director values after importing them:
 
 .. code-block:: python
@@ -109,9 +118,12 @@ Note that extending the mesh in the xy direction is essential if you define a no
 LC mask, because you need to leave enough room for the optical fields to propagate around the LC
 domain.
 
-And that's it! If you want to save this director file to a XML VTK file (the standard format
-used by the excellent visualisation software `Paraview <https://www.paraview.org/>`_), you can
-add the following command to your script:
+And that's it, we now have set-up the director field of a double-twist
+droplet with the polar axis oriented along the axis ``y``! If you want
+to save this director file to a XML VTK file (the standard format used
+by the excellent visualisation software `Paraview
+<https://www.paraview.org/>`_), you can add the following command to
+your script:
 
 .. code-block:: python
 
@@ -137,7 +149,7 @@ Defining a LCMaterial
 
 The next step is to define possible isotropic layers above the LC layer (which can distort the
 optical fields on the focal plane), as well as the refractive indices of all the materials in the
-sampe. Since our system here consists of a droplet embedded in another fluid, we need to specify
+sample. Since our system here consists of a droplet embedded in another fluid, we need to specify
 both extraordinay and ordinary indices for the LC droplet and the refractive index of the host
 fluid. All these informations are stored in the class :class:`~nemaktis.lc_material.LCMaterial`:
 
@@ -148,7 +160,7 @@ fluid. All these informations are stored in the class :class:`~nemaktis.lc_mater
 
 Note that you can also specify refractive indices with a string expression depending on the
 wavelength variable "lambda", in case you want to take into account the dispersivity of the
-materials of you sample. 
+materials of your sample. 
 
 We also want to add a glass plate above the sample and additional space for the host fluid
 between the droplet and the glass plate:
@@ -161,7 +173,7 @@ between the droplet and the glass plate:
 We don't specify isotropic layers below the sample because the high-level interface only support
 input optical fields propagating in the ``z`` direction (in which case the amplitude of the
 fields is uniformly affected by any isotropic layers orthogonal to ``z``). This may change in
-the future, since the backend ``dtmm`` does support multiple plane-wave source as in a real
+the future, since the backend ``dtmm`` does support multiple plane-waves source as in a real
 Köhler illumination setup.
 
 .. _prop:
@@ -171,7 +183,7 @@ Propagating optical fields through the sample
 
 Now that the sample geometry is fully caracterized, we can propagate fields through the sample
 and back to the central focal plane. This is simple as defining an array of wavelengths defining
-the spectrum extent of the light source, creating a
+the spectrum of the light source, creating a
 :class:`~nemaktis.light_propagator.LightPropagator` object, and calling the method
 :class:`~nemaktis.light_propagator.LightPropagator.propagate_fields`:
 
@@ -186,7 +198,7 @@ The numerical aperture defined in this code snippet corresponds to the one of th
 objective. The :class:`~nemaktis.light_propagator.LightPropagator.propagate_fields` method uses
 the specified backend to propagate fields (here, ``bpm-solver``) and returns an
 :class:`~nemaktis.light_propagator.OpticalFields` object containing the results of the
-simulation.  Periodic boundary conditions in the ``x`` and ``y`` directions are always
+simulation.  Periodic boundary conditions in the ``x`` and ``y`` directions are systematically
 assumed, so you should always extend apropriately your director field in order to have a
 uniform field near the mesh boundaries.
 
@@ -223,13 +235,15 @@ with the following lines of code:
     viewer.plot()
 
 All parameters in this user interface should be pretty self-explanatory. We will simply mention
-here that the quarter and half wavelengths compensators are assumed to be achromatic, while the
-full-wave "tint sensitive" compensator is aproximated with a slab of wavelength-independent
-refractive index with a full-wave shift only at a wavelength of 540 nm.
+here that the quarter-wavelength and half-wavelength compensators are
+assumed to be achromatic, while the full-wave "tint sensitive"
+compensator is aproximated with a slab of wavelength-independent
+refractive index with a full-wave shift at a wavelength of 540 nm.
 
 Concerning color management, we assume a D65 light source and project the output light spectrum
 first on the XYZ space, then on the sRGB color space, to finally obtain a usual RGB picture. 
 For more details, see `<https://dtmm.readthedocs.io/en/latest/tutorial.html#color-conversion>`_.
 
 Finally, refocalisation of the optical micrographs is done by switching to Fourrier space and
-using the exact propagator for the Helmholtz equation in free space.
+using the exact propagator for the Helmholtz equation in free space. The
+unit for the ``z-focus`` parameter is again micrometers.

@@ -122,4 +122,5 @@ html_static_path = []
 
 autodoc_mock_imports = ['pyface', 'dtmm', 'matplotlib', 'scipy', 'numpy',
         'vtk', 'bpm_backend', 'pyfftw']
+autodoc_member_order = 'bysource'
     
