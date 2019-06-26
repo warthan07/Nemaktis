@@ -6,8 +6,8 @@ import matplotlib as mpl
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
-from traits.api import *
-from traitsui.api import *
+from traits.api import HasTraits, Enum, Float, Bool, Int, Str, Directory, Instance
+from traitsui.api import View, Item, Spring, Group, Button, RangeEditor, EnumEditor
 from traitsui.qt4.editor import Editor
 from traitsui.qt4.basic_editor_factory import BasicEditorFactory
 
@@ -142,7 +142,7 @@ class MicroscopeSettings(HasTraits):
 
 
 class TextDisplay(HasTraits):
-    string =  String()
+    string =  Str()
     view= View(Item("string", show_label=False, springy=True, style="readonly"))
 
 
