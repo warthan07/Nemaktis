@@ -120,6 +120,6 @@ pygments_style = 'sphinx'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
-autodoc_mock_imports = ['dtmm', 'matplotlib', 'scipy', 'numpy',
+autodoc_mock_imports = ['pyface', 'dtmm', 'matplotlib', 'scipy', 'numpy',
         'vtk', 'bpm_backend', 'pyfftw']
     
