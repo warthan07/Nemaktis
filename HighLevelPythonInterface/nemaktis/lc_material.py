@@ -23,7 +23,7 @@ class LCMaterial(object):
     nhost : optional, float or math string depending on the wavelength variable "lambda" (µm)
         The refractive index associated with an eventual host fluid in which the LC domain
         is embedded (see DirectorField.set_mask).
-    nhost : optional, float or math string depending on the wavelength variable "lambda" (µm)
+    nin : optional, float or math string depending on the wavelength variable "lambda" (µm)
         The refractive index associated with the input medium below the LC layer. 
         A default value of 1 is assumed.
     """
