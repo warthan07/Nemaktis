@@ -39,8 +39,8 @@ std::complex<double> BaseADIOperator::d_ovr_dX(
 	unsigned int ix1, ix2;
 
 	if(periodic_x) {
-		ix1 = (ix!=0) ? ix-1 : Nx-1;
-		ix2 = (ix!=Nx-1) ? ix+1 : 0;
+		ix1 = (ix!=0) ? ix-1 : Nx-2;
+		ix2 = (ix!=Nx-1) ? ix+1 : 1;
 		return
 			( src({ix2,iy,0},comp) - src({ix1,iy,0},comp) ) / (2*delta_X);
 	}
@@ -61,8 +61,8 @@ std::complex<double> BaseADIOperator::d_ovr_dY(
 	unsigned int iy1, iy2;
 
 	if(periodic_y) {
-		iy1 = (iy!=0) ? iy-1 : Ny-1; 	
-		iy2 = (iy!=Ny-1) ? iy+1 : 0;
+		iy1 = (iy!=0) ? iy-1 : Ny-2; 	
+		iy2 = (iy!=Ny-1) ? iy+1 : 1;
 
 		return
 			( src({ix,iy2,0},comp) - src({ix,iy1,0},comp) ) / (2*delta_Y);
@@ -84,8 +84,8 @@ std::complex<double> BaseADIOperator::d2_ovr_dX2(
 	unsigned int ix1, ix2, ix3;
 
 	if(periodic_x) {
-		ix1 = (ix!=0) ? ix-1 : Nx-1;
-		ix3 = (ix!=Nx-1) ? ix+1 : 0;
+		ix1 = (ix!=0) ? ix-1 : Nx-2;
+		ix3 = (ix!=Nx-1) ? ix+1 : 1;
 
 		return 
 			( src({ix1,iy,0},comp) - 2*src({ix,iy,0},comp) + src({ix3,iy,0},comp) )
@@ -109,8 +109,8 @@ std::complex<double> BaseADIOperator::d2_ovr_dY2(
 	unsigned int iy1, iy2, iy3;
 
 	if(periodic_y) {
-		iy1 = (iy!=0) ? iy-1 : Ny-1; 	
-		iy3 = (iy!=Ny-1) ? iy+1 : 0;
+		iy1 = (iy!=0) ? iy-1 : Ny-2; 	
+		iy3 = (iy!=Ny-1) ? iy+1 : 1;
 
 		return 
 			( src({ix,iy1,0},comp) - 2*src({ix,iy,0},comp) + src({ix,iy3,0},comp) )
@@ -134,8 +134,8 @@ std::complex<double> BaseADIOperator::d2_ovr_dXdY(
 	unsigned int ix1, ix2, iy1, iy2;
 	double dX, dY;
 	if(periodic_x) {
-		ix1 = (ix!=0) ? ix-1 : Nx-1;
-		ix2 = (ix!=Nx-1) ? ix+1 : 0;
+		ix1 = (ix!=0) ? ix-1 : Nx-2;
+		ix2 = (ix!=Nx-1) ? ix+1 : 1;
 		dX = 2*delta_X;
 	}
 	else {
@@ -146,8 +146,8 @@ std::complex<double> BaseADIOperator::d2_ovr_dXdY(
 	}
 
 	if(periodic_x) {
-		iy1 = (iy!=0) ? iy-1 : Ny-1; 	
-		iy2 = (iy!=Ny-1) ? iy+1 : 0;
+		iy1 = (iy!=0) ? iy-1 : Ny-2; 	
+		iy2 = (iy!=Ny-1) ? iy+1 : 1;
 		dY = 2*delta_Y;
 	}
 	else {

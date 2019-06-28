@@ -103,6 +103,7 @@ class LightPropagator:
                     "no":                                 str(self._material.no),
                     "ne":                                 str(self._material.ne),
                     "nhost":                              str(self._material.nhost),
+                    "nin":                                str(self._material.nin),
                     "Wavelengths":                        self._wavelengths }},
             "Postprocessor settings": {
                 "Bulk output": {
@@ -143,26 +144,42 @@ class LightPropagator:
         spacings = director_field.get_mesh_spacings()
 
         if np.abs(spacings[0]-spacings[1])>1e-6:
-            raise Exception("dtmm supports only uniform spacings in the XY plane.")
+            # 2D simulation with an artificial spacings along the normal
+            if spacings[0]==0:
+                spacings[0] = spacings[1] 
+            elif spacings[1]==0:
+                spacings[1] = spacings[0] 
+            else:
+                raise Exception("dtmm supports only uniform spacings in the XY plane.")
 
         if isinstance(self._material.ne, str):
-            print("Warning: dtmm does not support dispersive index; Using ne(0.6µm) instead")
+            if "lambda" in self._material.ne:
+                print("Warning: dtmm does not support dispersive index; Using ne(0.6µm) instead")
             l = 0.6
             ne = eval(self._material.ne.replace("lambda","l").replace("^","**"))
         else:
             ne = self._material.ne
         if isinstance(self._material.no, str):
-            print("Warning: dtmm does not support dispersive index; Using no(0.6µm) instead")
+            if "lambda" in self._material.no:
+                print("Warning: dtmm does not support dispersive index; Using no(0.6µm) instead")
             l = 0.6
             no = eval(self._material.no.replace("lambda","l").replace("^","**"))
         else:
             no = self._material.no
         if isinstance(self._material.nhost, str):
-            print("Warning: dtmm does not support dispersive index; Using nhost(0.6µm) instead")
+            if "lambda" in self._material.nhost:
+                print("Warning: dtmm does not support dispersive index; Using nhost(0.6µm) instead")
             l = 0.6
             nhost = eval(self._material.nhost.replace("lambda","l").replace("^","**"))
         else:
             nhost = self._material.nhost
+        if isinstance(self._material.nhost, str):
+            if "lambda" in self._material.nin:
+                print("Warning: dtmm does not support dispersive index; Using nin(0.6µm) instead")
+            l = 0.6
+            nin = eval(self._material.nin.replace("lambda","l").replace("^","**"))
+        else:
+            nin = self._material.nin
 
         if len(self._material.iso_layer_indices)!=0:
             print("Warning: specified isotropic layers will be ignored since this feature is "+
@@ -176,9 +193,9 @@ class LightPropagator:
 
         wavelengths = 1000*np.array(self._wavelengths)
         field_data_in = dtmm.illumination_data(
-            (dims[1],dims[0]), wavelengths, pixelsize = 1000*spacings[0])
+            (dims[1],dims[0]), wavelengths, pixelsize = 1000*spacings[0], n = nin)
         field_data_out = dtmm.transfer_field(
-            field_data_in, optical_data,
+            field_data_in, optical_data, nin=nin,
             betamax=self._numerical_aperture,
             ret_bulk=bulk_filename is not None)[0]
         print("")
@@ -188,21 +205,29 @@ class LightPropagator:
             lengths = director_field.get_mesh_lengths()
 
             vti_data = vtkImageData()
-            vti_data.SetDimensions(dims[0], dims[1], dims[2]+2)
+            vti_data.SetDimensions(dims[0], dims[1], dims[2]+1)
             vti_data.SetOrigin(-lengths[0]/2, -lengths[1]/2, -lengths[2]/2)
-            vti_data.SetSpacing(spacings[0], spacings[1], spacings[2]*(dims[2]-1)/(dims[2]+1))
+            vti_data.SetSpacing(spacings[0], spacings[1], spacings[2]*(dims[2]-1)/dims[2])
 
             for i in range(0,len(wavelengths)):
-                transmissions = field_data_out[:,:,i,[0,2],:,:].transpose(
-                    (1,2,0,3,4)).reshape((4,dims[0]*dims[1]*(dims[2]+2))).transpose()
+                E_inputX = field_data_out[:-1,0,i,[0,2],:,:].transpose(
+                    (1,0,2,3)).reshape((2,dims[0]*dims[1]*(dims[2]+1))).transpose()
+                E_inputY = field_data_out[:-1,1,i,[0,2],:,:].transpose(
+                    (1,0,2,3)).reshape((2,dims[0]*dims[1]*(dims[2]+1))).transpose()
 
-                transmissions_real = vn.numpy_to_vtk(np.real(transmissions))
-                transmissions_real.SetName("transmissions_real_%sum" % wavelengths[i])
-                vti_data.GetPointData().AddArray(transmissions_real)
+                E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
+                E_real_inputX.SetName("E_real_inputX_%sum" % wavelengths[i])
+                vti_data.GetPointData().AddArray(E_real_inputX)
+                E_imag_inputX = vn.numpy_to_vtk(np.imag(E_inputX))
+                E_imag_inputX.SetName("E_imag_inputX_%sum" % wavelengths[i])
+                vti_data.GetPointData().AddArray(E_imag_inputX)
 
-                transmissions_imag = vn.numpy_to_vtk(np.imag(transmissions))
-                transmissions_imag.SetName("transmissions_imag_%sum" % wavelengths[i])
-                vti_data.GetPointData().AddArray(transmissions_imag)
+                E_real_inputY = vn.numpy_to_vtk(np.real(E_inputY))
+                E_real_inputY.SetName("E_real_inputY_%sum" % wavelengths[i])
+                vti_data.GetPointData().AddArray(E_real_inputY)
+                E_imag_inputY = vn.numpy_to_vtk(np.imag(E_inputY))
+                E_imag_inputY.SetName("E_imag_inputY_%sum" % wavelengths[i])
+                vti_data.GetPointData().AddArray(E_imag_inputY)
 
             writer = vtkXMLImageDataWriter()
             writer.SetFileName(bulk_filename+".vti")
@@ -210,7 +235,7 @@ class LightPropagator:
             writer.Write()
 
             # We only keep the last slice to compute micrographs
-            field_data_out = np.squeeze(field_data_out[-1,:,:,:,:,:])
+            field_data_out = field_data_out[-1,:,:,:,:,:]
 
         output_fields = OpticalFields(
             wavelengths = self._wavelengths,

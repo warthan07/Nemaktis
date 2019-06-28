@@ -34,13 +34,10 @@ void TriDiagonalADIOperatorX::vmult(
 		#pragma omp parallel for
 		for(unsigned int iy=0; iy<Ny; iy++) {
 			dst({0,iy,0},dst_comp) =
-				diag_inf(0,iy) * src({Nx-1,iy,0},src_comp) +
+				diag_inf(0,iy) * src({Nx-2,iy,0},src_comp) +
 				diag_mid(0,iy) * src({0,iy,0},src_comp) +
 				diag_sup(0,iy) * src({1,iy,0},src_comp);
-			dst({Nx-1,iy,0},dst_comp) =
-				diag_inf(Nx-1,iy) * src({Nx-2,iy,0},src_comp) +
-				diag_mid(Nx-1,iy) * src({Nx-1,iy,0},src_comp) +
-				diag_sup(Nx-1,iy) * src({0,iy,0},src_comp);
+			dst({Nx-1,iy,0},dst_comp) = dst({0,iy,0},dst_comp);
 			for(unsigned int ix=1; ix<Nx-1; ix++) {
 				dst({ix,iy,0},dst_comp) =
 					diag_inf(ix,iy) * src({ix-1,iy,0},src_comp) +
@@ -77,14 +74,14 @@ void TriDiagonalADIOperatorX::inverse_vmult(
 	if(periodic_x) {
 		#pragma omp parallel for
 		for(unsigned int iy=0; iy<Ny; iy++) {
-			std::vector<std::complex<double> > gamma(Nx-1);
-			std::vector<std::complex<double> > corr(Nx);
+			std::vector<std::complex<double> > gamma(Nx-2);
+			std::vector<std::complex<double> > corr(Nx-1);
 
 			std::complex<double> beta = 2.*diag_mid(0,iy);
 			dst({0,iy,0},dst_comp) = src({0,iy,0},src_comp) / beta;
 			corr[0] = -0.5;
 			
-			for(unsigned int ix=1; ix<Nx-1; ix++) {
+			for(unsigned int ix=1; ix<Nx-2; ix++) {
 				gamma[ix-1] = diag_sup(ix-1,iy) / beta;
 				beta = diag_mid(ix,iy) - diag_inf(ix,iy)*gamma[ix-1];
 
@@ -93,25 +90,26 @@ void TriDiagonalADIOperatorX::inverse_vmult(
 				corr[ix] = - diag_inf(ix,iy)*corr[ix-1] / beta;
 			}
 
-			gamma[Nx-2] = diag_sup(Nx-2,iy) / beta;
+			gamma[Nx-3] = diag_sup(Nx-3,iy) / beta;
 			beta =
-				diag_mid(Nx-1,iy) + diag_sup(Nx-1,iy)*diag_inf(0,iy)/diag_mid(0,iy)
-				- diag_inf(Nx-1,iy)*gamma[Nx-2];
+				diag_mid(Nx-2,iy) + diag_sup(Nx-2,iy)*diag_inf(0,iy)/diag_mid(0,iy)
+				- diag_inf(Nx-2,iy)*gamma[Nx-3];
 
-			dst({Nx-1,iy,0},dst_comp) =
-				( src({Nx-1,iy,0},src_comp) - diag_inf(Nx-1,iy)*dst({Nx-2,iy,0},dst_comp) ) / beta;
-			corr[Nx-1] = ( diag_sup(Nx-1,iy) - diag_inf(Nx-1,iy)*corr[Nx-2] ) / beta;
+			dst({Nx-2,iy,0},dst_comp) =
+				( src({Nx-2,iy,0},src_comp) - diag_inf(Nx-2,iy)*dst({Nx-3,iy,0},dst_comp) ) / beta;
+			corr[Nx-2] = ( diag_sup(Nx-2,iy) - diag_inf(Nx-2,iy)*corr[Nx-3] ) / beta;
 
-			for(unsigned int ix=Nx-1; ix>0; ix--) {
+			for(unsigned int ix=Nx-2; ix>0; ix--) {
 				dst({ix-1,iy,0},dst_comp) -= gamma[ix-1]*dst({ix,iy,0},dst_comp);
 				corr[ix-1] -= gamma[ix-1]*corr[ix];
 			}
 
 			std::complex<double> frac =
-				( dst({0,iy,0},dst_comp) - diag_inf(0,iy)/diag_mid(0,iy)*dst({Nx-1,iy,0},dst_comp) ) /
-				( 1 + corr[0] - diag_inf(0,iy)/diag_mid(0,iy)*corr[Nx-1] );
-			for(unsigned int ix=0; ix<Nx; ix++)
+				( dst({0,iy,0},dst_comp) - diag_inf(0,iy)/diag_mid(0,iy)*dst({Nx-2,iy,0},dst_comp) ) /
+				( 1 + corr[0] - diag_inf(0,iy)/diag_mid(0,iy)*corr[Nx-2] );
+			for(unsigned int ix=0; ix<Nx-1; ix++)
 				dst({ix,iy,0},dst_comp) -= frac*corr[ix];
+			dst({Nx-1,iy,0},dst_comp) = dst({0,iy,0},dst_comp);
 		}
 	}
 	else {
@@ -186,13 +184,10 @@ void TriDiagonalADIOperatorY::vmult(
 		#pragma omp parallel for
 		for(unsigned int ix=0; ix<Nx; ix++) {
 			dst({ix,0,0},dst_comp) =
-				diag_inf(ix,0) * src({ix,Ny-1,0},src_comp) +
+				diag_inf(ix,0) * src({ix,Ny-2,0},src_comp) +
 				diag_mid(ix,0) * src({ix,0,0},src_comp) +
 				diag_sup(ix,0) * src({ix,1,0},src_comp);
-			dst({ix,Ny-1,0},dst_comp) =
-				diag_inf(ix,Ny-1) * src({ix,Ny-2,0},src_comp) +
-				diag_mid(ix,Ny-1) * src({ix,Ny-1,0},src_comp) +
-				diag_sup(ix,Ny-1) * src({ix,0,0},src_comp);
+			dst({ix,Ny-1,0},dst_comp) = dst({ix,0,0},dst_comp);
 			for(unsigned int iy=1; iy<Ny-1; iy++) {
 				dst({ix,iy,0},dst_comp) =
 					diag_inf(ix, iy) * src({ix,iy-1,0},src_comp) +
@@ -229,14 +224,14 @@ void TriDiagonalADIOperatorY::inverse_vmult(
 	if(periodic_y) {
 		#pragma omp parallel for
 		for(unsigned int ix=0; ix<Nx; ix++) {
-			std::vector<std::complex<double> > gamma(Ny-1);
-			std::vector<std::complex<double> > corr(Ny);
+			std::vector<std::complex<double> > gamma(Ny-2);
+			std::vector<std::complex<double> > corr(Ny-1);
 
 			std::complex<double> beta = 2.*diag_mid(ix,0);
 			dst({ix,0,0},dst_comp) = src({ix,0,0},src_comp) / beta;
 			corr[0] = -0.5;
 			
-			for(unsigned int iy=1; iy<Ny-1; iy++) {
+			for(unsigned int iy=1; iy<Ny-2; iy++) {
 				gamma[iy-1] = diag_sup(ix,iy-1) / beta;
 				beta = diag_mid(ix,iy) - diag_inf(ix,iy)*gamma[iy-1];
 
@@ -245,25 +240,26 @@ void TriDiagonalADIOperatorY::inverse_vmult(
 				corr[iy] = - diag_inf(ix,iy)*corr[iy-1] / beta;
 			}
 
-			gamma[Ny-2] = diag_sup(ix,Ny-2) / beta;
+			gamma[Ny-3] = diag_sup(ix,Ny-3) / beta;
 			beta =
-				diag_mid(ix,Ny-1) + diag_sup(ix,Ny-1)*diag_inf(ix,0)/diag_mid(ix,0)
-				- diag_inf(ix,Ny-1)*gamma[Ny-2];
+				diag_mid(ix,Ny-2) + diag_sup(ix,Ny-2)*diag_inf(ix,0)/diag_mid(ix,0)
+				- diag_inf(ix,Ny-2)*gamma[Ny-3];
 
-			dst({ix,Ny-1,0},dst_comp) =
-				( src({ix,Ny-1,0},src_comp) - diag_inf(ix,Ny-1)*dst({ix,Ny-2,0},dst_comp) ) / beta;
-			corr[Ny-1] = ( diag_sup(ix,Ny-1) - diag_inf(ix,Ny-1)*corr[Ny-2] ) / beta;
+			dst({ix,Ny-2,0},dst_comp) =
+				( src({ix,Ny-2,0},src_comp) - diag_inf(ix,Ny-2)*dst({ix,Ny-3,0},dst_comp) ) / beta;
+			corr[Ny-2] = ( diag_sup(ix,Ny-2) - diag_inf(ix,Ny-2)*corr[Ny-3] ) / beta;
 
-			for(unsigned int iy=Ny-1; iy>0; iy--) {
+			for(unsigned int iy=Ny-2; iy>0; iy--) {
 				dst({ix,iy-1,0},dst_comp) -= gamma[iy-1]*dst({ix,iy,0},dst_comp);
 				corr[iy-1] -= gamma[iy-1]*corr[iy];
 			}
 
 			std::complex<double> frac =
-				( dst({ix,0,0},dst_comp) - diag_inf(ix,0)/diag_mid(ix,0)*dst({ix,Ny-1,0},dst_comp) ) /
-				( 1 + corr[0] - diag_inf(ix,0)/diag_mid(ix,0)*corr[Ny-1] );
-			for(unsigned int iy=0; iy<Ny; iy++)
+				( dst({ix,0,0},dst_comp) - diag_inf(ix,0)/diag_mid(ix,0)*dst({ix,Ny-2,0},dst_comp) ) /
+				( 1 + corr[0] - diag_inf(ix,0)/diag_mid(ix,0)*corr[Ny-2] );
+			for(unsigned int iy=0; iy<Ny-1; iy++)
 				dst({ix,iy,0},dst_comp) -= frac*corr[iy];
+			dst({ix,Ny-1,0},dst_comp) = dst({ix,0,0},dst_comp);
 		}
 	}
 	else {

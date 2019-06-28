@@ -27,7 +27,10 @@ CoefficientsSettings::CoefficientsSettings(const nlohmann::json &j) :
 	ne_expression(parse<std::string>("ne")),
 	nhost_expression(
 		(json_node.find("nhost") != json_node.end()) ?
-		parse<std::string>("nhost") : "1") {
+		parse<std::string>("nhost") : "1"),
+	nin_expression(
+		(json_node.find("nin") != json_node.end()) ?
+		parse<std::string>("nin") : "1") {
 
 	if(json_node.find("Wavelengths") != json_node.end())
 		_wavelengths = parse_vector<double>("Wavelengths");

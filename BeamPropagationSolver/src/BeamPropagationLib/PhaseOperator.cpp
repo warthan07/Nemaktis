@@ -23,7 +23,7 @@ PhaseOperator::PhaseOperator(
 	for(unsigned int iz=0; iz<Nz-1; iz++) {
 		for(unsigned int iy=0; iy<Ny; iy++) {
 			for(unsigned int ix=0; ix<Nx; ix++) {
-				// Efficient calculation of d=I*(sqrt(eps_transverse)-no*Id)*delta_Z/2
+				// Efficient calculation of d=(sqrt(eps_transverse)-no*Id)*delta_Z/2
 				// with eps_transverse = {{exx-exz^2/ezz,exy-exz*eyz/ezz}
 				//                       ,{exy-exz*eyz/ezz,eyy-eyz^2/ezz}}
 				// based on its invariants (determinant and half trace)

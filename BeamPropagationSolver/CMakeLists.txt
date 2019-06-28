@@ -26,7 +26,8 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED COMPONENTS filesystem regex)
+find_package(Boost REQUIRED COMPONENTS filesystem regex system)
+message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
 find_package(OpenMP REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -178,8 +179,9 @@ swig_add_library(${PYTHONBACKEND_BASENAME} LANGUAGE python
 target_link_libraries(${PROJECT_NAME} Settings)
 target_link_libraries(Settings BPM Postprocessor)
 target_link_libraries(Postprocessor Physics
-	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES})
+	${VTK_LIBRARIES} ${FFTW_LIBRARIES})
 target_link_libraries(BPM Utilities Physics)
+target_link_libraries(Utilities ${Boost_LIBRARIES})
 target_link_libraries(Physics ${MUPARSER_LIBRARIES})
 
 target_link_libraries(bpm-lib

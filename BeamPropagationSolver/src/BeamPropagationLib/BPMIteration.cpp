@@ -4,6 +4,7 @@
 #include "ADIOperatorX.h"
 #include "ADIOperatorY.h"
 #include "PhaseOperator.h"
+#include "FresnelOperator.h"
 
 BPMIteration::BPMIteration(
 		const VectorField<double> &lc_sol,
@@ -36,7 +37,7 @@ void BPMIteration::update_optical_field() {
 		{lc_sol.mesh.Nx, lc_sol.mesh.Ny, 1});
 	VectorField<std::complex<double> > transverse_field_1(transverse_mesh, 2);
 	VectorField<std::complex<double> > transverse_field_2(transverse_mesh, 2);
-		
+
 	std::string pol_strs[2] = {"X", "Y"};
 	for(unsigned int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
 		std::cout <<
@@ -47,6 +48,7 @@ void BPMIteration::update_optical_field() {
 		ADIOperatorX adi_operator_x(eps, wavelengths[wave_idx], bpm_settings);
 		ADIOperatorY adi_operator_y(eps, wavelengths[wave_idx], bpm_settings);
 		PhaseOperator phase_operator(eps, wavelengths[wave_idx]);
+		FresnelOperator fresnel_operator(eps, coefs.get_nin(wavelengths[wave_idx]));
 		
 		for(unsigned int pol_idx=0; pol_idx<2; pol_idx++) {
 			adi_operator_x.z_step_reset();
@@ -73,9 +75,10 @@ void BPMIteration::update_optical_field() {
 			for(unsigned int iperp=0; iperp<Nx*Ny; iperp++) {
 				x = ((iperp%Nx) - (Nx-1)/2.) * delta_x;
 				y = ((iperp/Nx) - (Ny-1)/2.) * delta_y;
-				transverse_field_1(iperp,0) = beam_profile->get_Ex(x, y);
-				transverse_field_1(iperp,1) = beam_profile->get_Ey(x, y);
+				transverse_field_2(iperp,0) = beam_profile->get_Ex(x, y);
+				transverse_field_2(iperp,1) = beam_profile->get_Ey(x, y);
 			}
+			fresnel_operator.vmult(transverse_field_1, transverse_field_2);
 		
 			#pragma omp parallel for
 			for(unsigned int iperp=0; iperp<Nx*Ny; iperp++)
