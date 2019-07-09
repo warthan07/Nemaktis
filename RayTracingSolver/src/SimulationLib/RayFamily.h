@@ -44,7 +44,7 @@ public:
 	CubicInterpolatedMapping<dim-1,1,double> evanescent_map;
 
 private:
-	Vector<3,std::complex<double> > E;
+	Vector<3, std::complex<double> > E;
 	Vector<3,double> moment;
 	Vector<dim-1,double> r;
 	Vector<1,double> optical_length, NA_limited, evanescent;

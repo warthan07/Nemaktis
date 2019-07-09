@@ -43,7 +43,7 @@ private:
 	 * Number of points in each space direction for the global mesh
 	 * (LC+plates)
 	 */
-	unsigned int Nx, Ny, Nz;
+	int Nx, Ny, Nz;
 
 	/**
 	 * Shortcut reference to the LC solution.

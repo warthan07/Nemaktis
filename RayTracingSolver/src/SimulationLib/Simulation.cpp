@@ -16,7 +16,7 @@ Simulation<dim>::Simulation(
 	auto &j = settings.at("Light source");
 	if(j.find("Wavelengths") != j.end()) {
 		wavelengths = j.at("Wavelengths").get<std::vector<double> >();
-		N_wavelengths = wavelengths.size();
+		N_wavelengths = int(wavelengths.size());
 	}
 	else {
 		N_wavelengths = j.at("N wavelengths");
@@ -26,7 +26,6 @@ Simulation<dim>::Simulation(
 		if(N_wavelengths==1)
 			wavelengths.push_back(j.at("Mean wavelength"));
 		else {
-			double lambda;
 			for(int i=0; i<N_wavelengths; i++) {
 				wavelengths.push_back(mean_lambda - 0.5*fwhm + fwhm*i/(N_wavelengths-1));
 			}
@@ -215,26 +214,26 @@ void Simulation<dim>::apply_fourier_iso_layer_filter() {
 		fftw_plan_dft_1d(dims[1], in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	#pragma omp parallel for
-	for(unsigned int wave_idx=0; wave_idx<N_wavelengths; wave_idx++) {
+	for(int wave_idx=0; wave_idx<N_wavelengths; wave_idx++) {
 		// First we assemble the filter
 		auto iso_filter =
 			std::make_shared<std::vector<std::complex<double> > >(dims[0]*dims[1]);
-		double k0 = 2*M_PI/wavelengths[wave_idx];
+		double k0 = 2*PI/wavelengths[wave_idx];
 
 		// transfer matrix in column-major order
 		std::vector<std::complex<double> > tmat(4), prev_tmat(4); 
 		std::complex<double> t1, t2;
 
-		for(unsigned int iy=0; iy<dims[1]; iy++) {
-			for(unsigned int ix=0; ix<dims[0]; ix++) {
+		for(int iy=0; iy<dims[1]; iy++) {
+			for(int ix=0; ix<dims[0]; ix++) {
 				double kx = (ix<double(dims[0]/2.)) ?
-					2*M_PI*ix/(spacings[0]*(dims[0]-1)) :
-					-2*M_PI*(dims[0]-ix)/(spacings[0]*(dims[0]-1));
+					2*PI*ix/(spacings[0]*(dims[0]-1)) :
+					-2*PI*(dims[0]-ix)/(spacings[0]*(dims[0]-1));
 				if(dim==2)
 					kx = 0;
 				double ky = (iy<double(dims[1]/2.)) ?
-					2*M_PI*iy/(spacings[1]*(dims[1]-1)) :
-					-2*M_PI*(dims[1]-iy)/(spacings[1]*(dims[1]-1));
+					2*PI*iy/(spacings[1]*(dims[1]-1)) :
+					-2*PI*(dims[1]-iy)/(spacings[1]*(dims[1]-1));
 				double k = std::sqrt(kx*kx+ky*ky);
 
 				if(k<k0*numerical_aperture) {
@@ -247,7 +246,7 @@ void Simulation<dim>::apply_fourier_iso_layer_filter() {
 
 					double kN = std::sqrt(k0*k0-k*k);
 
-					for(unsigned int p=0; p<mat_properties.e_upper_layers.size(); p++) {
+					for(int p=0; p<mat_properties.e_upper_layers.size(); p++) {
 						double np = mat_properties.n_upper_layers[p];
 						double ep = mat_properties.e_upper_layers[p];
 						double kp = std::sqrt(std::pow(k0*np,2.)-k*k);
@@ -280,10 +279,10 @@ void Simulation<dim>::apply_fourier_iso_layer_filter() {
 		fftw_complex *fft_field = static_cast<fftw_complex*>(
 			fftw_malloc(sizeof(fftw_complex) * dims[0]*dims[1]));
 
-		for(unsigned int pol_idx=0; pol_idx<2; pol_idx++) {
-			for(unsigned int comp=0; comp<2; comp++) {
+		for(int pol_idx=0; pol_idx<2; pol_idx++) {
+			for(int comp=0; comp<2; comp++) {
 				// First, we fill the fftw input array with our data
-				for(unsigned int i=0; i<dims[0]*dims[1]; i++) {
+				for(int i=0; i<dims[0]*dims[1]; i++) {
 					field[i][0] =
 						screen_fields_data->E_real[pol_idx][wave_idx]->GetComponent(i,comp);
 					field[i][1] = 
@@ -292,7 +291,7 @@ void Simulation<dim>::apply_fourier_iso_layer_filter() {
 
 				// We switch to fourrier space and apply the iso filter
 				fftw_execute_dft(forward_plan, field, fft_field);
-				for(unsigned int i=0; i<dims[0]*dims[1]; i++) {
+				for(int i=0; i<dims[0]*dims[1]; i++) {
 					auto val = std::complex<double>(fft_field[i][0], fft_field[i][1]);
 					fft_field[i][0] = std::real(val * iso_filter->at(i));
 					fft_field[i][1] = std::imag(val * iso_filter->at(i));
@@ -302,7 +301,7 @@ void Simulation<dim>::apply_fourier_iso_layer_filter() {
 				// data
 				fftw_execute_dft(backward_plan, fft_field, field);
 
-				for(unsigned int i=0; i<dims[0]*dims[1]; i++) {
+				for(int i=0; i<dims[0]*dims[1]; i++) {
 					screen_fields_data->E_real[pol_idx][wave_idx]->SetComponent(
 						i, comp, field[i][0]/(dims[0]*dims[1]));
 					screen_fields_data->E_imag[pol_idx][wave_idx]->SetComponent(

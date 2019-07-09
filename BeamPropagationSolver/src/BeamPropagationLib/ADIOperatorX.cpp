@@ -21,8 +21,8 @@ void ADIOperatorX::vmult(
 	block_00.vmult_corr(tmp_2, 0, src, 0);
 
 	#pragma omp parallel for
-	for(unsigned int iy=0; iy<src.mesh.Ny; iy++)
-		for(unsigned int ix=0; ix<src.mesh.Nx; ix++)
+	for(int iy=0; iy<src.mesh.Ny; iy++)
+		for(int ix=0; ix<src.mesh.Nx; ix++)
 			dst({ix,iy,0},0) += tmp_1({ix,iy,0},0) + tmp_2({ix,iy,0},0);
 
 }
@@ -38,8 +38,8 @@ void ADIOperatorX::inverse_vmult(
 	block_01.vmult(tmp_1, 0, dst, 1);
 
 	#pragma omp parallel for
-	for(unsigned int iy=0; iy<src.mesh.Ny; iy++)
-		for(unsigned int ix=0; ix<src.mesh.Nx; ix++)
+	for(int iy=0; iy<src.mesh.Ny; iy++)
+		for(int ix=0; ix<src.mesh.Nx; ix++)
 			tmp_1({ix,iy,0},0) = src({ix,iy,0},0)-tmp_1({ix,iy,0},0);
 
 	block_00.inverse_vmult(dst, 0, tmp_1, 0);
@@ -47,15 +47,15 @@ void ADIOperatorX::inverse_vmult(
 	// We use the Woodbury formula to take into account the correction
 	// block
 	#pragma omp parallel for
-	for(unsigned int iy=0; iy<src.mesh.Ny; iy++)
-		for(unsigned int ix=0; ix<src.mesh.Nx; ix++)
+	for(int iy=0; iy<src.mesh.Ny; iy++)
+		for(int ix=0; ix<src.mesh.Nx; ix++)
 			tmp_1({ix,iy,0},0) = dst({ix,iy,0},0);
-	for(unsigned int it=0; it<N_woodbury_steps; it++) {
+	for(int it=0; it<N_woodbury_steps; it++) {
 		block_00.vmult_corr(tmp_2, 0, tmp_1, 0);
 		block_00.inverse_vmult(tmp_1, 0, tmp_2, 0);
 		#pragma omp parallel for
-		for(unsigned int iy=0; iy<src.mesh.Ny; iy++)
-			for(unsigned int ix=0; ix<src.mesh.Nx; ix++)
+		for(int iy=0; iy<src.mesh.Ny; iy++)
+			for(int ix=0; ix<src.mesh.Nx; ix++)
 				dst({ix,iy,0},0) += tmp_1({ix,iy,0},0);
 	}
 }
@@ -101,7 +101,7 @@ ADIOperatorX::Block00::Block00(
 	TriDiagonalADIOperatorX(eps, wavelength, bpm_settings) {}
 
 std::complex<double> ADIOperatorX::Block00::diag_inf(
-		unsigned int ix, unsigned int iy) const {
+		int ix, int iy) const {
 
 	double exx = eps.xx({ix,iy,iz});
 	double exz = eps.xz({ix,iy,iz});
@@ -113,25 +113,25 @@ std::complex<double> ADIOperatorX::Block00::diag_inf(
 }
 
 std::complex<double> ADIOperatorX::Block00::diag_mid(
-		unsigned int ix, unsigned int iy) const {
+		int ix, int iy) const {
 
 	double exx = eps.xx({ix,iy,iz});
 	double ezz = eps.zz({ix,iy,iz});
 	if(ix!=0 && ix!=Nx-1)
 		return 
-			1 - mu*std::sqrt(exx)/(ezz*std::pow(delta_X, 2.));
+			1. - mu*std::sqrt(exx)/(ezz*std::pow(delta_X, 2.));
 	else if(ix==0)
 		return 
-			1 + mu*std::sqrt(exx)*(lower_tbc_exp[iy]-2)/(2*ezz*std::pow(delta_X,2.));
+			1. + mu*std::sqrt(exx)*(lower_tbc_exp[iy]-2.)/(2*ezz*std::pow(delta_X,2.));
 	else if(ix==Nx-1)
 		return 
-			1 + mu*std::sqrt(exx)*(upper_tbc_exp[iy]-2)/(2*ezz*std::pow(delta_X,2.));
+			1. + mu*std::sqrt(exx)*(upper_tbc_exp[iy]-2.)/(2*ezz*std::pow(delta_X,2.));
 	else
-		return 0;
+		return 0.;
 }
 
 std::complex<double> ADIOperatorX::Block00::diag_sup(
-		unsigned int ix, unsigned int iy) const {
+		int ix, int iy) const {
 
 	double exx = eps.xx({ix,iy,iz});
 	double exz = eps.xz({ix,iy,iz});
@@ -144,14 +144,14 @@ std::complex<double> ADIOperatorX::Block00::diag_sup(
 
 void ADIOperatorX::Block00::vmult_corr(
 		VectorField<std::complex<double> > &dst,
-		unsigned int dst_comp,
+		int dst_comp,
 		const VectorField<std::complex<double> > &src,
-		unsigned int src_comp) const {
+		int src_comp) const {
 
 	double exx, ezz, exy;
 	#pragma omp parallel for firstprivate(exx,ezz,exy)
-	for(unsigned int iy=0; iy<Ny; iy++) {
-		for(unsigned int ix=0; ix<Nx; ix++) {
+	for(int iy=0; iy<Ny; iy++) {
+		for(int ix=0; ix<Nx; ix++) {
 			exx = eps.xx({ix,iy,iz});
 			ezz = eps.zz({ix,iy,iz});
 			exy = eps.xy({ix,iy,iz});
@@ -168,7 +168,7 @@ ADIOperatorX::Block11::Block11(
 	TriDiagonalADIOperatorX(eps, wavelength, bpm_settings) {}
 
 std::complex<double> ADIOperatorX::Block11::diag_inf(
-		unsigned int ix, unsigned int iy) const {
+		int ix, int iy) const {
 
 	double eyy = eps.yy({ix,iy,iz});
 	return
@@ -176,24 +176,24 @@ std::complex<double> ADIOperatorX::Block11::diag_inf(
 }
 
 std::complex<double> ADIOperatorX::Block11::diag_mid(
-		unsigned int ix, unsigned int iy) const {
+		int ix, int iy) const {
 
 	double eyy = eps.yy({ix,iy,iz});
 	if(ix!=0 && ix!=Nx-1)
 		return 
-			1 - mu / (std::sqrt(eyy)*std::pow(delta_X, 2.));
+			1. - mu / (std::sqrt(eyy)*std::pow(delta_X, 2.));
 	else if(ix==0)
 		return 
-			1 + mu * (lower_tbc_exp[iy]-2) / (2*std::sqrt(eyy)*std::pow(delta_X,2.));
+			1. + mu * (lower_tbc_exp[iy]-2.) / (2.*std::sqrt(eyy)*std::pow(delta_X,2.));
 	else if(ix==Nx-1)
 		return 
-			1 + mu * (upper_tbc_exp[iy]-2) / (2*std::sqrt(eyy)*std::pow(delta_X,2.));
+			1. + mu * (upper_tbc_exp[iy]-2.) / (2.*std::sqrt(eyy)*std::pow(delta_X,2.));
 	else
-		return 0;
+		return 0.;
 }
 
 std::complex<double> ADIOperatorX::Block11::diag_sup(
-		unsigned int ix, unsigned int iy) const {
+		int ix, int iy) const {
 
 	double eyy = eps.yy({ix,iy,iz});
 	return
@@ -212,14 +212,14 @@ ADIOperatorX::Block01::Block01(
 
 void ADIOperatorX::Block01::vmult(
 		VectorField<std::complex<double> > &dst,
-		unsigned int dst_comp,
+		int dst_comp,
 		const VectorField<std::complex<double> > &src,
-		unsigned int src_comp) const {
+		int src_comp) const {
 
 	double exx, eyy, ezz, exy, exz, eyz;
 	#pragma omp parallel for firstprivate(exx,eyy,ezz,exy,exz,eyz)
-	for(unsigned int iy=0; iy<Ny; iy++) {
-		for(unsigned int ix=0; ix<Nx; ix++) {
+	for(int iy=0; iy<Ny; iy++) {
+		for(int ix=0; ix<Nx; ix++) {
 			exx = eps.xx({ix,iy,iz});
 			eyy = eps.yy({ix,iy,iz});
 			ezz = eps.zz({ix,iy,iz});

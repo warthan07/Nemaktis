@@ -16,9 +16,9 @@ void FresnelOperator::vmult(
 
 	// Parallel loop which applies the Fresnel boudary conditions to the input fields.
 	#pragma omp parallel for
-	for(unsigned int iperp=0; iperp<Nx*Ny; iperp++) {
-		unsigned int ix = iperp%Nx;
-		unsigned int iy = iperp/Nx;
+	for(int iperp=0; iperp<Nx*Ny; iperp++) {
+		int ix = iperp%Nx;
+		int iy = iperp/Nx;
 
 		// Efficient calculation of d=sqrt(eps_transverse)
 		// with eps_transverse = {{exx-exz^2/ezz,exy-exz*eyz/ezz}

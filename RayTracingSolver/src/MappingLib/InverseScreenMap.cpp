@@ -101,7 +101,7 @@ void InverseScreenMap<dim>::refine_data() {
 
 			Vector<dim,int> one(1);
 			int selected_idx;
-			int prev_size = 0;
+			std::size_t prev_size = 0;
 
 			MultiDimIndex<dim> cell_idx(2, 0., false);
 			for(; cell_idx.valid(); cell_idx++) {
@@ -162,7 +162,7 @@ void InverseScreenMap<dim>::refine_data() {
 				continue;
 
 			int flat_idx, selected_idx;
-			int prev_size = 0;
+			std::size_t prev_size = 0;
 			for(int d=0; d<dim; d++) {
 				if(cur_idx(d)!=0) {
 					flat_idx =

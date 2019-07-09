@@ -10,9 +10,9 @@ public:
 		double wavelength, const BPMSettings& bpm_settings);
 
 protected:
-	virtual std::complex<double> diag_inf(unsigned int ix, unsigned int iy) const = 0;
-	virtual std::complex<double> diag_mid(unsigned int ix, unsigned int iy) const = 0;
-	virtual std::complex<double> diag_sup(unsigned int ix, unsigned int iy) const = 0;
+	virtual std::complex<double> diag_inf(int ix, int iy) const = 0;
+	virtual std::complex<double> diag_mid(int ix, int iy) const = 0;
+	virtual std::complex<double> diag_sup(int ix, int iy) const = 0;
 };
 
 class TriDiagonalADIOperatorX : public TriDiagonalADIOperator {
@@ -23,18 +23,18 @@ public:
 
 	virtual void vmult(
 		VectorField<std::complex<double> > &dst,
-		unsigned int dst_comp,
+		int dst_comp,
 		const VectorField<std::complex<double> > &src,
-		unsigned int src_comp) const;
+		int src_comp) const;
 	void inverse_vmult(
 		VectorField<std::complex<double> > &dst,
-		unsigned int dst_comp,
+		int dst_comp,
 		const VectorField<std::complex<double> > &src,
-		unsigned int src_comp) const;
+		int src_comp) const;
 
 	void update_tbc_wavectors(
 		const VectorField<std::complex<double> > &src,
-		unsigned int comp);
+		int comp);
 
 protected:
 	/**
@@ -57,18 +57,18 @@ public:
 
 	virtual void vmult(
 		VectorField<std::complex<double> > &dst,
-		unsigned int dst_comp,
+		int dst_comp,
 		const VectorField<std::complex<double> > &src,
-		unsigned int src_comp) const;
+		int src_comp) const;
 	void inverse_vmult(
 		VectorField<std::complex<double> > &dst,
-		unsigned int dst_comp,
+		int dst_comp,
 		const VectorField<std::complex<double> > &src,
-		unsigned int src_comp) const;
+		int src_comp) const;
 
 	void update_tbc_wavectors(
 		const VectorField<std::complex<double> > &src,
-		unsigned int comp);
+		int comp);
 
 protected:
 	/**

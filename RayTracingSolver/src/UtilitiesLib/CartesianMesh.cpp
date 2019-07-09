@@ -4,7 +4,7 @@ template <int dim>
 CartesianMesh<dim>::CartesianMesh(
 		const Vector<dim,double> &mesh_origin,
 		const Vector<dim,double> &mesh_lengths,
-		const Vector<dim,unsigned long> &n_points_per_dim,
+		const Vector<dim,long> &n_points_per_dim,
 		bool last_idx_fastest) :
 	origin(mesh_origin),
 	lengths(mesh_lengths),

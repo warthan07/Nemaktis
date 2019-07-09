@@ -95,10 +95,10 @@ DropletSampleSimulation::DropletSampleSimulation(
 		iso_ray_ode_seq.odes.push_back(ode);
 	}
 
-	ray_splitting_ode_idx = this->lower_iso_odes.size();
+	ray_splitting_ode_idx = int(this->lower_iso_odes.size());
 
-	N_droplet_rays = extra_ray_family->ray_bundles->size();
-	N_iso_rays = iso_ray_family->ray_bundles->size();
+	N_droplet_rays = int(extra_ray_family->ray_bundles->size());
+	N_iso_rays = int(iso_ray_family->ray_bundles->size());
 }
 
 void DropletSampleSimulation::run() {
@@ -135,10 +135,10 @@ void DropletSampleSimulation::run() {
 	std::vector<double> s_steps_iso(N_iso_rays, this->z_step);
 
 	#pragma omp parallel for \
-		firstprivate(e_seq, o_seq, stepper, trans, trans_odes)
+		firstprivate(e_seq, o_seq, stepper, trans) private(trans_odes)
 	for(int ray_idx=0; ray_idx<N_droplet_rays; ray_idx++) {
-		try {
-			auto& extra_ray_bundle = e.ray_bundles->at(ray_idx);
+		/*try {*/
+			/*auto& extra_ray_bundle = e.ray_bundles->at(ray_idx);
 			auto& ordi_ray_bundle = o.ray_bundles->at(ray_idx);
 
 			for(int ode_idx=0; ode_idx<=ray_splitting_ode_idx-1; ode_idx++) {
@@ -162,16 +162,16 @@ void DropletSampleSimulation::run() {
 				s_steps_extra[ray_idx], -droplet_radius);
 			stepper.euler_z_step(
 				o_seq.odes[ray_splitting_ode_idx], ordi_ray_bundle,
-				s_steps_ordi[ray_idx], -droplet_radius);
-		}
+				s_steps_ordi[ray_idx], -droplet_radius);*/
+		/*}
 		catch(...) {
 			exc.capture_exception();
-		}
+		}*/
 	}
 	exc.rethrow();
 
 	#pragma omp parallel for \
-		firstprivate(s_seq, stepper, trans, trans_odes)
+		firstprivate(s_seq, stepper, trans) private(trans_odes)
 	for(int ray_idx=0; ray_idx<N_iso_rays; ray_idx++) {
 		try {
 			auto& iso_ray_bundle = s.ray_bundles->at(ray_idx);
@@ -272,7 +272,7 @@ void DropletSampleSimulation::run() {
 							E_tot = std::complex<double>(0,0);
 							for(int ray=0; ray<E_vals[0].size(); ray++)
 								E_tot += E_vals[pol_idx][ray]*std::exp(
-									I*2*PI*(optical_length_vals[ray]
+									I*2.*PI*(optical_length_vals[ray]
 										-this->mat_properties.n_host*this->z_step*k) /
 									this->wavelengths[wave_idx]);
 
@@ -319,7 +319,7 @@ void DropletSampleSimulation::run() {
 
 		if(k<this->N_lc_steps-1) {
 			#pragma omp parallel for \
-				firstprivate(e_seq,o_seq,stepper,trans,trans_odes)
+				firstprivate(e_seq,o_seq,stepper,trans) private(trans_odes)
 			for(int ray_idx=0; ray_idx<N_droplet_rays; ray_idx++) {
 				auto& extra_ray_bundle = e.ray_bundles->at(ray_idx);
 				auto& ordi_ray_bundle = o.ray_bundles->at(ray_idx);
@@ -398,7 +398,7 @@ void DropletSampleSimulation::run() {
 		else {
 			// We go the upper sample plate
 			#pragma omp parallel for \
-				firstprivate(e_seq,o_seq,stepper,trans,trans_odes)
+				firstprivate(e_seq,o_seq,stepper,trans) private(trans_odes)
 			for(int ray_idx=0; ray_idx<N_droplet_rays; ray_idx++) {
 				auto& extra_ray_bundle = e.ray_bundles->at(ray_idx);
 				auto& ordi_ray_bundle = o.ray_bundles->at(ray_idx);
@@ -431,7 +431,7 @@ void DropletSampleSimulation::run() {
 				}
 			}
 			#pragma omp parallel for \
-				firstprivate(s_seq,stepper,trans,trans_odes)
+				firstprivate(s_seq,stepper,trans) private(trans_odes)
 			for(int ray_idx=0; ray_idx<N_iso_rays; ray_idx++) {
 				auto& iso_ray_bundle = s.ray_bundles->at(ray_idx);
 
@@ -539,7 +539,7 @@ void DropletSampleSimulation::run() {
 						E_tot = std::complex<double>(0,0);
 						for(int ray=0; ray<E_vals[0].size(); ray++)
 							E_tot += E_vals[pol_idx][ray]*std::exp(
-								I*2*PI*optical_length_vals[ray] /
+								I*2.*PI*optical_length_vals[ray] /
 								this->wavelengths[wave_idx]);
 
 						for(int comp=0; comp<3; comp++) {
@@ -587,7 +587,7 @@ void DropletSampleSimulation::run() {
 		std::cout <<
 			"Interpolating ray data on the focalisation plane..." << std::endl;
 		#pragma omp parallel for \
-			firstprivate(e_seq, o_seq, stepper, trans, trans_odes)
+			firstprivate(e_seq, o_seq, stepper, trans) private(trans_odes)
 		for(int i=0; i<N_droplet_rays; i++) {
 			try {
 				auto& extra_ray_bundle = e.ray_bundles->at(i);

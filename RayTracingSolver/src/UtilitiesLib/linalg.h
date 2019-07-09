@@ -318,13 +318,13 @@ MultiDimIndex<dim>& MultiDimIndex<dim>::operator=(long idx) {
 	long rem = idx-(flatten_weights,shift);
 	if(last_idx_fastest) {
 		for(int d=0; d<dim; d++) {
-			idx_vector(d) = shift(d) + floor(rem*1./flatten_weights(d));
+			idx_vector(d) = shift(d) + long(floor(rem*1./flatten_weights(d)));
 			rem = rem % flatten_weights(d);
 		}
 	}
 	else {
 		for(int d=dim-1; d>=0; d--) {
-			idx_vector(d) = shift(d) + floor(rem*1./flatten_weights(d));
+			idx_vector(d) = shift(d) + long(floor(rem*1./flatten_weights(d)));
 			rem = rem % flatten_weights(d);
 		}
 	}
@@ -675,7 +675,7 @@ inline Matrix<dim1,dim2,T> operator-(const Matrix<dim1,dim2,T> m) {
  * Right matrix-vector product.
  */
 template <int dim1, int dim2, typename T1, typename T2>
-inline Vec<dim1,T1,T2> operator*(
+inline Vec<dim1,T1,T2> operator&(
 		const Matrix<dim1,dim2,T1> &m, const Vector<dim2,T2> &v) {
 
 	Vec<dim1,T1,T2> res;
@@ -689,7 +689,7 @@ inline Vec<dim1,T1,T2> operator*(
  * Left matrix-vector product.
  */
 template <int dim1, int dim2, typename T1, typename T2>
-inline Vec<dim2,T1,T2> operator*(
+inline Vec<dim2,T1,T2> operator&(
 		const Vector<dim1,T1> &v, const Matrix<dim1,dim2,T2> &m) {
 
 	Vec<dim2,T1,T2> res;
@@ -781,7 +781,7 @@ template <typename T2>
 inline Vector<dim,T1>::Vector(T2 c) {
 
 	for(unsigned int i=0;i<dim; ++i)
-		data[i] = c;
+		data[i] = T1(c);
 }
 
 template <int dim, typename T1>
@@ -789,7 +789,7 @@ template <typename T2>
 inline Vector<dim,T1>::Vector(const Vector<dim,T2> &v) {
 
 	for(unsigned int i=0; i<dim; ++i)
-		data[i] = v(i);
+		data[i] = T1(v(i));
 }
 
 template <int dim, typename T1> 
@@ -797,7 +797,7 @@ template <typename T2>
 inline Vector<dim,T1>::Vector(const T2 (&v)[dim]) {
 
 	for(unsigned int i=0; i<dim; ++i)
-		data[i] = v[i];
+		data[i] = T1(v[i]);
 }
 
 template <int dim, typename T1> 
@@ -809,7 +809,7 @@ inline Vector<dim,T1>::Vector(const std::vector<T2> &v) {
 			"You are trying to initialize a Vector with an std::vector of "
 			"the wrong size"));
 	for(unsigned int i=0;i<dim; ++i)
-		data[i] = v[i];
+		data[i] = T1(v[i]);
 }
 
 template <int dim, typename T1>
@@ -1047,9 +1047,12 @@ public:
 	}
 };
 
-///////////////////////////////////////////////////
-// Ugly trick to have a less shitty std::complex //
-///////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+// Ugly trick to have a less shitty std::complex on Linux //
+////////////////////////////////////////////////////////////
+
+#ifndef _MSC_VER
+
 template <typename T>
 struct identity_t { typedef T type; };
 
@@ -1068,7 +1071,10 @@ struct identity_t { typedef T type; };
 COMPLEX_OPS(+)
 COMPLEX_OPS(-)
 COMPLEX_OPS(*)
-COMPLEX_OPS(/)
+COMPLEX_OPS(/ )
+
 #undef COMPLEX_OPS
+
+#endif
 
 #endif

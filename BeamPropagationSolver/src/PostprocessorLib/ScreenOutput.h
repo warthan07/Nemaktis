@@ -27,7 +27,7 @@ private:
 	std::shared_ptr<std::vector<std::complex<double> > > assemble_iso_filter(
 		double wavelength) const;
 
-	unsigned int Nx, Ny, Nz;
+	int Nx, Ny, Nz;
 	double delta_x, delta_y;
 
 	std::vector<double> iso_layer_thickness;

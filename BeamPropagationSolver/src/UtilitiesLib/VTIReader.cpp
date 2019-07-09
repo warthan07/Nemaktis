@@ -9,11 +9,8 @@
 #include "error.h"
 
 VTIReader::VTIReader(
-			std::string &filename, unsigned int lc_dim) :
+			std::string &filename, int lc_dim) :
 		lc_dim(lc_dim) {
-
-	Assert(
-		lc_dim==3 || lc_dim==6, "Wrong field dimension for the LC solution");
 
 	// We check if the given file exists
 	boost::filesystem::path path(filename);
@@ -88,8 +85,8 @@ void VTIReader::fill_solution_vector(
 	double spacing[3];
 	output->GetSpacing(spacing);
 
-	unsigned int I1, I2, I3;
-	unsigned int Np = 0;
+	int I1, I2, I3;
+	int Np = 0;
 	switch(basis_convention) {
 	case BasisConvention::XYZ:
 		I1 = 0;		I2 = 1;		I3 = 2;
@@ -112,16 +109,16 @@ void VTIReader::fill_solution_vector(
 
 	CartesianMesh mesh(
 		{spacing[I1], spacing[I2], spacing[I3]},
-		{(unsigned int)dim[I1], (unsigned int)dim[I2], (unsigned int)dim[I3]-2*Np});
+		{(int)dim[I1], (int)dim[I2], (int)dim[I3]-2*Np});
 	lc_sol = std::make_shared<VectorField<double> >(mesh, lc_dim);
 
 	if(lc_dim==3) {
-		for(unsigned int ix=0; ix<dim[0]-2*Np; ix++) {
-			for(unsigned int iy=0; iy<dim[1]; iy++) {
-				for(unsigned int iz=0; iz<dim[2]; iz++) {
-					unsigned int idx[3] = {ix, iy, iz};
-					unsigned int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
-					unsigned int i_in = Np+idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
+		for(int ix=0; ix<dim[0]-2*Np; ix++) {
+			for(int iy=0; iy<dim[1]; iy++) {
+				for(int iz=0; iz<dim[2]; iz++) {
+					int idx[3] = {ix, iy, iz};
+					int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
+					int i_in = Np+idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
 
 					if(std::isnan(n_data->GetComponent(i_in, I1)))
 						throw std::string("Error: NaN value in the given vti file");
@@ -140,17 +137,14 @@ void VTIReader::fill_solution_vector(
 	}
 	else if(lc_dim==6) {
 		if(found_q_data) {
-			for(unsigned int ix=0; ix<dim[0]; ix++) {
-				for(unsigned int iy=0; iy<dim[1]; iy++) {
-					for(unsigned int iz=0; iz<dim[2]; iz++) {
-						unsigned int idx[3] = {ix, iy, iz};
-						unsigned int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
-						unsigned int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
+			for(int ix=0; ix<dim[0]; ix++) {
+				for(int iy=0; iy<dim[1]; iy++) {
+					for(int iz=0; iz<dim[2]; iz++) {
+						int idx[3] = {ix, iy, iz};
+						int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
+						int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
 
-						for(unsigned int comp=0; comp<6; comp++) {
-							Assert(
-								!std::isnan(q_data->GetComponent(i_in, comp)),
-								"Error: NaN value in the given vti file");
+						for(int comp=0; comp<6; comp++) {
 							(*lc_sol)(i_out,comp) = q_data->GetComponent(i_in, comp);
 						}
 					}
@@ -160,12 +154,12 @@ void VTIReader::fill_solution_vector(
 		else {
 			if(found_S_data) {
 				#pragma omp parallel for
-				for(unsigned int ix=0; ix<dim[0]; ix++) {
-					for(unsigned int iy=0; iy<dim[1]; iy++) {
-						for(unsigned int iz=0; iz<dim[2]; iz++) {
-							unsigned int idx[3] = {ix, iy, iz};
-							unsigned int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
-							unsigned int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
+				for(int ix=0; ix<dim[0]; ix++) {
+					for(int iy=0; iy<dim[1]; iy++) {
+						for(int iz=0; iz<dim[2]; iz++) {
+							int idx[3] = {ix, iy, iz};
+							int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
+							int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
 
 							(*lc_sol)(i_out,0) =
 								0.5*(1-S_data->GetComponent(i_in,0))*(
@@ -191,12 +185,12 @@ void VTIReader::fill_solution_vector(
 			}
 			else {
 				#pragma omp parallel for
-				for(unsigned int ix=0; ix<dim[0]; ix++) {
-					for(unsigned int iy=0; iy<dim[1]; iy++) {
-						for(unsigned int iz=0; iz<dim[2]; iz++) {
-							unsigned int idx[3] = {ix, iy, iz};
-							unsigned int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
-							unsigned int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
+				for(int ix=0; ix<dim[0]; ix++) {
+					for(int iy=0; iy<dim[1]; iy++) {
+						for(int iz=0; iz<dim[2]; iz++) {
+							int idx[3] = {ix, iy, iz};
+							int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
+							int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
 
 							(*lc_sol)(i_out,0) =
 								0.5*(3*n_data->GetComponent(i_in,0)*n_data->GetComponent(i_in,0)-1);

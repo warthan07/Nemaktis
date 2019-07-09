@@ -15,9 +15,6 @@ PostprocessorBase::PostprocessorBase(
 	results_dirname(results_dirname),
 	coefs(coefs) {
 
-	Assert(
-		pp_settings.activate,
-		"You are trying to create a postprocessor which should not be activated");
     if(results_dirname!="" && results_dirname!=".")
     	boost::filesystem::create_directory(results_dirname);
 }

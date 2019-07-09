@@ -20,13 +20,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 # Necessary libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/scripts)
-find_package(FFTW REQUIRED)
 find_package(Eigen3 REQUIRED)
+
+if(WIN32)
+	set(FFTW_USE_STATIC_LIBS ON)
+endif()
+find_package(FFTW REQUIRED)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS filesystem regex)
+if (WIN32)
+  add_definitions( -DBOOST_ALL_NO_LIB )
+  add_definitions( -DBOOST_ALL_DYN_LINK )
+endif()
 
 find_package(OpenMP REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -41,8 +49,13 @@ include(${VTK_USE_FILE})
 # Custom targets to ease the switching between debug or release compilation
 ###########################################################################
 
-set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+if(WIN32)
+	set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+else()
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+	set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
+endif()
 add_custom_target(debug
 	COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
 	COMMAND +${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all

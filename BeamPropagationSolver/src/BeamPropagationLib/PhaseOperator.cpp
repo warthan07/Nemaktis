@@ -3,6 +3,8 @@
 #include "PhaseOperator.h"
 #include "error.h"
 
+#define M_PI 3.1415926535897932
+
 PhaseOperator::PhaseOperator(
 		const PermittivityTensorField &eps,
 		double wavelength) :
@@ -20,9 +22,9 @@ PhaseOperator::PhaseOperator(
 	// exp(I*delta_n*k0_dz/2), where the matrix delta_n is defined for
 	// each vertex in the functions delta_n_**.
 	#pragma omp parallel for
-	for(unsigned int iz=0; iz<Nz-1; iz++) {
-		for(unsigned int iy=0; iy<Ny; iy++) {
-			for(unsigned int ix=0; ix<Nx; ix++) {
+	for(int iz=0; iz<Nz-1; iz++) {
+		for(int iy=0; iy<Ny; iy++) {
+			for(int ix=0; ix<Nx; ix++) {
 				// Efficient calculation of d=(sqrt(eps_transverse)-no*Id)*delta_Z/2
 				// with eps_transverse = {{exx-exz^2/ezz,exy-exz*eyz/ezz}
 				//                       ,{exy-exz*eyz/ezz,eyy-eyz^2/ezz}}
@@ -82,9 +84,9 @@ void PhaseOperator::vmult(
 		const VectorField<std::complex<double> > &src) const {
 
 	#pragma omp parallel for
-	for(unsigned int transverse_idx=0; transverse_idx<Nx*Ny; transverse_idx++) {
-		unsigned int ix = (transverse_idx%Nx);
-		unsigned int iy = (transverse_idx/Nx);
+	for(int transverse_idx=0; transverse_idx<Nx*Ny; transverse_idx++) {
+		int ix = (transverse_idx%Nx);
+		int iy = (transverse_idx/Nx);
 
 		dst({ix,iy,0},0) = 
 			op_field({ix,iy,iz},0) * src({ix,iy,0},0) +
@@ -97,7 +99,5 @@ void PhaseOperator::vmult(
 
 void PhaseOperator::z_step_increment() {
 
-	Assert(
-		iz<Nz-1, "Out-of-range z increment for the BaseADI operator.");
 	iz++;
 }

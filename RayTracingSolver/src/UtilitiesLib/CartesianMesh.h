@@ -48,7 +48,7 @@ public:
 	CartesianMesh(
 		const Vector<dim,double> &mesh_origin,
 		const Vector<dim,double> &mesh_lengths,
-		const Vector<dim,unsigned long> &n_points_per_dim,
+		const Vector<dim,long> &n_points_per_dim,
 		bool last_idx_fastest = true); 
 
 	/**
@@ -57,7 +57,7 @@ public:
 	 * 
 	 * @param indices A vector containing the multi-dimensional index.
 	 */
-	unsigned long flatten(const Vector<dim,unsigned long> &indices) const {
+	unsigned long flatten(const Vector<dim,long> &indices) const {
 		return (indices,flatten_weights);
 	};
 	/**
@@ -84,20 +84,20 @@ public:
 	 * A vector containing the weigths \f$w_j\f$ used in the flattening
 	 * formula.
 	 */
-	Vector<dim,unsigned long> flatten_weights;
+	Vector<dim,long> flatten_weights;
 	/**
 	 * A vector containing the numbers of mesh points in each direction
 	 * \f$d=1...d_1\f$.
 	 */
-	Vector<dim,unsigned long> n_points_per_dim;
+	Vector<dim,long> n_points_per_dim;
 	/**
 	 * Number of points per cell in dimension <tt>dim_1</tt>.
 	 */
-	unsigned int n_points_per_cell;
+	int n_points_per_cell;
 	/**
 	 * Total number of points in the mesh.
 	 */
-	unsigned long n_points;
+	long n_points;
 
 	/**
 	 * Is the last index of the MultiDimIndex the fastest to change when

@@ -20,7 +20,7 @@ private:
 	/**
 	 * Number of points in each space direction.
 	 */
-	unsigned int Nx, Ny;
+	int Nx, Ny;
 	/**
 	 * Input refractive index.
 	 */

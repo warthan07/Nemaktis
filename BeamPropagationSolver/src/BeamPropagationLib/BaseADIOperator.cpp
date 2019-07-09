@@ -1,5 +1,7 @@
 #include "BaseADIOperator.h"
 
+#define M_PI 3.1415926535897932
+
 BaseADIOperator::BaseADIOperator(
 		const PermittivityTensorField &eps,
 		double wavelength, const BPMSettings& bpm_settings) :
@@ -27,16 +29,14 @@ void BaseADIOperator::switch_to_forward_operator() {
 }
 void BaseADIOperator::z_step_increment() {
 
-	Assert(
-		iz<Nz-1, "Out-of-range z increment for the BaseADI operator.");
 	iz++;
 }
 
 std::complex<double> BaseADIOperator::d_ovr_dX(
 		const VectorField<std::complex<double> > &src,
-		unsigned int ix, unsigned int iy, unsigned int comp) const {
+		int ix, int iy, int comp) const {
 
-	unsigned int ix1, ix2;
+	int ix1, ix2;
 
 	if(periodic_x) {
 		ix1 = (ix!=0) ? ix-1 : Nx-2;
@@ -56,9 +56,9 @@ std::complex<double> BaseADIOperator::d_ovr_dX(
 
 std::complex<double> BaseADIOperator::d_ovr_dY(
 		const VectorField<std::complex<double> > &src,
-		unsigned int ix, unsigned int iy, unsigned int comp) const {
+		int ix, int iy, int comp) const {
 
-	unsigned int iy1, iy2;
+	int iy1, iy2;
 
 	if(periodic_y) {
 		iy1 = (iy!=0) ? iy-1 : Ny-2; 	
@@ -79,16 +79,16 @@ std::complex<double> BaseADIOperator::d_ovr_dY(
 
 std::complex<double> BaseADIOperator::d2_ovr_dX2(
 		const VectorField<std::complex<double> > &src,
-		unsigned int ix, unsigned int iy, unsigned int comp) const {
+		int ix, int iy, int comp) const {
 
-	unsigned int ix1, ix2, ix3;
+	int ix1, ix2, ix3;
 
 	if(periodic_x) {
 		ix1 = (ix!=0) ? ix-1 : Nx-2;
 		ix3 = (ix!=Nx-1) ? ix+1 : 1;
 
 		return 
-			( src({ix1,iy,0},comp) - 2*src({ix,iy,0},comp) + src({ix3,iy,0},comp) )
+			( src({ix1,iy,0},comp) - 2.*src({ix,iy,0},comp) + src({ix3,iy,0},comp) )
 			/ (delta_X*delta_X);
 	}
 	else {
@@ -97,23 +97,23 @@ std::complex<double> BaseADIOperator::d2_ovr_dX2(
 		else				{ 	ix1 = ix-1;		ix2 = ix;		ix3 = ix+1;	}
 	
 		return 
-			( src({ix1,iy,0},comp) - 2*src({ix2,iy,0},comp) + src({ix3,iy,0},comp) )
+			( src({ix1,iy,0},comp) - 2.*src({ix2,iy,0},comp) + src({ix3,iy,0},comp) )
 			/ (delta_X*delta_X);
 	}
 }
 
 std::complex<double> BaseADIOperator::d2_ovr_dY2(
 		const VectorField<std::complex<double> > &src,
-		unsigned int ix, unsigned int iy, unsigned int comp) const {
+		int ix, int iy, int comp) const {
 
-	unsigned int iy1, iy2, iy3;
+	int iy1, iy2, iy3;
 
 	if(periodic_y) {
 		iy1 = (iy!=0) ? iy-1 : Ny-2; 	
 		iy3 = (iy!=Ny-1) ? iy+1 : 1;
 
 		return 
-			( src({ix,iy1,0},comp) - 2*src({ix,iy,0},comp) + src({ix,iy3,0},comp) )
+			( src({ix,iy1,0},comp) - 2.*src({ix,iy,0},comp) + src({ix,iy3,0},comp) )
 			/ (delta_Y*delta_Y);
 	}
 	else {
@@ -122,16 +122,16 @@ std::complex<double> BaseADIOperator::d2_ovr_dY2(
 		else				{ 	iy1 = iy-1;		iy2 = iy;		iy3 = iy+1;	}
 	
 		return 
-			( src({ix,iy1,0},comp) - 2*src({ix,iy2,0},comp) + src({ix,iy3,0},comp) )
+			( src({ix,iy1,0},comp) - 2.*src({ix,iy2,0},comp) + src({ix,iy3,0},comp) )
 			/ (delta_Y*delta_Y);
 	}
 }
 
 std::complex<double> BaseADIOperator::d2_ovr_dXdY(
 		const VectorField<std::complex<double> > &src,
-		unsigned int ix, unsigned int iy, unsigned int comp) const {
+		int ix, int iy, int comp) const {
 
-	unsigned int ix1, ix2, iy1, iy2;
+	int ix1, ix2, iy1, iy2;
 	double dX, dY;
 	if(periodic_x) {
 		ix1 = (ix!=0) ? ix-1 : Nx-2;

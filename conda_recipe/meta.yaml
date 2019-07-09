@@ -16,6 +16,7 @@ requirements:
     build:
         - cmake
         - {{ compiler('cxx') }}
+        - vs2015_runtime # [win]
     host:
         - pkgconfig
         - muparser
@@ -46,3 +47,4 @@ requirements:
         - ipython
         - traits
         - traitsui
+        - vs2015_runtime # [win]

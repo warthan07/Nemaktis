@@ -16,14 +16,14 @@
 class VTIReader {
 public:
 	VTIReader(
-		std::string &filename, unsigned int lc_dim);
+		std::string &filename, int lc_dim);
 
 	void fill_solution_vector(
 		std::shared_ptr<VectorField<double> > &lc_sol,
 		BasisConvention basis_convention) const;
 
 private:
-	const unsigned int lc_dim;
+	const int lc_dim;
 
 	vtkSmartPointer<vtkXMLImageDataReader> reader;
 	vtkSmartPointer<vtkImageData> output;

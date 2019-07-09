@@ -1,5 +1,7 @@
 #include "BeamProfile.h"
 
+#define M_PI 3.1415926535897932
+
 BeamProfile::BeamProfile(
 		const PhysicsCoefficients &coefs, double pol_angle, double wavelength) :
 	ne(coefs.get_ne(wavelength)),

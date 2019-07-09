@@ -96,7 +96,7 @@ void FresnelTransmission<dim>::update(
 			ray_bundle_1.evanescent = true;
 		else {
 			ray_bundle_1.cur_transmission_factors[i] *=
-				2 * fresnel_coefs[2] /
+				2. * fresnel_coefs[2] /
 				std::sqrt(std::abs(ray_bundle_1.cur_geom_spreading)) /
 				ray_bundle_1.cur_optical_index;
 			ray_bundle_1.cur_pols[i] = e_pol[2];
@@ -106,7 +106,7 @@ void FresnelTransmission<dim>::update(
 			ray_bundle_2.evanescent = true;
 		else {
 			ray_bundle_2.cur_transmission_factors[i] *=
-				2 * fresnel_coefs[3] /
+				2. * fresnel_coefs[3] /
 				std::sqrt(std::abs(ray_bundle_2.cur_geom_spreading)) /
 				ray_bundle_2.cur_optical_index;
 			ray_bundle_2.cur_pols[i] = e_pol[3];
