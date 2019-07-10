@@ -1,11 +1,9 @@
 #include "BaseADIOperator.h"
 
-#define M_PI 3.1415926535897932
-
 BaseADIOperator::BaseADIOperator(
 		const PermittivityTensorField &eps,
 		double wavelength, const BPMSettings& bpm_settings) :
-	k0(2*M_PI/wavelength),
+	k0(2*PI/wavelength),
 	delta_X(k0*eps.mesh.delta_x),
 	delta_Y(k0*eps.mesh.delta_y),
 	delta_Z(k0*eps.mesh.delta_z),

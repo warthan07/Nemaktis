@@ -10,8 +10,6 @@
 
 #include "ScreenOutput.h"
 
-#define M_PI 3.1415926535897932
-
 ScreenOutput::ScreenOutput(
 		const RootSettings &settings,
 		const PhysicsCoefficients &coefs) :
@@ -252,7 +250,7 @@ std::shared_ptr<std::vector<std::complex<double> > > ScreenOutput::assemble_iso_
 	}
 
 	auto iso_filter = std::make_shared<std::vector<std::complex<double> > >(Nx*Ny);
-	double k0 = 2*M_PI/wavelength;
+	double k0 = 2*PI/wavelength;
 
 	// transfer matrix in column-major order
 	std::vector<std::complex<double> > tmat(4), prev_tmat(4); 
@@ -262,11 +260,11 @@ std::shared_ptr<std::vector<std::complex<double> > > ScreenOutput::assemble_iso_
 	for(int iy=0; iy<Ny; iy++) {
 		for(int ix=0; ix<Nx; ix++) {
 			double kx = (ix<double(Nx/2.)) ?
-				2*M_PI*ix/(delta_x*(Nx-1)) :
-				-2*M_PI*(Nx-ix)/(delta_x*(Nx-1));
+				2*PI*ix/(delta_x*(Nx-1)) :
+				-2*PI*(Nx-ix)/(delta_x*(Nx-1));
 			double ky = (iy<double(Ny/2.)) ?
-				2*M_PI*iy/(delta_y*(Ny-1)) :
-				-2*M_PI*(Ny-iy)/(delta_y*(Ny-1));
+				2*PI*iy/(delta_y*(Ny-1)) :
+				-2*PI*(Ny-iy)/(delta_y*(Ny-1));
 			double k = std::sqrt(kx*kx+ky*ky);
 
 			if(k<k0*numerical_aperture) {

@@ -3,15 +3,13 @@
 #include "PhaseOperator.h"
 #include "error.h"
 
-#define M_PI 3.1415926535897932
-
 PhaseOperator::PhaseOperator(
 		const PermittivityTensorField &eps,
 		double wavelength) :
 	Nx(eps.mesh.Nx),
 	Ny(eps.mesh.Ny),
 	Nz(eps.mesh.Nz),
-	delta_Z(2*M_PI*eps.mesh.delta_z/wavelength),
+	delta_Z(2*PI*eps.mesh.delta_z/wavelength),
 	iz(0),
 	op_field(eps.mesh, 3) {
 

@@ -1,4 +1,4 @@
-cxx_compiler:
-  - vs2015
-target_platform:
-  - win-64
+win_cxx_compiler: # [win]
+  - vs2015        # [win]
+target_platform:  # [win]
+  - win-64        # [win]

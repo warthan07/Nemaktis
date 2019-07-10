@@ -6,8 +6,6 @@
 #include "PhaseOperator.h"
 #include "FresnelOperator.h"
 
-#define M_PI 3.1415926535897932
-
 BPMIteration::BPMIteration(
 		const VectorField<double> &lc_sol,
 		std::vector<VectorField<std::complex<double> > > (&bpm_sol)[2],
@@ -68,10 +66,10 @@ void BPMIteration::update_optical_field() {
 			std::shared_ptr<BeamProfile> beam_profile;
 			if(beam_profile_type == BeamProfileType::GaussianBeam)
 				beam_profile = std::make_shared<GaussianBeam>(
-					coefs, 0.5*M_PI*pol_idx, 5, wavelengths[wave_idx]);
+					coefs, 0.5*PI*pol_idx, 5, wavelengths[wave_idx]);
 			else if(beam_profile_type == BeamProfileType::UniformBeam)
 				beam_profile = std::make_shared<UniformBeam>(
-					coefs, 0.5*M_PI*pol_idx, wavelengths[wave_idx]);
+					coefs, 0.5*PI*pol_idx, wavelengths[wave_idx]);
 	
 			double x, y;
 			for(int iperp=0; iperp<Nx*Ny; iperp++) {
