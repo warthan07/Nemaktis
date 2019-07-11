@@ -23,7 +23,7 @@ requirements:
         - muparser
         - pyfftw
         - fftw
-        - boost
+        - boost 1.67
         - openmp
         - vtk
         - eigen

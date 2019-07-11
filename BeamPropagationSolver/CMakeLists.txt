@@ -35,6 +35,7 @@ if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
+message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
 find_package(OpenMP REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
