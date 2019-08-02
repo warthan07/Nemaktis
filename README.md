@@ -57,7 +57,7 @@ repository: <https://github.com/IJSComplexMatter/dtmm>.
 See the following page for installation instructions (you don't have to clone this repository
 unless you want to modify the code):
 
-<https://nemaktis.readthedocs.io/intro/installation.html>
+<https://nemaktis.readthedocs.io/en/latest/intro/installation.html>
 
 
 ## Where to start?
