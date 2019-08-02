@@ -54,81 +54,10 @@ repository: <https://github.com/IJSComplexMatter/dtmm>.
 
 ## Installation
 
-### Simple method (conda package, linux-64)
+See the following page for installation instructions (you don't have to clone this repository
+unless you want to modify the code):
 
-The simplest way of installing this package is through the *conda* package manager (no
-compilation and no dependency to install manually). You just need a Linux machine with conda
-or miniconda installed on it (it should be available on the native package manager of your Linux
-distribution, if not see [Installing miniconda on
-Linux](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)).
-
-First, open a terminal and create a new environment for ``nemaktis`` (of course you can adjust the
-name of this environment):
-```
-conda create -n nemaktis
-```
-Then, activate the environment and install the ``nemaktis`` package]:
-```
-conda activate nemaktis
-conda install -c anaconda -c conda-forge -c warthan07 nemaktis
-```
-
-After this, all dependencies for ``nemaktis`` will be available in the environment you just
-created, which means you just need to run ``conda activate nemaktis`` in any terminal
-window to start using this package.
-
-
-### Developper method (conda-build, linux-64)
-
-If you want to be able to modify the code (perhaps you found a bug, or want to implement
-yourselves a new feature), but still want to enjoy the simplicity of conda packages
-(no relative paths to manage, everything works as with a system package), you can build 
-yourselves the ``nemaktis`` package for Linux:
-
-1. Get the code of this repository (``git clone git@github.com:warthan07/Nemaktis.git``) and
-   implements the changes that you want. For the C++ codes, compilation steps are provided
-   in the subfolders [bpm-solver](BeamPropagationSolver) and [rt-solver](RayTracingSolver) if
-   you want to test them locally (in which case you will have to install yourselves the
-   dependencies listed in each CMakeLists).
-
-2. In a terminal, go to the subfolder *conda_recipe* of this repository and activate any
-   conda environment in which you have write access. If you don't have any conda environment
-   yet, you can type:
-   ```
-   conda create -n build
-   conda activate build
-   ```
-   If necessary, install the conda-build tools:
-   ```
-   conda install conda-build conda-verify
-   ```
-
-3. Run the following command, which will create a sub-environment, install all dependencies
-   listed in [meta.yaml](conda_recipe/meta.yaml), and compile/package everything (it should take
-   between 5 and 10 minutes):
-   ```
-   conda-build . -c anaconda -c conda-forge
-   ```
-
-4. Once the package is built, you can install it in your current environment by typing:
-   ```
-   conda install -c anaconda -c conda-forge -c ${CONDA_PREFIX}/conda-bld/ nemaktis
-   ```
-
-
-### Complex method (conda-build, any platform)
-
-If you don't want to use Linux but still want to use conda, you will have to build yourself the
-conda package. This means that you need to be familiar with the
-[conda-build](https://docs.conda.io/projects/conda-build/en/latest/) framework. You can take a
-look in the subfolder [conda_recipe](conda_recipe) to see how the compilation recipe was written
-for the Linux platform, and start adapting this recipe for your own platform.
-
-The reason I don't provide conda packages for Mac and Windows is simply that I don't have access
-to machines with these operating systems. If you manage to write a working recipe for one of
-these OSs and want to share it with the community, please contact me so that I can add the
-relevant documentation and links (ideally, you should upload the package that you built to the
-anaconda cloud so that anyone can install it with ``conda install``).
+<https://nemaktis.readthedocs.io/intro/installation.html>
 
 
 ## Where to start?

@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; Nemaktis 1.0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial" href="../high_level/tutorial.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Nemaktis
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#with-conda-windows-or-linux">With Conda (windows or linux)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developper-method-only-linux">Developper method (only linux)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">High-level python interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../high_level/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../high_level/api.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Backends</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../backends/rtm.html">Ray-tracing backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends/bpm.html">Beam propagation backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends/dtmm.html">Diffractive transfer matrix backend</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Nemaktis</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intro/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<span id="install"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">Nemaktis</span></code> is a mixture of C++ and python codes, and have been successfully tested both on
+Windows and Linux (note that it should be straightforward to adapt it for Mac, since it is
+a Unix-based OS). The next two subsections present the two possible ways of installing this
+package.</p>
+<div class="section" id="with-conda-windows-or-linux">
+<h2>With Conda (windows or linux)<a class="headerlink" href="#with-conda-windows-or-linux" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way of installing the <code class="docutils literal notranslate"><span class="pre">Nemaktis</span></code> package is through the package manager
+<code class="docutils literal notranslate"><span class="pre">conda</span></code> (no compilation and no dependency to be installed by hand). I provide precompiled
+packages for both <strong>Linux</strong> and <strong>Windows</strong>, which means the following method will work on these two
+operating systems.</p>
+<p>The first step is to install the software <code class="docutils literal notranslate"><span class="pre">miniconda</span></code>, which contains a barebone version of
+the package manager <code class="docutils literal notranslate"><span class="pre">conda</span></code>. If you already have the full python distribution <code class="docutils literal notranslate"><span class="pre">Anaconda</span></code>
+installed on your machine, this step is not necessary. The installation files for Windows/Linux
+are available at this address: <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">https://docs.conda.io/en/latest/miniconda.html</a></p>
+<p>If you don’t want to copy-paste commands in a terminal, the next step is as simple as running
+the following installation script:</p>
+<ul class="simple">
+<li><p>Windows: <a class="reference external" href="https://github.com/warthan07/Nemaktis/releases/download/v1.0/Install.Nemaktis.cmd">https://github.com/warthan07/Nemaktis/releases/download/v1.0/Install.Nemaktis.cmd</a></p></li>
+<li><p>Linux: soon</p></li>
+</ul>
+<p>Both scripts will create a special environment for <code class="docutils literal notranslate"><span class="pre">Nemaktis</span></code> named <em>nm</em> and will install
+everything needed in it. The windows script will also install the python editor <code class="docutils literal notranslate"><span class="pre">Spyder</span></code>
+and create a shortcut named <em>Spyder (Nemakis environment)</em> for it on your Desktop (this is
+necessary even if you already installed Spyder, since it has to be run from inside the conda
+environment <em>nm</em>).</p>
+<p>If you want to type the installation commands yourselves (they are not very complicated after
+all!), open a terminal (Windows: application “Conda terminal” installed with miniconda, Linux:
+any terminal) and type the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">nm</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">-</span><span class="n">c</span> <span class="n">warthan07</span> <span class="o">-</span><span class="n">y</span> <span class="n">nemaktis</span>
+</pre></div>
+</div>
+<p>(Optional) If you want to use your favourite python editor when using <code class="docutils literal notranslate"><span class="pre">Nemaktis</span></code>, you have
+to install and run it from the same environment. You can search <a class="reference external" href="https://anaconda.org/">https://anaconda.org/</a> to find
+the associated package and installation command. For example, to install <code class="docutils literal notranslate"><span class="pre">Spyder</span></code> you just
+need to type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">nm</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">spyder</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="developper-method-only-linux">
+<h2>Developper method (only linux)<a class="headerlink" href="#developper-method-only-linux" title="Permalink to this headline">¶</a></h2>
+<p>If you want to be able to modify the code, but still want to enjoy the simplicity of conda
+packages (no relative paths to manage, everything works as with a system package), you can build
+yourselves the nemaktis package for Linux:</p>
+<ol class="arabic">
+<li><p>Get the code of the <code class="docutils literal notranslate"><span class="pre">Nemaktis</span></code> repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">warthan07</span><span class="o">/</span><span class="n">Nemaktis</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>And implements the changes that you want. For the C++ codes, compilation steps are provided
+in the subfolders bpm-solver and rt-solver if you want to test them locally (in which case
+you will have to install yourselves the dependencies listed in each CMakeLists).</p>
+</li>
+<li><p>In a terminal, go to the subfolder <strong>conda_recipe</strong> of the <code class="docutils literal notranslate"><span class="pre">Nemaktis</span></code> repository and activate
+any conda environment in which you have write access. If you don’t have any conda environment
+yet, you can type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">build</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">build</span>
+</pre></div>
+</div>
+<p>If necessary, install the conda-build tools:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">conda</span><span class="o">-</span><span class="n">build</span> <span class="n">conda</span><span class="o">-</span><span class="n">verify</span>
+</pre></div>
+</div>
+</li>
+<li><p>Run the following command, which will create a sub-environment, install all dependencies
+listed in meta.yaml, and compile/package everything (it should take between 5 and 10
+minutes):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span><span class="o">-</span><span class="n">build</span> <span class="o">.</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+</li>
+<li><p>Once the package is built, you can install it in your current environment by typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>conda install -c anaconda -c conda-forge -c ${CONDA_PREFIX}/conda-bld/ nemaktis
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../high_level/tutorial.html" class="btn btn-neutral float-right" title="Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Guilhem Poy, Andrej Petelin
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
