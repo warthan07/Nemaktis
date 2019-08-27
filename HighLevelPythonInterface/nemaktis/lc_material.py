@@ -336,8 +336,8 @@ class DirectorField:
 
     @vals.setter
     def vals(self, director_ndarray):
-        if self.vals.shape==director_ndarray.shape:
-            self.vals = director_ndarray
+        if self._vals.shape==director_ndarray.shape:
+            self._vals = director_ndarray
         else:
             raise Exception("Wrong shape for the director field ndarray")
 
