@@ -37,8 +37,6 @@ void ExtraordinaryODEFunction<dim>::compute_ode_function(
 		Vector<3,double> &pos_derivative,
 		Vector<3,double> &moment_derivative) {
 
-	int i,j;
-
 	// We get the value of the director and its derivative
 	Vector<3,double> n;
 	if(!director_field->get_value_embedded(ray.cur_pos, n))
@@ -54,7 +52,7 @@ void ExtraordinaryODEFunction<dim>::compute_ode_function(
 		ray.cur_moment / eps_par
 		+ (n,ray.cur_moment) * n / eps_a_bar;
 	moment_derivative = 
-		- (n,ray.cur_moment) * (grad_n*ray.cur_moment) / eps_a_bar;
+		- (n,ray.cur_moment) * (grad_n & ray.cur_moment) / eps_a_bar;
 }
 
 template <int dim>

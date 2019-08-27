@@ -10,14 +10,14 @@ struct Index3D {
 	/**
 	 * Index for each spatial directions.
 	 */
-	unsigned int x, y, z;
+	int x, y, z;
 };
 
 template <typename T>
 class VectorField {
 public:
-	VectorField(CartesianMesh mesh, unsigned int field_dim);
-	VectorField(CartesianMesh mesh, unsigned int field_dim, T val);
+	VectorField(CartesianMesh mesh, int field_dim);
+	VectorField(CartesianMesh mesh, int field_dim, T val);
 	/**
 	 * Initializes a vector field from a raw pointer array (slow to fast
 	 * indices: iz -> iy -> ix -> field component). The number of components
@@ -26,10 +26,10 @@ public:
 	 * last component). Positive mask values are equivalent to true,
 	 * strictly negative mask values are equivalent to false.
 	 */
-	VectorField(CartesianMesh mesh, unsigned int field_dim, T* user_vals, int n_user_vals);
+	VectorField(CartesianMesh mesh, int field_dim, T* user_vals, int n_user_vals);
 
 	void set_mask(std::string mask_formula);
-	bool get_mask_val(const unsigned int vertex_idx) const;
+	bool get_mask_val(const int vertex_idx) const;
 	bool get_mask_val(const Index3D &p) const;
 
 	void operator=(T val);
@@ -41,14 +41,14 @@ public:
 	void operator+=(const VectorField<T> &src);
 	void operator-=(const VectorField<T> &src);
 
-	T operator[](unsigned int idx) const;
-	T& operator[](unsigned int idx);
+	T operator[](int idx) const;
+	T& operator[](int idx);
 
-	T operator()(const unsigned int vertex_idx, unsigned int comp) const;
-	T& operator()(const unsigned int vertex_idx, unsigned int comp);
+	T operator()(const int vertex_idx, int comp) const;
+	T& operator()(const int vertex_idx, int comp);
 
-	T operator()(const Index3D &p, unsigned int comp) const;
-	T& operator()(const Index3D &p, unsigned int comp);
+	T operator()(const Index3D &p, int comp) const;
+	T& operator()(const Index3D &p, int comp);
 
 	T operator,(const VectorField<T> &src);
 
@@ -58,8 +58,8 @@ public:
 	double norm();
 	double linfty_norm();
 
-	const unsigned int field_dim;
-	const unsigned int n_vertex;
+	const int field_dim;
+	const int n_vertex;
 
 	const CartesianMesh mesh;
 

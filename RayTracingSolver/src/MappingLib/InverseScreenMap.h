@@ -19,7 +19,7 @@ public:
 	}
 	void refine_data();
 
-	const Vector<dim,unsigned long>& n_points_per_dim() const {
+	const Vector<dim,unsigned long> n_points_per_dim() const {
 		return coarse_mesh.n_points_per_dim;
 	}
 

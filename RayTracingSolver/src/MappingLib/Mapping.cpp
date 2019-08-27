@@ -109,7 +109,7 @@ bool InterpolatedMapping<dim1,dim2,T>::get_value(
 			else
 				return false;
 		}
-		cell_origin_indices(d) = floor(x_mesh_indices(d));
+		cell_origin_indices(d) = long(floor(x_mesh_indices(d)));
 	}
 	x_cell_coords = x_mesh_indices - cell_origin_indices.get();
 	
@@ -164,7 +164,7 @@ bool InterpolatedMapping<dim1,dim2,T>::get_gradient(
 			else
 				return false;
 		}
-		cell_origin_indices(d) = floor(x_mesh_indices(d));
+		cell_origin_indices(d) = long(floor(x_mesh_indices(d)));
 	}
 	x_cell_coords = x_mesh_indices - cell_origin_indices.get();
 
@@ -241,7 +241,7 @@ void InterpolatedMapping<dim1,dim2,T>::extrapolate_data() {
 					( vals[i](j) - val(j) ) *
 					( (double) signs[i] ) / this->mesh->cell_lengths(i);
 
-		values->at(p.first()) = val+((pos-inside_pos)*grad);
+		values->at(p.first()) = val+((pos-inside_pos)&grad);
 	}
 }
 
@@ -251,7 +251,7 @@ void InterpolatedMapping<dim1,dim2,T>::get_nearby_points_indices() {
 	// First, we record the origin index of cells overlapping the domain
 	// interface
 	int Nc = (pol_order-1)/2;
-	bool valid_cell_origin, interface_cell;
+	bool valid_cell_origin;
 
 	std::vector<MultiDimIndex<dim1> > interface_cells_idx;
 	Vector<dim1,double> pos;
@@ -307,7 +307,7 @@ void InterpolatedMapping<dim1,dim2,T>::get_nearby_points_indices() {
 	// inside the definition domain (which will contain valid mapping
 	// data).
 	Vector<dim1,double> inside_pos, mesh_indices;
-	Vector<dim1,unsigned int> cell_origin_indices;
+	Vector<dim1,int> cell_origin_indices;
 	for(auto& p : nearby_point_data) {
 		pos = mesh->origin + p.first.get()*mesh->cell_lengths;
 		this->def_domain->compute_projection(pos, inside_pos, -SURFACE_EPS);
@@ -315,7 +315,7 @@ void InterpolatedMapping<dim1,dim2,T>::get_nearby_points_indices() {
 		mesh_indices =
 			( inside_pos - this->mesh->origin ) / this->mesh->cell_lengths;
 		for(int d=0; d<dim1; ++d) {
-			cell_origin_indices(d) = floor(mesh_indices(d));
+			cell_origin_indices(d) = int(floor(mesh_indices(d)));
 		}
 
 		MultiDimIndex<dim1> cell_idx(2);

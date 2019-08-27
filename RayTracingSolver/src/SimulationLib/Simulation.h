@@ -32,10 +32,10 @@ protected:
 	std::shared_ptr<FieldsData> bulk_fields_data, screen_fields_data;
 
 	double z_step;
-	unsigned long N_lc_steps, N_horiz_pixels;
+	long N_lc_steps, N_horiz_pixels;
 
 	std::vector<double> wavelengths;
-	unsigned int N_wavelengths;
+	int N_wavelengths;
 	double numerical_aperture;
 
 	MaterialProperties mat_properties;

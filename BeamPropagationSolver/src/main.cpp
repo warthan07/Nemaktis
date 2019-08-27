@@ -81,8 +81,12 @@ void create_default_settings_file(std::string filename) {
 
     		# Refractive index of the host fluid, used in case of a
 			# non-trivial LC domain mask (can include a dependence on the
-			# wavelength "lambda" in µm)
+			# wavelength "lambda" in µm). Only used in backend-mode.
 			"nhost": 				"1.5",
+
+    		# Refractive index of the input medium below the LC layer (can
+			# include a dependence on the wavelength "lambda" in µm). 
+			"nin": 				"1.5",
 
 			# Mean wavelength for the spectrum of the input beam
 			"Mean wavelength":	0.6,

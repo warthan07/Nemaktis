@@ -30,9 +30,9 @@ private:
 			double wavelength, const BPMSettings& bpm_settings);
 	
 	protected:
-		virtual std::complex<double> diag_inf(unsigned int ix, unsigned int iy) const;
-		virtual std::complex<double> diag_mid(unsigned int ix, unsigned int iy) const;
-		virtual std::complex<double> diag_sup(unsigned int ix, unsigned int iy) const;
+		virtual std::complex<double> diag_inf(int ix, int iy) const;
+		virtual std::complex<double> diag_mid(int ix, int iy) const;
+		virtual std::complex<double> diag_sup(int ix, int iy) const;
 	};
 	class Block11 : public TriDiagonalADIOperatorY {
 	public:
@@ -42,14 +42,14 @@ private:
 	
 		void vmult_corr(
 			VectorField<std::complex<double> > &dst,
-			unsigned int dst_comp,
+			int dst_comp,
 			const VectorField<std::complex<double> > &src,
-			unsigned int src_comp) const;
+			int src_comp) const;
 
 	protected:
-		virtual std::complex<double> diag_inf(unsigned int ix, unsigned int iy) const;
-		virtual std::complex<double> diag_mid(unsigned int ix, unsigned int iy) const;
-		virtual std::complex<double> diag_sup(unsigned int ix, unsigned int iy) const;
+		virtual std::complex<double> diag_inf(int ix, int iy) const;
+		virtual std::complex<double> diag_mid(int ix, int iy) const;
+		virtual std::complex<double> diag_sup(int ix, int iy) const;
 	};
 	class Block10 : public BaseADIOperator {
 	public:
@@ -59,15 +59,15 @@ private:
 
 		virtual void vmult(
 			VectorField<std::complex<double> > &dst,
-			unsigned int dst_comp,
+			int dst_comp,
 			const VectorField<std::complex<double> > &src,
-			unsigned int src_comp) const;
+			int src_comp) const;
 	};
 	Block00 block_00;
 	Block10 block_10;
 	Block11 block_11;
 	
-	unsigned int N_woodbury_steps;
+	int N_woodbury_steps;
 };
 
 

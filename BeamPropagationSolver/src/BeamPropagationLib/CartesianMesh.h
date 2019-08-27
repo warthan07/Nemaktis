@@ -2,7 +2,7 @@
 #define CARTESIANMESH_H
 
 struct CartesianMesh {
-	CartesianMesh(const double (&delta)[3], const unsigned int (&N)[3]) :
+	CartesianMesh(const double (&delta)[3], const int (&N)[3]) :
 		delta_x(delta[0]),
 		delta_y(delta[1]),
 		delta_z(delta[2]),
@@ -18,7 +18,7 @@ struct CartesianMesh {
 	/**
 	 * Number of points in each space direction.
 	 */
-	unsigned int Nx, Ny, Nz;
+	int Nx, Ny, Nz;
 };
 
 #endif

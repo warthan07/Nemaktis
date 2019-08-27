@@ -37,8 +37,9 @@ RayFamily<dim>::RayFamily(LightSource<dim-1> &source, double z_init, double init
 template <int dim>
 void RayFamily<dim>::update_map_data() {
 
-	#pragma omp parallel for firstprivate(E)
+	#pragma omp parallel for
 	for(int i=0; i<ray_bundles->size(); i++) {
+		Vector<3, std::complex<double> > E;
 		for(int pol_idx=0; pol_idx<2; pol_idx++) {
 			ray_bundles->at(i).compute_E_field(E, pol_idx);
 			E_maps_data[pol_idx]->at(ray_to_mesh_indices[i]) = E;

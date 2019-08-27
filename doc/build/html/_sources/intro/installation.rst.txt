@@ -1,0 +1,87 @@
+.. _install:
+
+Installation
+============
+
+``Nemaktis`` is a mixture of C++ and python codes, and have been successfully tested both on
+Windows and Linux (note that it should be straightforward to adapt it for Mac, since it is
+a Unix-based OS). The next two subsections present the two possible ways of installing this
+package.
+
+With Conda (windows or linux)
+-----------------------------
+
+The simplest way of installing the ``Nemaktis`` package is through the package manager
+``conda`` (no compilation and no dependency to be installed by hand). I provide precompiled
+packages for both **Linux** and **Windows**, which means the following method will work on these two
+operating systems.
+
+The first step is to install the software ``miniconda``, which contains a barebone version of
+the package manager ``conda``. If you already have the full python distribution ``Anaconda``
+installed on your machine, this step is not necessary. The installation files for Windows/Linux
+are available at this address: https://docs.conda.io/en/latest/miniconda.html
+
+If you don't want to copy-paste commands in a terminal, the next step is as simple as running
+the following installation script:
+
+- Windows: https://github.com/warthan07/Nemaktis/releases/download/v1.0/Install.Nemaktis.cmd
+- Linux: soon
+
+Both scripts will create a special environment for ``Nemaktis`` named *nm* and will install
+everything needed in it. The windows script will also install the python editor ``Spyder``
+and create a shortcut named *Spyder (Nemakis environment)* for it on your Desktop (this is
+necessary even if you already installed Spyder, since it has to be run from inside the conda
+environment *nm*).
+
+If you want to type the installation commands yourselves (they are not very complicated after
+all!), open a terminal (Windows: application "Conda terminal" installed with miniconda, Linux:
+any terminal) and type the following command: ::
+
+  conda create -n nm -c conda-forge -c warthan07 -y nemaktis
+
+(Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
+to install and run it from the same environment. You can search https://anaconda.org/ to find
+the associated package and installation command. For example, to install ``Spyder`` you just
+need to type: ::
+
+  conda activate nm
+  conda install spyder
+
+
+Developper method (only linux)
+------------------------------
+
+If you want to be able to modify the code, but still want to enjoy the simplicity of conda
+packages (no relative paths to manage, everything works as with a system package), you can build
+yourselves the nemaktis package for Linux:
+
+1. Get the code of the ``Nemaktis`` repository: ::
+
+     git clone git@github.com:warthan07/Nemaktis.git
+
+   And implements the changes that you want. For the C++ codes, compilation steps are provided
+   in the subfolders bpm-solver and rt-solver if you want to test them locally (in which case
+   you will have to install yourselves the dependencies listed in each CMakeLists).
+
+2. In a terminal, go to the subfolder **conda_recipe** of the ``Nemaktis`` repository and activate
+   any conda environment in which you have write access. If you don't have any conda environment
+   yet, you can type: ::
+     
+     conda create -n build
+     conda activate build
+
+   If necessary, install the conda-build tools: ::
+
+     conda install conda-build conda-verify
+
+3. Run the following command, which will create a sub-environment, install all dependencies
+   listed in meta.yaml, and compile/package everything (it should take between 5 and 10
+   minutes): ::
+
+     conda-build . -c conda-forge
+
+4. Once the package is built, you can install it in your current environment by typing: ::
+
+     conda install -c anaconda -c conda-forge -c ${CONDA_PREFIX}/conda-bld/ nemaktis
+
+

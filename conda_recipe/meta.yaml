@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.0.4"
+    version: "1.0.6"
 
 source:
     - path: ../BeamPropagationSolver
@@ -15,13 +15,15 @@ source:
 requirements:
     build:
         - cmake
-        - {{ compiler('cxx') }}
+        - {{ compiler('cxx') }} # [not win]
+        - {{ compiler('win_cxx') }} # [win]
+        - vs2015_runtime # [win]
     host:
         - pkgconfig
         - muparser
         - pyfftw
         - fftw
-        - boost
+        - boost 1.67
         - openmp
         - vtk
         - eigen
@@ -46,3 +48,4 @@ requirements:
         - ipython
         - traits
         - traitsui
+        - vs2015_runtime # [win]

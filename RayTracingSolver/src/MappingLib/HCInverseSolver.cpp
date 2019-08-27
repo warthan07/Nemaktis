@@ -83,7 +83,7 @@ void HCInverseSolver<dim>::find_inverses(
 
 	Matrix<dim,dim,double> grad, grad_inv;
 	Vector<dim,double> shift;
-	int prev_size;
+	std::size_t prev_size;
 	
 	output.second.clear();
 

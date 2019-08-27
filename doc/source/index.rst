@@ -6,6 +6,17 @@
 Welcome to Nemaktis's documentation!
 ====================================
 
+.. _intro:
+
+.. toctree::
+    :maxdepth: 2
+    :glob:
+    :caption: Introduction 
+
+    intro/overview.rst
+    intro/installation.rst
+
+
 .. _high_level:
 
 .. toctree::
@@ -15,6 +26,7 @@ Welcome to Nemaktis's documentation!
 
     high_level/tutorial.rst
     high_level/api.rst
+
 
 .. _backends:
 

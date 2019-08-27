@@ -16,7 +16,7 @@ void run_backend(
 	
 		std::vector<double> spacings =
 			j.at("Physics settings").at("Initial conditions").at("Mesh spacings");
-		std::vector<unsigned int> dims =
+		std::vector<int> dims =
 			j.at("Physics settings").at("Initial conditions").at("Mesh dimensions");
 		CartesianMesh mesh(
 			{spacings[0], spacings[1], spacings[2]},

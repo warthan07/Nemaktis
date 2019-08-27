@@ -4,7 +4,7 @@ BeamProfile::BeamProfile(
 		const PhysicsCoefficients &coefs, double pol_angle, double wavelength) :
 	ne(coefs.get_ne(wavelength)),
 	no(coefs.get_no(wavelength)),
-	k(2*M_PI/wavelength),
+	k(2*PI/wavelength),
 	theta(pol_angle),
 	h(coefs.mesh_thickness()) {}
 

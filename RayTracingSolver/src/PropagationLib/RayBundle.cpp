@@ -149,7 +149,7 @@ void RayBundle<dim>::exact_geometrical_spreading_update(
 	double smin = std::min(0., step_length);
 	double smax = std::max(0., step_length);
 
-	int num_roots = 0;
+	double num_roots = 0;
 	if(delta==0 && -b/(2*a)>=smin && -b/(2*a)<=smax)
 		num_roots++;
 	else if(delta>0) {

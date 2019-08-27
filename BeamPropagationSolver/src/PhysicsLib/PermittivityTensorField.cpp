@@ -15,9 +15,9 @@ PermittivityTensorField::PermittivityTensorField(
 
 	if(lc_sol.field_dim == 3) {
 		#pragma omp parallel for firstprivate(mask_val0, mask_val1)
-		for(unsigned int iz=0; iz<mesh.Nz-1; iz++) {
-			for(unsigned int iy=0; iy<mesh.Ny; iy++) {
-				for(unsigned int ix=0; ix<mesh.Nx; ix++) {
+		for(int iz=0; iz<mesh.Nz-1; iz++) {
+			for(int iy=0; iy<mesh.Ny; iy++) {
+				for(int ix=0; ix<mesh.Nx; ix++) {
 					mask_val0 = lc_sol.get_mask_val({ix,iy,iz});
 					mask_val1 = lc_sol.get_mask_val({ix,iy,iz+1});
 	
@@ -59,9 +59,9 @@ PermittivityTensorField::PermittivityTensorField(
 		double eps_a_eff = 2*eps_a/3;
 		double eps_iso = eps_perp+eps_a/3.;
 		#pragma omp parallel for firstprivate(mask_val0, mask_val1)
-		for(unsigned int iz=0; iz<mesh.Nz-1; iz++) {
-			for(unsigned int iy=0; iy<mesh.Ny; iy++) {
-				for(unsigned int ix=0; ix<mesh.Nx; ix++) {
+		for(int iz=0; iz<mesh.Nz-1; iz++) {
+			for(int iy=0; iy<mesh.Ny; iy++) {
+				for(int ix=0; ix<mesh.Nx; ix++) {
 					mask_val0 = lc_sol.get_mask_val({ix,iy,iz});
 					mask_val1 = lc_sol.get_mask_val({ix,iy,iz+1});
 	

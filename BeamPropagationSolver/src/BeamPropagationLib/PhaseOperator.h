@@ -27,7 +27,7 @@ private:
 	/**
 	 * Number of points in each space direction.
 	 */
-	unsigned int Nx, Ny, Nz;
+	int Nx, Ny, Nz;
 
 	/**
 	 * Wavevector in empty space multiplied by the mesh spacing in the
@@ -37,7 +37,7 @@ private:
 	/**
 	 * Current z index.
 	 */
-	unsigned int iz;
+	int iz;
 
 	/**
 	 * A vector field containing the 3 independent components (xx, yy, xy)

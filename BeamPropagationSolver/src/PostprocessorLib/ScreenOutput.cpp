@@ -64,7 +64,7 @@ void ScreenOutput::apply(
 	std::string pol_strs[2] ={"inputX_", "inputY_"};
 
 	#pragma omp parallel for
-	for(unsigned int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
+	for(int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
 		// FFTW arrays for this thread
 		fftw_complex *field = static_cast<fftw_complex*>(
 			fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
@@ -78,7 +78,7 @@ void ScreenOutput::apply(
 		std::string suffix_str =
 			std::to_string(wavelengths[wave_idx])+"um";
 
-		for(unsigned int pol_idx=0; pol_idx<2; pol_idx++) {
+		for(int pol_idx=0; pol_idx<2; pol_idx++) {
 			auto real_data = vtkSmartPointer<vtkDoubleArray>::New();
 			real_data->SetNumberOfComponents(3);
 			real_data->SetNumberOfTuples(Nx*Ny);
@@ -94,9 +94,9 @@ void ScreenOutput::apply(
 			vti_data_arrays[4*wave_idx+2*pol_idx] = real_data;
 			vti_data_arrays[4*wave_idx+2*pol_idx+1] = imag_data;
 
-			for(unsigned int comp=0; comp<2; comp++) {
+			for(int comp=0; comp<2; comp++) {
 				// First, we fill the fftw input array with our data
-				for(unsigned int i=0; i<Nx*Ny; i++) {
+				for(int i=0; i<Nx*Ny; i++) {
 					field[i][0] = 
 						std::real(bpm_sol[pol_idx][wave_idx](i+Nx*Ny*(Nz-1),comp));
 					field[i][1] = 
@@ -105,7 +105,7 @@ void ScreenOutput::apply(
 
 				// We switch to fourrier space and apply the iso filter
 				fftw_execute_dft(forward_plan, field, fft_field);
-				for(unsigned int i=0; i<Nx*Ny; i++) {
+				for(int i=0; i<Nx*Ny; i++) {
 					auto val = std::complex<double>(fft_field[i][0], fft_field[i][1]);
 					fft_field[i][0] = std::real(val * iso_filter->at(i));
 					fft_field[i][1] = std::imag(val * iso_filter->at(i));
@@ -115,12 +115,12 @@ void ScreenOutput::apply(
 				// data
 				fftw_execute_dft(backward_plan, fft_field, field);
 
-				for(unsigned int i=0; i<Nx*Ny; i++) {
+				for(int i=0; i<Nx*Ny; i++) {
 					real_data->SetComponent(i, comp, field[i][0]/(Nx*Ny));
 					imag_data->SetComponent(i, comp, field[i][1]/(Nx*Ny));
 				}
 			}
-			for(unsigned int i=0; i<Nx*Ny; i++) {
+			for(int i=0; i<Nx*Ny; i++) {
 				real_data->SetComponent(i, 2, 0);
 				imag_data->SetComponent(i, 2, 0);
 			}
@@ -189,7 +189,7 @@ void ScreenOutput::apply_no_export(
 		"    Filtering optical fields..." << std::endl;
 
 	#pragma omp parallel for
-	for(unsigned int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
+	for(int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
 		// FFTW arrays for this thread
 		fftw_complex *field = static_cast<fftw_complex*>(
 			fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
@@ -199,10 +199,10 @@ void ScreenOutput::apply_no_export(
 		// Propagation filter for this wavelength
 		auto iso_filter = assemble_iso_filter(wavelengths[wave_idx]);
 
-		for(unsigned int pol_idx=0; pol_idx<2; pol_idx++) {
-			for(unsigned int comp=0; comp<2; comp++) {
+		for(int pol_idx=0; pol_idx<2; pol_idx++) {
+			for(int comp=0; comp<2; comp++) {
 				// First, we fill the fftw input array with our data
-				for(unsigned int i=0; i<Nx*Ny; i++) {
+				for(int i=0; i<Nx*Ny; i++) {
 					field[i][0] = 
 						std::real(bpm_sol[pol_idx][wave_idx](i+Nx*Ny*(Nz-1),comp));
 					field[i][1] = 
@@ -211,7 +211,7 @@ void ScreenOutput::apply_no_export(
 
 				// We switch to fourrier space and apply the iso filter
 				fftw_execute_dft(forward_plan, field, fft_field);
-				for(unsigned int i=0; i<Nx*Ny; i++) {
+				for(int i=0; i<Nx*Ny; i++) {
 					auto val = std::complex<double>(fft_field[i][0], fft_field[i][1]);
 					fft_field[i][0] = std::real(val * iso_filter->at(i));
 					fft_field[i][1] = std::imag(val * iso_filter->at(i));
@@ -221,7 +221,7 @@ void ScreenOutput::apply_no_export(
 				// data
 				fftw_execute_dft(backward_plan, fft_field, field);
 
-				for(unsigned int i=0; i<Nx*Ny; i++)
+				for(int i=0; i<Nx*Ny; i++)
 					fields_vals[i+Nx*Ny*(comp+2*pol_idx+4*wave_idx)] =
 						std::complex<double>(field[i][0]/(Nx*Ny), field[i][1]/(Nx*Ny));
 			}
@@ -244,27 +244,27 @@ std::shared_ptr<std::vector<std::complex<double> > > ScreenOutput::assemble_iso_
 
 	double z_foc = focalisation_z_shift;
 	double z_end = 0;
-	for(unsigned int i=0; i<iso_layer_thickness.size(); i++) {
+	for(int i=0; i<iso_layer_thickness.size(); i++) {
 		z_foc += iso_layer_thickness[i] * (1-1./iso_layer_index[i]);
 		z_end += iso_layer_thickness[i];
 	}
 
 	auto iso_filter = std::make_shared<std::vector<std::complex<double> > >(Nx*Ny);
-	double k0 = 2*M_PI/wavelength;
+	double k0 = 2*PI/wavelength;
 
 	// transfer matrix in column-major order
 	std::vector<std::complex<double> > tmat(4), prev_tmat(4); 
 	std::complex<double> t1, t2;
 
 	#pragma omp parallel for firstprivate(tmat, prev_tmat, t1, t2)
-	for(unsigned int iy=0; iy<Ny; iy++) {
-		for(unsigned int ix=0; ix<Nx; ix++) {
+	for(int iy=0; iy<Ny; iy++) {
+		for(int ix=0; ix<Nx; ix++) {
 			double kx = (ix<double(Nx/2.)) ?
-				2*M_PI*ix/(delta_x*(Nx-1)) :
-				-2*M_PI*(Nx-ix)/(delta_x*(Nx-1));
+				2*PI*ix/(delta_x*(Nx-1)) :
+				-2*PI*(Nx-ix)/(delta_x*(Nx-1));
 			double ky = (iy<double(Ny/2.)) ?
-				2*M_PI*iy/(delta_y*(Ny-1)) :
-				-2*M_PI*(Ny-iy)/(delta_y*(Ny-1));
+				2*PI*iy/(delta_y*(Ny-1)) :
+				-2*PI*(Ny-iy)/(delta_y*(Ny-1));
 			double k = std::sqrt(kx*kx+ky*ky);
 
 			if(k<k0*numerical_aperture) {
@@ -277,7 +277,7 @@ std::shared_ptr<std::vector<std::complex<double> > > ScreenOutput::assemble_iso_
 
 				double kN = std::sqrt(k0*k0-k*k);
 
-				for(unsigned int p=0; p<iso_layer_thickness.size(); p++) {
+				for(int p=0; p<iso_layer_thickness.size(); p++) {
 					double np = iso_layer_index[p];
 					// double np = 1.5046+0.00420/std::pow(wavelength,2.);
 					double ep = iso_layer_thickness[p];

@@ -29,7 +29,6 @@ protected:
 	virtual bool update_residual() = 0;
 	virtual bool update_jacobian_and_residual() = 0;
 	bool update_reduced_jacobian_and_residual();
-	bool compute_root_func(const Vector<dim,double> &pos, Vector<dim,double> &res);
 
 	double newton_tol;
 	int opt_iter;

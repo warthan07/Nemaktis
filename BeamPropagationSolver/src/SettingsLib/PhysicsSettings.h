@@ -28,6 +28,7 @@ public:
 	const std::string ne_expression;
 	const std::string no_expression;
 	const std::string nhost_expression;
+	const std::string nin_expression;
 	std::vector<double> wavelengths() const {
 		return _wavelengths;
 	}

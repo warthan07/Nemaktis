@@ -1,13 +1,13 @@
 import six
 from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt4'
+ETSConfig.toolkit = 'qt'
 
 import matplotlib as mpl
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from traits.api import HasTraits, Enum, Float, Bool, Int, Str, Directory, Instance
-from traitsui.api import View, Item, Spring, Group, Button, RangeEditor, EnumEditor
+from traits.api import HasTraits, Enum, Float, Bool, Int, Str, Directory, Instance, Button
+from traitsui.api import View, Item, Spring, Group, RangeEditor, EnumEditor
 from traitsui.qt4.editor import Editor
 from traitsui.qt4.basic_editor_factory import BasicEditorFactory
 

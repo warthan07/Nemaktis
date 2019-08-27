@@ -23,15 +23,19 @@ class LCMaterial(object):
     nhost : optional, float or math string depending on the wavelength variable "lambda" (µm)
         The refractive index associated with an eventual host fluid in which the LC domain
         is embedded (see DirectorField.set_mask).
+    nin : optional, float or math string depending on the wavelength variable "lambda" (µm)
+        The refractive index associated with the input medium below the LC layer. 
+        A default value of 1 is assumed.
     """
     iso_layer_indices = [] 
     iso_layer_thicknesses = [] 
 
-    def __init__(self, *, director_field, ne, no, nhost = 1):
+    def __init__(self, *, director_field, ne, no, nhost = 1, nin = 1):
         self.director_field = director_field
         self.ne = ne
         self.no = no
         self.nhost = nhost
+        self.nin = nin
 
     def add_isotropic_layer(self, *, nlayer, thickness):
         """Add an isotropic layer above the sample.  Light is assumed to propagate in the
