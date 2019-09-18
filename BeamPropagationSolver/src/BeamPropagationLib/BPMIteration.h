@@ -46,6 +46,11 @@ private:
 	int Nx, Ny, Nz;
 
 	/**
+	 * Beam waist (in case of a gaussian input
+	 */
+	double waist;
+
+	/**
 	 * Shortcut reference to the LC solution.
 	 */
 	const VectorField<double> &lc_sol;

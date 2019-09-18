@@ -57,11 +57,11 @@ void create_default_settings_file(std::string filename) {
 
 	"Physics settings": {
 		"Initial conditions": {
-			# The type of beam profile (GaussianBeam or UniformBeam)
+			# The type of beam profile (GaussianBeam(WAIST) or UniformBeam)
 			# used to initialize the optical fields on the entrance plane.
 			"Beam profile":		"UniformBeam",
 
-			# Relative path to a vti file containing the LC orientation field, named "n"
+			# Relative path to a vti file containing the LC orientational field, named "n"
 			# in "Director" mode or "Q" in "Q-tensor" mode.
 			"LC field file":	"",
 

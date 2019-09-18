@@ -1,4 +1,5 @@
 ﻿#include <memory>
+#include <boost/regex.hpp>
 
 #include "BPMIteration.h"
 #include "ADIOperatorX.h"
@@ -24,10 +25,20 @@ BPMIteration::BPMIteration(
 	wavelengths(coefs.wavelengths()) {
 
 	auto& ic_settings = settings.physics.initial_conditions;
-	if(ic_settings.beam_profile_type == "GaussianBeam")
-		beam_profile_type = BeamProfileType::GaussianBeam;
-	else if(ic_settings.beam_profile_type == "UniformBeam")
+	if(ic_settings.beam_profile_type == "UniformBeam")
 		beam_profile_type = BeamProfileType::UniformBeam;
+	else {
+		boost::smatch match_res;
+		if(boost::regex_match(
+				ic_settings.beam_profile_type, match_res,
+				boost::regex("GaussianBeam\\(([0-9]+\\.?[0-9]*)\\)"))) {
+			beam_profile_type = BeamProfileType::GaussianBeam;
+			waist = std::stod(match_res[1]);
+		}
+		else {
+			throw std::string("Unrecognised beam profile");
+		}
+	}
 }
 
 void BPMIteration::update_optical_field() {
@@ -66,7 +77,7 @@ void BPMIteration::update_optical_field() {
 			std::shared_ptr<BeamProfile> beam_profile;
 			if(beam_profile_type == BeamProfileType::GaussianBeam)
 				beam_profile = std::make_shared<GaussianBeam>(
-					coefs, 0.5*PI*pol_idx, 5, wavelengths[wave_idx]);
+					coefs, waist, 0.5*PI*pol_idx, wavelengths[wave_idx]);
 			else if(beam_profile_type == BeamProfileType::UniformBeam)
 				beam_profile = std::make_shared<UniformBeam>(
 					coefs, 0.5*PI*pol_idx, wavelengths[wave_idx]);
