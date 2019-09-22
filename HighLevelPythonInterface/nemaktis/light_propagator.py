@@ -222,17 +222,17 @@ class LightPropagator:
                     (1,0,2,3)).reshape((2,dims[0]*dims[1]*(dims[2]+1))).transpose()
 
                 E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
-                E_real_inputX.SetName("E_real_inputX_%sum" % wavelengths[i])
+                E_real_inputX.SetName("E_real_inputX_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_real_inputX)
                 E_imag_inputX = vn.numpy_to_vtk(np.imag(E_inputX))
-                E_imag_inputX.SetName("E_imag_inputX_%sum" % wavelengths[i])
+                E_imag_inputX.SetName("E_imag_inputX_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_imag_inputX)
 
                 E_real_inputY = vn.numpy_to_vtk(np.real(E_inputY))
-                E_real_inputY.SetName("E_real_inputY_%sum" % wavelengths[i])
+                E_real_inputY.SetName("E_real_inputY_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_real_inputY)
                 E_imag_inputY = vn.numpy_to_vtk(np.imag(E_inputY))
-                E_imag_inputY.SetName("E_imag_inputY_%sum" % wavelengths[i])
+                E_imag_inputY.SetName("E_imag_inputY_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_imag_inputY)
 
             writer = vtkXMLImageDataWriter()
