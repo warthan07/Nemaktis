@@ -30,10 +30,10 @@ UniformBeam::UniformBeam(
 
 std::complex<double> UniformBeam::get_Ex(double x, double y) {
 
-	return std::cos(theta)*std::exp(std::complex<double>(0,1)*0.*k*y);
+	return std::cos(theta);
 }
 
 std::complex<double> UniformBeam::get_Ey(double x, double y) {
 
-	return std::sin(theta)*std::exp(std::complex<double>(0,1)*0.*k*y);
+	return std::sin(theta);
 }

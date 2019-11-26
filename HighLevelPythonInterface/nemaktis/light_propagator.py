@@ -63,8 +63,9 @@ class LightPropagator:
             If equal to "bpm", the beam propagation backend will be used. Should be used
             if accuracy is privileged over speed.
 
-            If equal to "dtmm", the diffractive transfer matrix backend will be used. Should
-            be used if speed is privileged over accuracy.
+            If equal to "dtmm", the diffractive transfer matrix backend
+            will be used (in its simplest version). Should be used if
+            speed is privileged over accuracy.
         bulk_filename : None or string
             If none, the backend will not export the bulk value of the optical fields in the
             LC layer.  Else, the bulk fields values will be exported to a vti file whose
@@ -75,7 +76,12 @@ class LightPropagator:
         elif method=="dtmm":
             return self._dtmm_propagation(bulk_filename)
         else:
-            raise Exception("Unrecognised method, should be 'bpm' or 'dtmm'")
+            match = re.compile("dtmm\((\d+)\)").match(method)
+            if match:
+                return self._dtmm_propagation(
+                    bulk_filename, diffraction=int(match.group(1)))
+            else:
+                raise Exception("Unrecognised method, should be 'bpm' or 'dtmm'")
 
     def _bpm_propagation(self, bulk_filename):
         print("{ Running beam propagation backend }\n")
@@ -136,7 +142,7 @@ class LightPropagator:
         return output_fields
 
 
-    def _dtmm_propagation(self, bulk_filename):
+    def _dtmm_propagation(self, bulk_filename, diffraction=1):
         print("{ Running diffraction transfer matrix backend }\n")
 
         director_field = self._material.director_field
@@ -196,7 +202,7 @@ class LightPropagator:
             (dims[1],dims[0]), wavelengths, pixelsize = 1000*spacings[0], n = nin)
         field_data_out = dtmm.transfer_field(
             field_data_in, optical_data, nin=nin,
-            betamax=self._numerical_aperture,
+            betamax=self._numerical_aperture, diffraction=diffraction,
             ret_bulk=bulk_filename is not None)[0]
         print("")
 
@@ -216,17 +222,17 @@ class LightPropagator:
                     (1,0,2,3)).reshape((2,dims[0]*dims[1]*(dims[2]+1))).transpose()
 
                 E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
-                E_real_inputX.SetName("E_real_inputX_%sum" % wavelengths[i])
+                E_real_inputX.SetName("E_real_inputX_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_real_inputX)
                 E_imag_inputX = vn.numpy_to_vtk(np.imag(E_inputX))
-                E_imag_inputX.SetName("E_imag_inputX_%sum" % wavelengths[i])
+                E_imag_inputX.SetName("E_imag_inputX_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_imag_inputX)
 
                 E_real_inputY = vn.numpy_to_vtk(np.real(E_inputY))
-                E_real_inputY.SetName("E_real_inputY_%sum" % wavelengths[i])
+                E_real_inputY.SetName("E_real_inputY_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_real_inputY)
                 E_imag_inputY = vn.numpy_to_vtk(np.imag(E_inputY))
-                E_imag_inputY.SetName("E_imag_inputY_%sum" % wavelengths[i])
+                E_imag_inputY.SetName("E_imag_inputY_%sum" % self._wavelengths[i])
                 vti_data.GetPointData().AddArray(E_imag_inputY)
 
             writer = vtkXMLImageDataWriter()
