@@ -27,15 +27,15 @@ class LCMaterial(object):
         The refractive index associated with the input medium below the LC layer. 
         A default value of 1 is assumed.
     """
-    iso_layer_indices = [] 
-    iso_layer_thicknesses = [] 
-
     def __init__(self, *, director_field, ne, no, nhost = 1, nin = 1):
         self.director_field = director_field
         self.ne = ne
         self.no = no
         self.nhost = nhost
         self.nin = nin
+        self.iso_layer_indices = [] 
+        self.iso_layer_thicknesses = [] 
+
 
     def add_isotropic_layer(self, *, nlayer, thickness):
         """Add an isotropic layer above the sample.  Light is assumed to propagate in the

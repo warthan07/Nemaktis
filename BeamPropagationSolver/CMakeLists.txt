@@ -30,7 +30,7 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED COMPONENTS filesystem regex system)
+find_package(Boost 1.67 EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
@@ -198,9 +198,8 @@ swig_add_library(${PYTHONBACKEND_BASENAME} LANGUAGE python
 target_link_libraries(${PROJECT_NAME} Settings)
 target_link_libraries(Settings BPM Postprocessor)
 target_link_libraries(Postprocessor Physics
-	${VTK_LIBRARIES} ${FFTW_LIBRARIES})
+	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES})
 target_link_libraries(BPM Utilities Physics)
-target_link_libraries(Utilities ${Boost_LIBRARIES})
 target_link_libraries(Physics ${MUPARSER_LIBRARIES})
 
 target_link_libraries(bpm-lib
