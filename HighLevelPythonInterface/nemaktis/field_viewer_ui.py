@@ -289,6 +289,7 @@ class FieldViewerUI(HasTraits):
 
         self.edit_traits()
         app = QtGui.QApplication.instance()
+        app.lastWindowClosed.connect(app.quit)
         for c in range(0,len(app.topLevelWidgets())):
             if hasattr(app.topLevelWidgets()[c], "_mw"):
                 app.topLevelWidgets()[c]._mw.setMinimumSize(1200,600)
