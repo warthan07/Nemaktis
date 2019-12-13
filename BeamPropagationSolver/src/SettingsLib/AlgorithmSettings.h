@@ -19,9 +19,6 @@ class BPMSettings : public BaseSettings {
 public:
 	BPMSettings(const nlohmann::json &j);
 
-	std::vector<bool> wide_angle_corrections() const {
-		return _wide_angle_corrections;
-	}
 	std::vector<BoundaryType> boundary_types() const {
 		return _boundary_types;
 	}

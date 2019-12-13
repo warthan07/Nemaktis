@@ -14,11 +14,6 @@ BPMSettings::BPMSettings(const nlohmann::json &j) :
 	BaseSettings(j, "Beam propagation"),
 	n_woodbury_steps(parse<unsigned int>("N Woodbury steps")) {
 
-	_wide_angle_corrections = parse_vector<bool>("Wide angle corrections", 2);
-	if(_wide_angle_corrections[0] && _wide_angle_corrections[1])
-		throw std::string(
-			"The wide angle corrections can only be activated for one transverse direction");
-
 	auto types = parse_vector<std::string>("Boundary condition types", 2);
 	for(int i=0; i<2; i++) {
 		if(types[i]=="Transparent")

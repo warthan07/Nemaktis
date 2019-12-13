@@ -6,6 +6,14 @@
 
 #include "CartesianMesh.h"
 
+struct Index2D {
+	/**
+	 * Index for each spatial directions.
+	 */
+	int x, y;
+};
+
+
 struct Index3D {
 	/**
 	 * Index for each spatial directions.
