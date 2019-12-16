@@ -101,7 +101,7 @@ void BPMIteration::update_optical_field() {
 			for(int pol_idx=0; pol_idx<2; pol_idx++) {
 				for(unsigned int k=0; k<Nz_substeps; k++) {
 					secondary_evolution_operator.apply(Eperp[pol_idx]);
-					// primary_evolution_operator.apply(Eperp[pol_idx]);
+					primary_evolution_operator.apply(Eperp[pol_idx]);
 					secondary_evolution_operator.apply(Eperp[pol_idx]);
 				}
 			}

@@ -210,12 +210,12 @@ void ParaxialPrimaryEvolutionOperator::update() {
 		Index3D p_pz({p.x,p.y,p.z+1});
 
 		exx_sqrt = (eps.xx_sqrt(p)+eps.xx_sqrt(p_pz))/2;
-		exy_sqrt = (eps.xy_sqrt(p)+eps.xy_sqrt(p_pz))/2;
 		eyy_sqrt = (eps.yy_sqrt(p)+eps.yy_sqrt(p_pz))/2;
+		exy_sqrt = (eps.xy_sqrt(p)+eps.xy_sqrt(p_pz))/2;
 		det = exx_sqrt*eyy_sqrt - std::pow(exy_sqrt,2.);
 		exx_sqrt_inv = eyy_sqrt/det;
-		exy_sqrt_inv = -exy_sqrt/det;
 		eyy_sqrt_inv = exx_sqrt/det;
+		exy_sqrt_inv = -exy_sqrt/det;
 
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the left blocks (Block00 and Block10) of 0.25*D*sqrt(K)^-1 to R_matrix
@@ -255,12 +255,12 @@ void ParaxialPrimaryEvolutionOperator::update() {
 		Index3D p_pz({p.x,p.y,p.z+1});
 
 		exx_sqrt = (eps.xx_sqrt(p)+eps.xx_sqrt(p_pz))/2;
-		exy_sqrt = (eps.xy_sqrt(p)+eps.xy_sqrt(p_pz))/2;
 		eyy_sqrt = (eps.yy_sqrt(p)+eps.yy_sqrt(p_pz))/2;
+		exy_sqrt = (eps.xy_sqrt(p)+eps.xy_sqrt(p_pz))/2;
 		det = exx_sqrt*eyy_sqrt - std::pow(exy_sqrt,2.);
 		exx_sqrt_inv = eyy_sqrt/det;
-		exy_sqrt_inv = -exy_sqrt/det;
 		eyy_sqrt_inv = exx_sqrt/det;
+		exy_sqrt_inv = -exy_sqrt/det;
 
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the upper blocks (Block00 and Block01) of 0.25*sqrt(K)^-1*D to R_matrix
@@ -321,8 +321,8 @@ void ParaxialPrimaryEvolutionOperator::update_D() {
 		Index3D p_pz({p.x,p.y,p.z+1});
 
 		exx_tr = (eps.xx_tr(p)+eps.xx_tr(p_pz))/2;
-		exy_tr = (eps.xy_tr(p)+eps.xy_tr(p_pz))/2;
 		eyy_tr = (eps.yy_tr(p)+eps.yy_tr(p_pz))/2;
+		exy_tr = (eps.xy_tr(p)+eps.xy_tr(p_pz))/2;
 
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the left blocks (Block00 and Block10) of D1*K to D_matrix

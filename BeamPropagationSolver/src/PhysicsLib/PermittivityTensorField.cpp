@@ -21,11 +21,11 @@ PermittivityTensorField::PermittivityTensorField(
 					Index3D p({ix,iy,iz});
 					mask_val = lc_sol.get_mask_val(p);
 					(*this)(p,0) = mask_val ?
-					 	eps_perp + eps_a * std::pow(lc_sol(p,0),2.) : eps_host;
+						eps_perp + eps_a * std::pow(lc_sol(p,0),2.) : eps_host;
 					(*this)(p,1) = mask_val ?
-					 	eps_perp + eps_a * std::pow(lc_sol(p,1),2.) : eps_host;
+						eps_perp + eps_a * std::pow(lc_sol(p,1),2.) : eps_host;
 					(*this)(p,2) = mask_val ?
-					 	eps_perp + eps_a * std::pow(lc_sol(p,2),2.) : eps_host;
+						eps_perp + eps_a * std::pow(lc_sol(p,2),2.) : eps_host;
 					(*this)(p,3) = mask_val ?
 						eps_a * lc_sol(p,0)*lc_sol(p,1) : 0;
 					(*this)(p,4) = mask_val ?

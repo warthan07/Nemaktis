@@ -19,8 +19,8 @@ void FresnelOperator::apply(TransverseOpticalField &src) const {
 		int iy = iperp/Nx;
 
 		double nxx = eps.xx_sqrt({ix,iy,0});
-		double nyy = eps.xx_sqrt({ix,iy,0});
-		double nxy = eps.xx_sqrt({ix,iy,0});
+		double nyy = eps.yy_sqrt({ix,iy,0});
+		double nxy = eps.xy_sqrt({ix,iy,0});
 
 		// We apply the Fresnel BC
 		double det = (ni+nxx)*(ni+nyy)-nxy*nxy;

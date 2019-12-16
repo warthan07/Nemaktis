@@ -260,11 +260,11 @@ std::shared_ptr<std::vector<std::complex<double> > > ScreenOutput::assemble_iso_
 	for(int iy=0; iy<Ny; iy++) {
 		for(int ix=0; ix<Nx; ix++) {
 			double kx = (ix<double(Nx/2.)) ?
-				2*PI*ix/(delta_x*(Nx-1)) :
-				-2*PI*(Nx-ix)/(delta_x*(Nx-1));
+				2*PI*ix/(delta_x*Nx) :
+				-2*PI*(Nx-ix)/(delta_x*Nx);
 			double ky = (iy<double(Ny/2.)) ?
-				2*PI*iy/(delta_y*(Ny-1)) :
-				-2*PI*(Ny-iy)/(delta_y*(Ny-1));
+				2*PI*iy/(delta_y*Ny) :
+				-2*PI*(Ny-iy)/(delta_y*Ny);
 			double k = std::sqrt(kx*kx+ky*ky);
 
 			if(k<k0*numerical_aperture) {
@@ -286,7 +286,7 @@ std::shared_ptr<std::vector<std::complex<double> > > ScreenOutput::assemble_iso_
 
 					t1 = 0.5*(1+kp/next_kp)*std::exp(std::complex<double>(0,(kp-kN)*ep));
 					t2 = 0.5*(1-kp/next_kp)*std::exp(std::complex<double>(0,(kp-kN)*ep));
-					
+
 					tmat[0] = t1*prev_tmat[0] + std::conj(t2)*prev_tmat[1];
 					tmat[1] = t2*prev_tmat[0] + std::conj(t1)*prev_tmat[1];
 					tmat[2] = t1*prev_tmat[2] + std::conj(t2)*prev_tmat[3];

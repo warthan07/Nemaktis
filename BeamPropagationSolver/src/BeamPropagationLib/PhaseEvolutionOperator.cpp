@@ -44,7 +44,7 @@ void PhaseEvolutionOperator::update() {
 			double dxx = 0.25*delta_Z*(eps.xx_sqrt(p)+eps.xx_sqrt(p_pz)-2*nref);
 			double dyy = 0.25*delta_Z*(eps.yy_sqrt(p)+eps.yy_sqrt(p_pz)-2*nref);
 			double dxy = 0.25*delta_Z*(eps.xy_sqrt(p)+eps.xy_sqrt(p_pz));
-			
+
 			// Efficient calculation of exp(I*d) based on the
 			// Cayleigh-Hamilton theorem and Sylvester formula (see
 			// wikipedia page "Matrix exponential").
