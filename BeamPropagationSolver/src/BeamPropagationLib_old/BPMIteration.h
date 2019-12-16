@@ -31,9 +31,9 @@ private:
 	const PhysicsCoefficients &coefs;
 
 	/**
-	 * Reference to the RootSettings object of this run.
+	 * Reference to the BPMSettings object of this run.
 	 */
-	const RootSettings &settings;
+	const BPMSettings &bpm_settings;
 
 	/**
 	 * Mesh spacings.
@@ -43,10 +43,6 @@ private:
 	 * Number of points in each space direction for the global mesh
 	 */
 	int Nx, Ny, Nz;
-	/**
-	 * Number of evolution sub-steps per z-slab
-	 */
-	unsigned int Nz_substeps;
 
 	/**
 	 * Beam waist (in case of a gaussian input

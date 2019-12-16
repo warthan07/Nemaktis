@@ -24,51 +24,59 @@ ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 	std::vector<Eigen::Triplet<double> > triplet_list;
 	int i;
 
-	// First, we initialize the matrices d_ovr_dX_* 
-	for(int iy=0; iy<Ny; iy++) {
-		i = Nx*iy;
-		triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx-1, -0.5/delta_X));
-		triplet_list.push_back(Eigen::Triplet<double>(i, i+1, 0.5/delta_X));
-		for(int ix=1; ix<Nx-1; ix++) {
-			i = ix+Nx*iy;
-			triplet_list.push_back(Eigen::Triplet<double>(i, i-1, -0.5/delta_X));
+	// First, we initialize the matrices d_ovr_dX_*. If Nx<=3, we assume x-invariant
+	// fields and structures
+	if(Nx>3) {
+		for(int iy=0; iy<Ny; iy++) {
+			i = Nx*iy;
+			triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx-2, -0.5/delta_X));
 			triplet_list.push_back(Eigen::Triplet<double>(i, i+1, 0.5/delta_X));
+			for(int ix=1; ix<Nx-2; ix++) {
+				i = ix+Nx*iy;
+				triplet_list.push_back(Eigen::Triplet<double>(i, i-1, -0.5/delta_X));
+				triplet_list.push_back(Eigen::Triplet<double>(i, i+1, 0.5/delta_X));
+			}
+			i = Nx-2+Nx*iy;
+			triplet_list.push_back(Eigen::Triplet<double>(i, i-1, -0.5/delta_X));
+			triplet_list.push_back(Eigen::Triplet<double>(i, Nx*iy, 0.5/delta_X));
 		}
-		i = Nx-1+Nx*iy;
-		triplet_list.push_back(Eigen::Triplet<double>(i, i-1, -0.5/delta_X));
-		triplet_list.push_back(Eigen::Triplet<double>(i, Nx*iy, 0.5/delta_X));
 	}
 	d_ovr_dX_csr.setFromTriplets(triplet_list.begin(), triplet_list.end());
 	d_ovr_dX_csc.setFromTriplets(triplet_list.begin(), triplet_list.end());
 
-	// Second, we initialize the matrices d_ovr_dY_*.
+	// Second, we initialize the matrices d_ovr_dY_*. If Ny<=3, we assume y-invariant
+	// fields and structures
 	triplet_list.clear();
-	for(int ix=0; ix<Nx; ix++) {
-		i = ix;
-		triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx*(Ny-1), -0.5/delta_Y));
-		triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx, 0.5/delta_Y));
-		for(int iy=1; iy<Ny-1; iy++) {
-			i = ix+Nx*iy;
-			triplet_list.push_back(Eigen::Triplet<double>(i, i-Nx, -0.5/delta_Y));
+	if(Ny>3) {
+		for(int ix=0; ix<Nx; ix++) {
+			i = ix;
+			triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx*(Ny-2), -0.5/delta_Y));
 			triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx, 0.5/delta_Y));
+			for(int iy=1; iy<Ny-2; iy++) {
+				i = ix+Nx*iy;
+				triplet_list.push_back(Eigen::Triplet<double>(i, i-Nx, -0.5/delta_Y));
+				triplet_list.push_back(Eigen::Triplet<double>(i, i+Nx, 0.5/delta_Y));
+			}
+			i = ix+Nx*(Ny-2);
+			triplet_list.push_back(Eigen::Triplet<double>(i, i-Nx, -0.5/delta_Y));
+			triplet_list.push_back(Eigen::Triplet<double>(i, ix, 0.5/delta_Y));
 		}
-		i = ix+Nx*(Ny-1);
-		triplet_list.push_back(Eigen::Triplet<double>(i, i-Nx, -0.5/delta_Y));
-		triplet_list.push_back(Eigen::Triplet<double>(i, ix, 0.5/delta_Y));
 	}
 	d_ovr_dY_csr.setFromTriplets(triplet_list.begin(), triplet_list.end());
 	d_ovr_dY_csc.setFromTriplets(triplet_list.begin(), triplet_list.end());
 
 	// Third, we initialize the matrix_D0.
-	for(int iy=1; iy<Ny-1; iy++) {
-		for(int ix=1; ix<Nx-1; ix++) {
+	for(int iy=0; iy<Ny; iy++) {
+		for(int ix=0; ix<Nx; ix++) {
 			i = ix+Nx*iy;
 			
-			D0_matrix(DiffDY, Block00, {ix,iy}, myShift) = 1./std::pow(delta_Y,2.);
-			D0_matrix(DiffDY, Block00, {ix,iy}, noShift) = -2./std::pow(delta_Y,2.);
-			D0_matrix(DiffDY, Block00, {ix,iy}, pyShift) = 1./std::pow(delta_Y,2.);
+			if(iy<Ny-1 && Ny>3) {
+				D0_matrix(DiffDY, Block00, {ix,iy}, myShift) = 1./std::pow(delta_Y,2.);
+				D0_matrix(DiffDY, Block00, {ix,iy}, noShift) = -2./std::pow(delta_Y,2.);
+				D0_matrix(DiffDY, Block00, {ix,iy}, pyShift) = 1./std::pow(delta_Y,2.);
+			}
 
-			if(ix>=Nx_plate-1 && ix<Nx-Nx_plate+1) {
+			if(iy<Ny-1 && ix<Nx-1 && Nx>3 && Ny>3) {
 				D0_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift) = 0.25/(delta_X*delta_Y);
 				D0_matrix(DiffDXDY, Block01, {ix,iy}, pxmyShift) = -0.25/(delta_X*delta_Y);
 				D0_matrix(DiffDXDY, Block01, {ix,iy}, mxpyShift) = -0.25/(delta_X*delta_Y);
@@ -80,26 +88,10 @@ ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 				D0_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift) = 0.25/(delta_X*delta_Y);
 			}
 
-			D0_matrix(DiffDX, Block11, {ix,iy}, mxShift) = 1./std::pow(delta_X,2.);
-			D0_matrix(DiffDX, Block11, {ix,iy}, noShift) = -2./std::pow(delta_X,2.);
-			D0_matrix(DiffDX, Block11, {ix,iy}, pxShift) = 1./std::pow(delta_X,2.);
-		}
-	}
-
-	// Finally, we initialize the sample plate dofs of matrix_D1. LC dofs will be
-	// initialized in the update_D1 method
-	for(int iy=1; iy<Ny-1; iy++) {
-		for(int ix=1; ix<Nx-1; ix++) {
-			i = ix+Nx*iy;
-			
-			if(ix<Nx_plate-1 || ix>=Nx-Nx_plate+1) {
-				D1_matrix(DiffDX, Block00, {ix,iy}, mxShift) = 1./std::pow(delta_X,2.);
-				D1_matrix(DiffDX, Block00, {ix,iy}, noShift) = -2./std::pow(delta_X,2.);
-				D1_matrix(DiffDX, Block00, {ix,iy}, pxShift) = 1./std::pow(delta_X,2.);
-
-				D1_matrix(DiffDY, Block11, {ix,iy}, myShift) = 1./std::pow(delta_Y,2.);
-				D1_matrix(DiffDY, Block11, {ix,iy}, noShift) = -2./std::pow(delta_Y,2.);
-				D1_matrix(DiffDY, Block11, {ix,iy}, pyShift) = 1./std::pow(delta_Y,2.);
+			if(ix<Nx-1 && Nx>3) {
+				D0_matrix(DiffDX, Block11, {ix,iy}, mxShift) = 1./std::pow(delta_X,2.);
+				D0_matrix(DiffDX, Block11, {ix,iy}, noShift) = -2./std::pow(delta_X,2.);
+				D0_matrix(DiffDX, Block11, {ix,iy}, pxShift) = 1./std::pow(delta_X,2.);
 			}
 		}
 	}
@@ -209,7 +201,7 @@ void ParaxialPrimaryEvolutionOperator::update() {
 		}
 	}
 
-	// Finally, we add (D*sqrt(K)^-1 + sqrt(K)^-1*D)/4 to R_matrix
+	// We add 0.25*D*sqrt(K)^-1 to R_matrix column-wise
 	double exx_sqrt, exy_sqrt, eyy_sqrt, det, exx_sqrt_inv, exy_sqrt_inv, eyy_sqrt_inv;
 	#pragma omp parallel for private(exx_sqrt,exy_sqrt,eyy_sqrt,det,exx_sqrt_inv, \
 			exy_sqrt_inv,eyy_sqrt_inv)
@@ -225,7 +217,6 @@ void ParaxialPrimaryEvolutionOperator::update() {
 		exy_sqrt_inv = -exy_sqrt/det;
 		eyy_sqrt_inv = exx_sqrt/det;
 
-		// We add 0.25*D*sqrt(K)^-1 to R_matrix column-wise
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the left blocks (Block00 and Block10) of 0.25*D*sqrt(K)^-1 to R_matrix
 			auto dst_it = R_matrix.column_iterators(diff_type, mesh_idx).begin();
@@ -255,8 +246,22 @@ void ParaxialPrimaryEvolutionOperator::update() {
 				dst_it->val += 0.25*D_it.val*eyy_sqrt_inv;
 			}
 		}
+	}
+	// We add 0.25*sqrt(K)^-1*D to R_matrix row-wise
+	#pragma omp parallel for private(exx_sqrt,exy_sqrt,eyy_sqrt,det,exx_sqrt_inv, \
+			exy_sqrt_inv,eyy_sqrt_inv)
+	for(int mesh_idx=0; mesh_idx<N; mesh_idx++) {
+		Index3D p({mesh_idx%Nx,mesh_idx/Nx,iz});
+		Index3D p_pz({p.x,p.y,p.z+1});
 
-		// We add 0.25*sqrt(K)^-1*D to R_matrix row-wise
+		exx_sqrt = (eps.xx_sqrt(p)+eps.xx_sqrt(p_pz))/2;
+		exy_sqrt = (eps.xy_sqrt(p)+eps.xy_sqrt(p_pz))/2;
+		eyy_sqrt = (eps.yy_sqrt(p)+eps.yy_sqrt(p_pz))/2;
+		det = exx_sqrt*eyy_sqrt - std::pow(exy_sqrt,2.);
+		exx_sqrt_inv = eyy_sqrt/det;
+		exy_sqrt_inv = -exy_sqrt/det;
+		eyy_sqrt_inv = exx_sqrt/det;
+
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the upper blocks (Block00 and Block01) of 0.25*sqrt(K)^-1*D to R_matrix
 			auto dst_it = R_matrix.row_iterators(diff_type, mesh_idx).begin();
@@ -355,18 +360,19 @@ void ParaxialPrimaryEvolutionOperator::update_D1() {
 
 	double ezz_inv, ezz_inv_px, ezz_inv_mx, ezz_inv_py, ezz_inv_my;
 	#pragma omp parallel for private(ezz_inv,ezz_inv_px,ezz_inv_mx,ezz_inv_py,ezz_inv_my)
-	for(int iy=1; iy<Ny-1; iy++) {
-		for(int ix=Nx_plate-1; ix<Nx-Nx_plate+1; ix++) {
+	for(int iy=0; iy<Ny; iy++) {
+		for(int ix=0; ix<Nx; ix++) {
 			Index3D p({ix,iy,iz});
-			Index3D p_pz({ix,iy,iz+1});
-			Index3D p_px({ix+1,iy,iz});
-			Index3D p_px_pz({ix+1,iy,iz+1});
-			Index3D p_mx({ix-1,iy,iz});
-			Index3D p_mx_pz({ix-1,iy,iz+1});
-			Index3D p_py({ix,iy+1,iz});
-			Index3D p_py_pz({ix,iy+1,iz+1});
-			Index3D p_my({ix,iy-1,iz});
-			Index3D p_my_pz({ix,iy-1,iz+1});
+			Index3D p_px({(ix==Nx-1)?1:ix+1,iy,iz});
+			Index3D p_mx({(ix==0)?Nx-2:ix-1,iy,iz});
+			Index3D p_py({ix,(iy==Ny-1)?1:iy+1,iz});
+			Index3D p_my({ix,(iy==0)?Ny-2:iy-1,iz});
+
+			Index3D p_pz({p.x,p.y,iz+1});
+			Index3D p_px_pz({p_px.x,p_px.y,iz+1});
+			Index3D p_mx_pz({p_mx.x,p_mx.y,iz+1});
+			Index3D p_py_pz({p_py.x,p_py.y,iz+1});
+			Index3D p_my_pz({p_my.x,p_my.y,iz+1});
 
 			ezz_inv = (1./eps.zz(p)+1./eps.zz(p_pz))/2;
 			ezz_inv_px = (1./eps.zz(p_px)+1./eps.zz(p_px_pz))/2;
@@ -374,47 +380,45 @@ void ParaxialPrimaryEvolutionOperator::update_D1() {
 			ezz_inv_py = (1./eps.zz(p_py)+1./eps.zz(p_py_pz))/2;
 			ezz_inv_my = (1./eps.zz(p_my)+1./eps.zz(p_my_pz))/2;
 
-			if(ix<=Nx_plate)
-				D1_matrix(DiffDX, Block00, {ix,iy}, mxShift) = 
-					ezz_inv_mx/std::pow(delta_X, 2.);
-			else
+			if(ix<Nx-1 && Nx>3) {
 				D1_matrix(DiffDX, Block00, {ix,iy}, mxShift) = 
 					0.5*(ezz_inv_mx+ezz_inv)/std::pow(delta_X, 2.);
-			if(ix>=Nx-Nx_plate-1)
-				D1_matrix(DiffDX, Block00, {ix,iy}, pxShift) = 
-					ezz_inv_px/std::pow(delta_X, 2.);
-			else
 				D1_matrix(DiffDX, Block00, {ix,iy}, pxShift) = 
 					0.5*(ezz_inv_px+ezz_inv)/std::pow(delta_X, 2.);
-			D1_matrix(DiffDX, Block00, {ix,iy}, noShift) = 
-				- D1_matrix(DiffDX, Block00, {ix,iy}, mxShift)
-				- D1_matrix(DiffDX, Block00, {ix,iy}, pxShift);
+				D1_matrix(DiffDX, Block00, {ix,iy}, noShift) = 
+					- D1_matrix(DiffDX, Block00, {ix,iy}, mxShift)
+					- D1_matrix(DiffDX, Block00, {ix,iy}, pxShift);
+			}
 
-			D1_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift) =
-				0.25*ezz_inv_px/(delta_X*delta_Y);
-			D1_matrix(DiffDXDY, Block01, {ix,iy}, mxmyShift) =
-				0.25*ezz_inv_mx/(delta_X*delta_Y);
-			D1_matrix(DiffDXDY, Block01, {ix,iy}, mxpyShift) =
-				- D1_matrix(DiffDXDY, Block01, {ix,iy}, mxmyShift);
-			D1_matrix(DiffDXDY, Block01, {ix,iy}, pxmyShift) =
-				- D1_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift);
+			if(ix<Nx-1 && iy<Ny-1 && Nx>3 && Ny>3) {
+				D1_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift) =
+					0.25*ezz_inv_px/(delta_X*delta_Y);
+				D1_matrix(DiffDXDY, Block01, {ix,iy}, mxmyShift) =
+					0.25*ezz_inv_mx/(delta_X*delta_Y);
+				D1_matrix(DiffDXDY, Block01, {ix,iy}, mxpyShift) =
+					- D1_matrix(DiffDXDY, Block01, {ix,iy}, mxmyShift);
+				D1_matrix(DiffDXDY, Block01, {ix,iy}, pxmyShift) =
+					- D1_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift);
 
-			D1_matrix(DiffDXDY, Block10, {ix,iy}, pxpyShift) =
-				0.25*ezz_inv_py/(delta_X*delta_Y);
-			D1_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift) =
-				0.25*ezz_inv_my/(delta_X*delta_Y);
-			D1_matrix(DiffDXDY, Block10, {ix,iy}, mxpyShift) =
-				- D1_matrix(DiffDXDY, Block10, {ix,iy}, pxpyShift);
-			D1_matrix(DiffDXDY, Block10, {ix,iy}, pxmyShift) =
-				- D1_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift);
-
-			D1_matrix(DiffDY, Block11, {ix,iy}, pyShift) = 
-				0.5*(ezz_inv_py+ezz_inv)/std::pow(delta_Y, 2.);
-			D1_matrix(DiffDY, Block11, {ix,iy}, myShift) = 
-				0.5*(ezz_inv_my+ezz_inv)/std::pow(delta_Y, 2.);
-			D1_matrix(DiffDY, Block11, {ix,iy}, noShift) = 
-				- D1_matrix(DiffDY, Block11, {ix,iy}, myShift)
-				- D1_matrix(DiffDY, Block11, {ix,iy}, pyShift);
+				D1_matrix(DiffDXDY, Block10, {ix,iy}, pxpyShift) =
+					0.25*ezz_inv_py/(delta_X*delta_Y);
+				D1_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift) =
+					0.25*ezz_inv_my/(delta_X*delta_Y);
+				D1_matrix(DiffDXDY, Block10, {ix,iy}, mxpyShift) =
+					- D1_matrix(DiffDXDY, Block10, {ix,iy}, pxpyShift);
+				D1_matrix(DiffDXDY, Block10, {ix,iy}, pxmyShift) =
+					- D1_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift);
+			}
+	
+			if(iy<Ny-1 && Ny>3) {
+				D1_matrix(DiffDY, Block11, {ix,iy}, pyShift) = 
+					0.5*(ezz_inv_py+ezz_inv)/std::pow(delta_Y, 2.);
+				D1_matrix(DiffDY, Block11, {ix,iy}, myShift) = 
+					0.5*(ezz_inv_my+ezz_inv)/std::pow(delta_Y, 2.);
+				D1_matrix(DiffDY, Block11, {ix,iy}, noShift) = 
+					- D1_matrix(DiffDY, Block11, {ix,iy}, myShift)
+					- D1_matrix(DiffDY, Block11, {ix,iy}, pyShift);
+			}
 		}
 	}
 }

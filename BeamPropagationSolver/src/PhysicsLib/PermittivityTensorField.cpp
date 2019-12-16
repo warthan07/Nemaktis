@@ -4,7 +4,7 @@ PermittivityTensorField::PermittivityTensorField(
 		const VectorField<double> &lc_sol,
 		const PhysicsCoefficients &coefs,
 		double wavelength) :
-	VectorField<double>(lc_sol.mesh, 6),
+	VectorField<double>(lc_sol.mesh, 12),
 	no(coefs.get_no(wavelength)),
 	ne(coefs.get_ne(wavelength)),
 	eps_perp(std::pow(no,2.)),
@@ -69,6 +69,7 @@ PermittivityTensorField::PermittivityTensorField(
 		for(int iy=0; iy<mesh.Ny; iy++) {
 			for(int ix=0; ix<mesh.Nx; ix++) {
 				Index3D p({ix,iy,iz});
+
 				(*this)(p,6) = xx(p) - std::pow(xz(p),2)/zz(p);
 				(*this)(p,7) = yy(p) - std::pow(yz(p),2)/zz(p);
 				(*this)(p,8) = xy(p) - xz(p)*yz(p)/zz(p);

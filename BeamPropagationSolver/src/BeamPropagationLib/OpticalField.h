@@ -22,34 +22,55 @@ public:
 	void add_scaled_field(std::complex<double> &scaling_factor, TransverseOpticalField &src) {
 		vec += scaling_factor*src.vec;
 	}
-	inline void add_block(
-			TransverseOpticalField &src, int comp) {
+	inline void set_block_to_zero(int comp) {
 		#pragma omp parallel for
-		for(int iy=1; iy<Ny-1; iy++) 
-			for(int ix=1; ix<Nx-1; ix++) 
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
+				(*this)({ix,iy},comp) = 0;
+	}
+	inline void add_block(
+			const TransverseOpticalField &src, int comp) {
+		#pragma omp parallel for
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
 				(*this)({ix,iy},comp) += src({ix,iy},comp);
 	}
-	inline void copy_block(
-			TransverseOpticalField &src, int comp) {
+	inline void add_block(
+			int dst_comp, const TransverseOpticalField &src, int src_comp) {
 		#pragma omp parallel for
-		for(int iy=1; iy<Ny-1; iy++) 
-			for(int ix=1; ix<Nx-1; ix++) 
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
+				(*this)({ix,iy},dst_comp) += src({ix,iy},src_comp);
+	}
+	inline void copy_block(
+			const TransverseOpticalField &src, int comp) {
+		#pragma omp parallel for
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
 				(*this)({ix,iy},comp) = src({ix,iy},comp);
+	}
+	inline void copy_block(
+			int dst_comp, const TransverseOpticalField &src, int src_comp) {
+		#pragma omp parallel for
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
+				(*this)({ix,iy},dst_comp) = src({ix,iy},src_comp);
 	}
 	inline void scale_block(
 			const std::complex<double> &scaling_factor, int comp) {
 		#pragma omp parallel for
-		for(int iy=1; iy<Ny-1; iy++) 
-			for(int ix=1; ix<Nx-1; ix++) 
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
 				(*this)({ix,iy},comp) *= scaling_factor;
 	}
 	inline void scale_and_add_block(
 			const std::complex<double> &scaling_factor,
 			TransverseOpticalField &src, int comp) {
 		#pragma omp parallel for
-		for(int iy=1; iy<Ny-1; iy++) 
-			for(int ix=1; ix<Nx-1; ix++) 
-				(*this)({ix,iy},comp) = src({ix,iy},comp) + scaling_factor*(*this)({ix,iy},comp);
+		for(int iy=0; iy<Ny; iy++) 
+			for(int ix=0; ix<Nx; ix++) 
+				(*this)({ix,iy},comp) =
+					src({ix,iy},comp) + scaling_factor*(*this)({ix,iy},comp);
 	}
 
 	const Eigen::VectorXcd& operator()() const {

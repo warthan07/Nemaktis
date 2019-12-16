@@ -6,7 +6,7 @@
 
 #include "CartesianMesh.h"
 #include "PermittivityTensorField.h"
-#include "TransparentBoundaryConditions.h"
+#include "OpticalField.h"
 
 /**
  * Enum for acessing the sub-blocks of a 2x2 block matrix

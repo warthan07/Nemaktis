@@ -74,6 +74,21 @@ void VectorField<T>::set_mask(std::string mask_formula) {
 }
 
 template <typename T>
+void VectorField<T>::set_mask_from_nonzeros() {
+
+	mask_vals.resize(n_vertex);
+	mask_exists = true;
+	#pragma omp parallel for
+	for(int vertex_idx=0; vertex_idx<n_vertex; vertex_idx++) {
+		double norm = 0;
+		for(int c=0; c<field_dim; c++)
+			norm += std::pow(std::abs((*this)(vertex_idx,c)), 2);
+		norm = std::sqrt(norm);
+		mask_vals[vertex_idx] = (norm>1e-8);
+	}
+}
+
+template <typename T>
 bool VectorField<T>::get_mask_val(const int vertex_idx) const {
 
 	if(!mask_exists)

@@ -9,7 +9,7 @@
 #include "PhysicsCoefficients.h"
 #include "CartesianMesh.h"
 #include "PermittivityTensorField.h"
-#include "TransparentBoundaryConditions.h"
+#include "OpticalField.h"
 
 
 /**
@@ -76,15 +76,6 @@ public:
 	const PermittivityTensorField& eps;
 
 protected:
-	/**
-	 * Do we need to apply periodic BC along x?
-	 */
-	const bool periodic_x;
-	/**
-	 * Do we need to apply periodic BC along y?
-	 */
-	const bool periodic_y;
-
 	/**
 	 * Current z index.
 	 */

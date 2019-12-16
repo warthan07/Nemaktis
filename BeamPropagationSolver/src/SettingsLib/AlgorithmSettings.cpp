@@ -12,20 +12,8 @@ GeneralSettings::GeneralSettings(const nlohmann::json &j) :
 
 BPMSettings::BPMSettings(const nlohmann::json &j) :
 	BaseSettings(j, "Beam propagation"),
-	n_woodbury_steps(parse<unsigned int>("N Woodbury steps")) {
-
-	auto types = parse_vector<std::string>("Boundary condition types", 2);
-	for(int i=0; i<2; i++) {
-		if(types[i]=="Transparent")
-			_boundary_types.push_back(BoundaryType::Transparent);
-		else if (types[i]=="Periodic")
-			_boundary_types.push_back(BoundaryType::Periodic);
-		else
-			throw std::string(
-				"Parsing error: each item in \"Boundary condition types\" \n"
-				"must be \"Transparent\" or \"Periodic\"");
-	}
-}
+	n_woodbury_steps(parse<int>("N Woodbury steps")),
+	Nz_substeps(parse<int>("Number of substeps per slab")){}
 
 
 AlgorithmSettings::AlgorithmSettings(const nlohmann::json &j) :

@@ -11,7 +11,5 @@ BaseBPMOperator::BaseBPMOperator(
 	Ny(eps.mesh.Ny),
 	Nz(eps.mesh.Nz),
 	eps(eps),
-	periodic_x(bpm_settings.boundary_types()[0]==BoundaryType::Periodic),
-	periodic_y(bpm_settings.boundary_types()[1]==BoundaryType::Periodic),
 	iz(0),
 	Nz_substeps(1) {}

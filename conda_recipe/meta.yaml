@@ -1,12 +1,12 @@
 package:
-    name: nemaktis 
+    name: nemaktis_extended
     version: "1.1.0"
 
 source:
     - path: ../BeamPropagationSolver
       folder: bpm
-    - path: ../RayTracingSolver
-      folder: rtm
+    # - path: ../RayTracingSolver
+      # folder: rtm
     - path: ../HighLevelPythonInterface
       folder: nemaktis
     - git_url: https://github.com/IJSComplexMatter/dtmm.git

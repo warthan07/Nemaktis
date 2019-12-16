@@ -7,8 +7,7 @@ class PhaseEvolutionOperator : public BaseBPMOperator {
 public:
 	PhaseEvolutionOperator(
 		const PermittivityTensorField& eps,
-		const PhysicsCoefficients &coefs,
-		const RootSettings &settings);
+		double wavelength, const RootSettings &settings);
 
 	/**
 	 * Apply this evolution operator to a transverse optical field.

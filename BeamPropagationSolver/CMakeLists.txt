@@ -36,7 +36,6 @@ if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
-message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
 find_package(OpenMP REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -201,7 +200,7 @@ target_link_libraries(${PROJECT_NAME} Settings)
 target_link_libraries(Settings BPM Postprocessor)
 target_link_libraries(Postprocessor Physics
 	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES})
-target_link_libraries(BPM Utilities Physics)
+target_link_libraries(BPM ${Boost_LIBRARIES} Utilities Physics)
 target_link_libraries(Physics ${MUPARSER_LIBRARIES})
 
 target_link_libraries(bpm-lib

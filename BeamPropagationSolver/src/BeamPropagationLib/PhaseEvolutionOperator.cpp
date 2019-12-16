@@ -2,41 +2,20 @@
 
 PhaseEvolutionOperator::PhaseEvolutionOperator(
 		const PermittivityTensorField& eps,
-		const PhysicsCoefficients &coefs,
-		const RootSettings &settings) :
-	BaseBPMOperator(eps, coefs, settings.algorithm.bpm.Nz_substeps),
+		double wavelength, const RootSettings &settings) :
+	BaseBPMOperator(eps, wavelength, settings.algorithm.bpm),
 	op_xx(Nx*Ny),
 	op_yy(Nx*Ny),
 	op_xy(Nx*Ny),
 	I(0,1),
-	nref((coefs.get_scalar_coef("nref"))) {
-
-	// We precompute the phase evolution operator for all dofs outside the LC layer:
-	// 		exp(I*(sqrt(eps)-nref)*k0_dz/2)
-	// (easy to compute since the permittivity tensor eps is diagonal on these dofs)
-	for(unsigned int iy=0; iy<Ny; iy++) {
-		unsigned int ix = 0;
-		while(ix<Nx) {
-			if(ix<Nx_plate || ix>=Nx-Nx_plate) {
-				op_xx[ix+Nx*iy] = exp(0.5*delta_Z*I*(std::sqrt(eps.eps_p)-nref));
-				op_yy[ix+Nx*iy] = exp(0.5*delta_Z*I*(std::sqrt(eps.eps_p)-nref));
-				op_xy[ix+Nx*iy] = 0;
-			}
-			// We jump to the second interface if we are on the first one, else we increment
-			if(ix==Nx_plate)
-				ix = Nx-Nx_plate-1;
-			else
-				ix++;
-		}
-	}
-}
+	nref(eps.get_no()) {}
 
 int PhaseEvolutionOperator::apply(TransverseOpticalField &field) {
 
 	std::complex<double> val_x, val_y; 
 
 	#pragma omp parallel for private(val_x,val_y)
-	for(unsigned int mesh_idx=0; mesh_idx<Nx*Ny; mesh_idx++) {
+	for(int mesh_idx=0; mesh_idx<Nx*Ny; mesh_idx++) {
 		val_x =
 			op_xx[mesh_idx] * field(mesh_idx,0) +
 			op_xy[mesh_idx] * field(mesh_idx,1);
@@ -56,8 +35,8 @@ void PhaseEvolutionOperator::update() {
 	// Parallel loop computing the phase evolution operator inside the LC layer:
 	// exp(mu*(sqrt(eps_tr)-nref)).
 	#pragma omp parallel for
-	for(unsigned int iy=0; iy<Ny; iy++) {
-		for(unsigned int ix=Nx_plate; ix<Nx-Nx_plate; ix++) {
+	for(int iy=0; iy<Ny; iy++) {
+		for(int ix=0; ix<Nx; ix++) {
 			Index3D p({ix,iy,iz});
 			Index3D p_pz({ix,iy,iz+1});
 
