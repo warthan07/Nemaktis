@@ -77,15 +77,15 @@ ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 			}
 
 			if(iy<Ny-1 && ix<Nx-1 && Nx>3 && Ny>3) {
-				D0_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift) = 0.25/(delta_X*delta_Y);
-				D0_matrix(DiffDXDY, Block01, {ix,iy}, pxmyShift) = -0.25/(delta_X*delta_Y);
-				D0_matrix(DiffDXDY, Block01, {ix,iy}, mxpyShift) = -0.25/(delta_X*delta_Y);
-				D0_matrix(DiffDXDY, Block01, {ix,iy}, mxmyShift) = 0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block01, {ix,iy}, pxpyShift) = -0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block01, {ix,iy}, pxmyShift) = 0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block01, {ix,iy}, mxpyShift) = 0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block01, {ix,iy}, mxmyShift) = -0.25/(delta_X*delta_Y);
 
-				D0_matrix(DiffDXDY, Block10, {ix,iy}, pxpyShift) = 0.25/(delta_X*delta_Y);
-				D0_matrix(DiffDXDY, Block10, {ix,iy}, pxmyShift) = -0.25/(delta_X*delta_Y);
-				D0_matrix(DiffDXDY, Block10, {ix,iy}, mxpyShift) = -0.25/(delta_X*delta_Y);
-				D0_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift) = 0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block10, {ix,iy}, pxpyShift) = -0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block10, {ix,iy}, pxmyShift) = 0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block10, {ix,iy}, mxpyShift) = 0.25/(delta_X*delta_Y);
+				D0_matrix(DiffDXDY, Block10, {ix,iy}, mxmyShift) = -0.25/(delta_X*delta_Y);
 			}
 
 			if(ix<Nx-1 && Nx>3) {
@@ -168,7 +168,7 @@ void ParaxialPrimaryEvolutionOperator::update() {
 		int mesh_idx = i%N;
 		Index3D p({mesh_idx%Nx,mesh_idx/Nx,iz});
 		Index3D p_pz({p.x,p.y,p.z+1});
-		auto val = (i<N) ? 
+		auto val = (i<N) ?
 			(eps.xz(p)/eps.zz(p)+eps.xz(p_pz)/eps.zz(p_pz))*std::complex<double>(0,0.25) :
 			(eps.yz(p)/eps.zz(p)+eps.yz(p_pz)/eps.zz(p_pz))*std::complex<double>(0,0.25);
 
@@ -323,6 +323,10 @@ void ParaxialPrimaryEvolutionOperator::update_D() {
 		exx_tr = (eps.xx_tr(p)+eps.xx_tr(p_pz))/2;
 		eyy_tr = (eps.yy_tr(p)+eps.yy_tr(p_pz))/2;
 		exy_tr = (eps.xy_tr(p)+eps.xy_tr(p_pz))/2;
+		
+		// exx_tr = eps.zz(p);
+		// eyy_tr = eps.zz(p);
+		// exy_tr = 0;
 
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the left blocks (Block00 and Block10) of D1*K to D_matrix
