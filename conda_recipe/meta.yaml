@@ -42,7 +42,7 @@ requirements:
         - eigen
         - numpy
         - numba
-        - scipy
+        - scipy 1.3
         - matplotlib
         - python
         - ipython

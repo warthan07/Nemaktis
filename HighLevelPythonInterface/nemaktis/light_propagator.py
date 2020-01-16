@@ -96,8 +96,7 @@ class LightPropagator:
                     "Results folder name":                "" },
                 "Beam propagation": {
                     "N Woodbury steps":                   2,
-                    "Boundary condition types":	          ["Periodic", "Periodic"],
-                    "Wide angle corrections":             [False, False] }},
+                    "Number of substeps per slab":        1 }},
             "Physics settings": {
                 "Initial conditions": {
                     "Beam profile":                       "UniformBeam",
