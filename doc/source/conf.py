@@ -37,12 +37,42 @@ MOCK_MODULES = [
 class HasTraits(MagicMock):
     @classmethod
     def __getattr__(cls, name):
-        return MagicMock()
+        if name in ("__file__", "__path__", "_mock_methods"):
+            # sphinx does not like getting a Mock object in this case.
+            return "/dev/null"
+        else:
+            # Return a mock as requested.
+            return HasTraits(mocked_name=name)
+
+    def __call__(self, *args, **kwards):
+        return HasTraits()
+
+    @property
+    def __name__(self):
+        # Make sure that if sphinx asks for the name of a Mocked class
+        # it gets a nice strings to use (instead of "DocMock")
+        return self.mocked_name
+
 
 class HasPrivateTraits(MagicMock):
     @classmethod
     def __getattr__(cls, name):
-        return MagicMock()
+        if name in ("__file__", "__path__", "_mock_methods"):
+            # sphinx does not like getting a Mock object in this case.
+            return "/dev/null"
+        else:
+            # Return a mock as requested.
+            return HasPrivateTraits(mocked_name=name)
+
+    def __call__(self, *args, **kwards):
+        return HasPrivateTraits()
+
+    @property
+    def __name__(self):
+        # Make sure that if sphinx asks for the name of a Mocked class
+        # it gets a nice strings to use (instead of "DocMock")
+        return self.mocked_name
+
 
 MOCK_TYPES = []
 MOCK_TYPES.append(
