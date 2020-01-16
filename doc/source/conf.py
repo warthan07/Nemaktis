@@ -73,8 +73,13 @@ class HasPrivateTraits(MagicMock):
         # it gets a nice strings to use (instead of "DocMock")
         return self.mocked_name
 
-
 MOCK_TYPES = []
+MOCK_TYPES.append(
+    ("traits.api", "HasTraits", (object,))
+)
+MOCK_TYPES.append(
+    ("traits.api", "HasPrivateTraits", (object,))
+)
 MOCK_TYPES.append(
     ("traitsui.delegating_handler", "DelegatingHandler", (HasTraits,))
 )
