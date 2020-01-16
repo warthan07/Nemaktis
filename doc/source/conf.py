@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath("../../HighLevelPythonInterface/"))
 # Modules that we need to mock
 MOCK_MODULES = [
     "traits",
-    "traits.etsconfig"
-    "traits.etsconfig.api"
+    "traits.etsconfig",
+    "traits.etsconfig.api",
     "traitsui",
     "traitsui.api",
     "traitsui.qt4",

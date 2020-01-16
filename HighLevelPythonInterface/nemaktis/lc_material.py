@@ -11,8 +11,10 @@ simplefilter(action='ignore', category=FutureWarning)
 
 
 class LCMaterial(object):
-    """A class containing the director field data, simulation mesh, and
+    """
+    A class containing the director field data, simulation mesh, and
     physics constants.
+
     Parameters
     ----------
     director_field : :class:`~nemaktis.lc_material.DirectorField` object
@@ -39,9 +41,11 @@ class LCMaterial(object):
 
 
     def add_isotropic_layer(self, *, nlayer, thickness):
-        """Add an isotropic layer above the sample.  Light is assumed to propagate in the
+        """
+        Add an isotropic layer above the sample.  Light is assumed to propagate in the
         z-direction, and will cross first the LC material, and then the isotropic layers
         specified with this function.
+
         Parameters
         ----------
         nlayer : float
