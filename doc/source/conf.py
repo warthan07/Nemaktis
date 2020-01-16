@@ -34,18 +34,28 @@ MOCK_MODULES = [
 # TraitDocumenter can properly identify and document traits.
 #  from traits.api import HasTraits, HasPrivateTraits
 
+class HasTraits(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+class HasPrivateTraits(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
 MOCK_TYPES = []
 MOCK_TYPES.append(
-    ("traitsui.delegating_handler", "DelegatingHandler", ("HasTraits",))
+    ("traitsui.delegating_handler", "DelegatingHandler", (HasTraits,))
 )
 MOCK_TYPES.append(
-    ("traitsui.view_element", "ViewSubElement", ("HasPrivateTraits",))
+    ("traitsui.view_element", "ViewSubElement", (HasPrivateTraits,))
 )
 MOCK_TYPES.append(
-    ("traitsui.editor", "Editor", ("HasPrivateTraits",))
+    ("traitsui.editor", "Editor", (HasPrivateTraits,))
 )
 MOCK_TYPES.append(
-    ("traitsui.basic_editor_factory", "BasicEditorFactory", ("HasPrivateTraits",))
+    ("traitsui.basic_editor_factory", "BasicEditorFactory", (HasPrivateTraits,))
 )
 
 
