@@ -36,16 +36,16 @@ MOCK_MODULES = [
 
 MOCK_TYPES = []
 MOCK_TYPES.append(
-    ("traitsui.delegating_handler", "DelegatingHandler", (Mock,))
+    ("traitsui.delegating_handler", "DelegatingHandler", ("HasTraits",))
 )
 MOCK_TYPES.append(
-    ("traitsui.view_element", "ViewSubElement", (Mock,))
+    ("traitsui.view_element", "ViewSubElement", ("HasPrivateTraits",))
 )
 MOCK_TYPES.append(
-    ("traitsui.editor", "Editor", (Mock,))
+    ("traitsui.editor", "Editor", ("HasPrivateTraits",))
 )
 MOCK_TYPES.append(
-    ("traitsui.basic_editor_factory", "BasicEditorFactory", (Mock,))
+    ("traitsui.basic_editor_factory", "BasicEditorFactory", ("HasPrivateTraits",))
 )
 
 
