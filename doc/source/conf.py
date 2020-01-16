@@ -11,11 +11,13 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
+from unittest.mock import MagicMock, Mock, patch
 import sys, os, six
 sys.path.insert(0, os.path.abspath("../../HighLevelPythonInterface/"))
 
 # Modules that we need to mock
 MOCK_MODULES = [
+    "traits",
     "traitsui",
     "traitsui.api",
     "traitsui.qt4",
@@ -27,23 +29,22 @@ MOCK_MODULES = [
 # Collect the types from traitsui that are based on HasTraits
 # We will need to mock them in a special way so that
 # TraitDocumenter can properly identify and document traits.
-from traits.api import HasTraits, HasPrivateTraits
+#  from traits.api import HasTraits, HasPrivateTraits
 
 MOCK_TYPES = []
 MOCK_TYPES.append(
-    ("traitsui.delegating_handler", "DelegatingHandler", (HasTraits,))
+    ("traitsui.delegating_handler", "DelegatingHandler", (Mock,))
 )
 MOCK_TYPES.append(
-    ("traitsui.view_element", "ViewSubElement", (HasPrivateTraits,))
+    ("traitsui.view_element", "ViewSubElement", (Mock,))
 )
 MOCK_TYPES.append(
-    ("traitsui.editor", "Editor", (HasPrivateTraits,))
+    ("traitsui.editor", "Editor", (Mock,))
 )
 MOCK_TYPES.append(
-    ("traitsui.basic_editor_factory", "BasicEditorFactory", (HasPrivateTraits,))
+    ("traitsui.basic_editor_factory", "BasicEditorFactory", (Mock,))
 )
 
-from unittest.mock import MagicMock
 
 # Create the custom types for the HasTraits based traitsui objects.
 TYPES = {
