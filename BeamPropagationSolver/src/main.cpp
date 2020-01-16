@@ -42,16 +42,8 @@ void create_default_settings_file(std::string filename) {
 			# validity of the convergence)
 			"N Woodbury steps": 		2,
 
-			# Type of boundary conditions (Periodic or Transparent) for
-			# the transverse directions x and y. 
-			"Boundary condition types":	["Periodic", "Periodic"],
-
-			# Array specifying if one needs to use wide angle
-			# corrections for the transverse directions x and y.
-			# Since this code supports only one direction for such
-			# corrections, the only acceptable values are [false,false],
-			# [true, false], and [false, true].
-			"Wide angle corrections":	[false, false]
+			# Number of evolution substeps per z-slab
+			"Number of substeps per slab": 1
 		}
 	},
 

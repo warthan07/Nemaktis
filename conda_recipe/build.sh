@@ -15,13 +15,15 @@ cd ../..
 # RTM solver #
 ##############
 
-mkdir -p rtm/bin
-cd rtm/bin
-rm -rf *
-
-cmake ..
-make install
-cd ../..
+if [ -d rtm ]; then
+	mkdir -p rtm/bin
+	cd rtm/bin
+	rm -rf *
+	
+	cmake ..
+	make install
+	cd ../..
+fi
 
 
 ###############

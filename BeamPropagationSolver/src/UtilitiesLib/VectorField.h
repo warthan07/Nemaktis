@@ -6,6 +6,14 @@
 
 #include "CartesianMesh.h"
 
+struct Index2D {
+	/**
+	 * Index for each spatial directions.
+	 */
+	int x, y;
+};
+
+
 struct Index3D {
 	/**
 	 * Index for each spatial directions.
@@ -29,6 +37,7 @@ public:
 	VectorField(CartesianMesh mesh, int field_dim, T* user_vals, int n_user_vals);
 
 	void set_mask(std::string mask_formula);
+	void set_mask_from_nonzeros();
 	bool get_mask_val(const int vertex_idx) const;
 	bool get_mask_val(const Index3D &p) const;
 

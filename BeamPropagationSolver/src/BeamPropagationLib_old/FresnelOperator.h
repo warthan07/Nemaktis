@@ -3,7 +3,6 @@
 
 #include <complex>
 #include "PermittivityTensorField.h"
-#include "OpticalField.h"
 
 class FresnelOperator {
 public: 
@@ -14,8 +13,9 @@ public:
 	/**
 	 * Apply the fresnel boundary conditions at the input interface.
 	 */
-	void apply(TransverseOpticalField &src) const;
-
+	void vmult(
+		VectorField<std::complex<double> > &dst,
+		const VectorField<std::complex<double> > &src) const;
 private:
 	/**
 	 * Number of points in each space direction.

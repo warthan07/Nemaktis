@@ -23,29 +23,53 @@ public:
 	}
 
 	/**
-	 * Get xx component of permittivity tensor
+	 * Get xx component of the permittivity tensor
 	 */
 	double xx(const Index3D &p) const;
 	/**
-	 * Get yy component of permittivity tensor
+	 * Get yy component of the permittivity tensor
 	 */
 	double yy(const Index3D &p) const;
 	/**
-	 * Get zz component of permittivity tensor
+	 * Get zz component of the permittivity tensor
 	 */
 	double zz(const Index3D &p) const;
 	/**
-	 * Get xy component of permittivity tensor
+	 * Get xy component of the permittivity tensor
 	 */
 	double xy(const Index3D &p) const;
 	/**
-	 * Get xz component of permittivity tensor
+	 * Get xz component of the permittivity tensor
 	 */
 	double xz(const Index3D &p) const;
 	/**
-	 * Get yz component of permittivity tensor
+	 * Get yz component of the permittivity tensor
 	 */
 	double yz(const Index3D &p) const;
+	/**
+	 * Get xx component of the transverse permittivity tensor: exx-exz^2/ezz
+	 */
+	double xx_tr(const Index3D &p) const;
+	/**
+	 * Get yy component of the transverse permittivity tensor: eyy-eyz^2/ezz
+	 */
+	double yy_tr(const Index3D &p) const;
+	/**
+	 * Get xy component of the transverse permittivity tensor: exy-exz*eyz/ezz
+	 */
+	double xy_tr(const Index3D &p) const;
+	/**
+	 * Get xx component of the square root of the transverse permittivity tensor
+	 */
+	double xx_sqrt(const Index3D &p) const;
+	/**
+	 * Get yy component of the square root of the transverse permittivity tensor
+	 */
+	double yy_sqrt(const Index3D &p) const;
+	/**
+	 * Get xy component of the square root of the transverse permittivity tensor
+	 */
+	double xy_sqrt(const Index3D &p) const;
 
 
 private:

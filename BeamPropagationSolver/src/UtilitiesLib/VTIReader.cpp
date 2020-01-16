@@ -86,22 +86,12 @@ void VTIReader::fill_solution_vector(
 	output->GetSpacing(spacing);
 
 	int I1, I2, I3;
-	int Np = 0;
 	switch(basis_convention) {
 	case BasisConvention::XYZ:
 		I1 = 0;		I2 = 1;		I3 = 2;
 		break;
 	case BasisConvention::YZX:
 		I1 = 1;		I2 = 2;		I3 = 0;
-		double norm;
-		do {
-			norm = std::sqrt(
-				std::pow(n_data->GetComponent(Np,0),2.)+
-				std::pow(n_data->GetComponent(Np,1),2.)+
-				std::pow(n_data->GetComponent(Np,2),2.));
-			Np++;
-		} while(norm==0);
-		Np--;
 		break;
 	case BasisConvention::ZXY:
 		I1 = 2;		I2 = 0;		I3 = 1;
@@ -109,16 +99,16 @@ void VTIReader::fill_solution_vector(
 
 	CartesianMesh mesh(
 		{spacing[I1], spacing[I2], spacing[I3]},
-		{(int)dim[I1], (int)dim[I2], (int)dim[I3]-2*Np});
+		{(int)dim[I1], (int)dim[I2], (int)dim[I3]});
 	lc_sol = std::make_shared<VectorField<double> >(mesh, lc_dim);
 
 	if(lc_dim==3) {
-		for(int ix=0; ix<dim[0]-2*Np; ix++) {
+		for(int ix=0; ix<dim[0]; ix++) {
 			for(int iy=0; iy<dim[1]; iy++) {
 				for(int iz=0; iz<dim[2]; iz++) {
 					int idx[3] = {ix, iy, iz};
 					int i_out = idx[I1]+dim[I1]*(idx[I2]+dim[I2]*idx[I3]);
-					int i_in = Np+idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
+					int i_in = idx[0]+dim[0]*(idx[1]+dim[1]*idx[2]);
 
 					if(std::isnan(n_data->GetComponent(i_in, I1)))
 						throw std::string("Error: NaN value in the given vti file");

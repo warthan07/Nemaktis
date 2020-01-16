@@ -21,6 +21,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 # Necessary libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/scripts)
 find_package(MuParser REQUIRED)
+find_package(Eigen3 3.3 REQUIRED)
 
 if(WIN32)
 	set(FFTW_USE_STATIC_LIBS ON)
@@ -30,12 +31,11 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.67 EXACT REQUIRED COMPONENTS filesystem regex system)
+find_package(Boost 1.71 EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
-message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
 find_package(OpenMP REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -151,6 +151,7 @@ INCLUDE_DIRECTORIES(
 	${Boost_INCLUDE_DIRS}
 	${Python3_INCLUDE_DIRS}
 	${Python3_NumPy_INCLUDE_DIRS}
+	${EIGEN3_INCLUDE_DIR}
 )
 
 
@@ -199,7 +200,7 @@ target_link_libraries(${PROJECT_NAME} Settings)
 target_link_libraries(Settings BPM Postprocessor)
 target_link_libraries(Postprocessor Physics
 	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES})
-target_link_libraries(BPM Utilities Physics)
+target_link_libraries(BPM ${Boost_LIBRARIES} Utilities Physics)
 target_link_libraries(Physics ${MUPARSER_LIBRARIES})
 
 target_link_libraries(bpm-lib

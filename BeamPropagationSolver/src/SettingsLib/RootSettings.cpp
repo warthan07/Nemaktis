@@ -31,6 +31,7 @@ void runFromSettings(RootSettings &settings) {
 			(settings.algorithm.general.lc_field_type=="Director") ? 3 : 6);
 		vti_reader.fill_solution_vector(
 			lc_sol, settings.physics.initial_conditions.basis_convention());
+		lc_sol->set_mask_from_nonzeros();
 	}
 	else
 		throw std::string(

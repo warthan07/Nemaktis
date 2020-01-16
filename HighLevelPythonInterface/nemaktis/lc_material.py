@@ -3,6 +3,8 @@ import os
 
 from vtk import vtkImageData, vtkXMLImageDataReader, vtkXMLImageDataWriter
 from vtk.util import numpy_support as vn
+from scipy.spatial.transform import Rotation as R
+from scipy.interpolate import interpn
 
 from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
@@ -11,7 +13,6 @@ simplefilter(action='ignore', category=FutureWarning)
 class LCMaterial(object):
     """A class containing the director field data, simulation mesh, and
     physics constants.
-
     Parameters
     ----------
     director_field : :class:`~nemaktis.lc_material.DirectorField` object
@@ -41,7 +42,6 @@ class LCMaterial(object):
         """Add an isotropic layer above the sample.  Light is assumed to propagate in the
         z-direction, and will cross first the LC material, and then the isotropic layers
         specified with this function.
-
         Parameters
         ----------
         nlayer : float
@@ -59,25 +59,19 @@ class DirectorField:
     informations. It is initialized given either the lengths and
     dimensions of the associated 3D mesh or a path to a vti file
     containing the director field and mesh details.
-
     In the first version of this constructor:
-
     .. code-block:: python
     
         nfield = DirectorField(
             mesh_lengths=(Lx,Ly,Lz), mesh_dimensions=(Nx,Ny,Nz))
-
     the actual values of the director field needs to be provided later
     using the "init_from_funcs" method or via the setter method "vals"
     (numpy array of shape (Nz,Ny,Nx,3)). The mesh lengths needs to be
     specified in micrometer.
-
     In the second version of this constructor:
-
     .. code-block:: python
     
         nfield = DirectorField(vti_file="path to vti file")
-
     the values of the director field and the details of the mesh are
     automatically assigned from the vti file.
     """
@@ -136,23 +130,18 @@ class DirectorField:
     def set_mask(self, *,  mask_type, mask_formula = None, mask_ndarray = None):
         """Set a boolean mask for the LC domain. This method allows to specifify complex shape
         for the LC domain inside the regular cartesian mesh specified at construction. 
-
         Three possible ways of initializing the mask are possible. If you simply want to
         specify a spherical domain for a droplet centered on the mesh and of diameter equal to
         the mesh length along z, call:
-
         .. code-block:: python
             
             nfield.set_mask(mask_type="droplet")
-
         You can also use a string formula depending on the space variables ``x``, ``y`` and
         ``z`` and which must evaluates to True if the associated point is inside the LC
         domain, else False:
-
         .. code-block:: python
             
             nfield.set_mask(mask_type="formula", mask_formula="your formula")
-
         Finally, you can directly gives a boolean numpy array of shape (Nz,Ny,Nx), where each
         value in this array must be True if the associated mesh point is inside the LC domain,
         else False:
@@ -160,7 +149,6 @@ class DirectorField:
         .. code-block:: python
             
             nfield.set_mask(mask_type="raw", mask_ndarray=your_mask_array)
-
         """
         if mask_type=="droplet":
             self._mask_type = mask_type
@@ -220,23 +208,22 @@ class DirectorField:
         Extend the computational mesh in the ``xy`` plane by padding new points near the ``x``
         and ``y`` boundaries. These new points are initialized with the edge value of the
         director field on the ``x`` and ``y`` boundaries.
-
         Parameters
         ----------
         scale_x : float
             The mesh length in the x-direction will be scaled by this factor.
         scale_y : float
             The mesh length in the y-direction will be scaled by this factor.
-
         """
         print("{ Extending computational mesh }")
+        
+        if self._mask_vals is not None:
+            raise Exception("You should always call set_mask after extend")
 
         Nx_pad = int(self._Nx*(scale_x-1)/2)
         Ny_pad = int(self._Ny*(scale_y-1)/2)
         self._vals = np.pad(
             self._vals, ((0,0),(Ny_pad,Ny_pad),(Nx_pad,Nx_pad),(0,0)), "edge")
-        if self._mask_vals is not None:
-            raise Exception("You should always call set_mask after extend")
 
         self._Nx = self._Nx+2*Nx_pad
         self._Ny = self._Ny+2*Ny_pad
@@ -273,6 +260,9 @@ class DirectorField:
             raise Exception("Could not parse axis.")
 
         print("{ 90 deg rotation around axis "+axis[-1]+" }")
+        
+        if self._mask_vals is not None:
+            raise Exception("You should always call set_mask after rotate_90deg")
 
         # mapping for the axis order in the raw data array (axis 3 is component axis)
         ax_map = [2, 1, 0, 3]
@@ -320,6 +310,9 @@ class DirectorField:
             raise Exception("Could not parse axis.")
 
         print("{ 180 deg rotation around axis "+axis[-1]+" }")
+        
+        if self._mask_vals is not None:
+            raise Exception("You should always call set_mask after rotate_180deg")
 
         # mapping for the axis order in the raw data array (axis 3 is component axis)
         ax_map = np.array([2, 1, 0, 3])
@@ -330,7 +323,62 @@ class DirectorField:
         # We apply the rotation
         self._vals = np.flip(self.vals, axis = ax_map[flip_axes])
         self._vals[:,:,:,flip_axes] = -self._vals[:,:,:,flip_axes]
+        
+    def rotate(self, axis, angle, fill_value=None):
+        """
+        Rotate the director field by an arbitrary angle around the specified axis.
+        
+        Parameters
+        ----------
+        axis : str
+            Axis around which to perform the rotation. Need to be under the form 'A' where
+            'A'='x', 'y' or 'z' defines the rotation axis.
+        angle : float
+            Angle of rotation in degrees.
+        """
+        if axis[0]=="x":
+            ax = 0
+        elif axis[0]=="y":
+            ax = 1
+        elif axis[0]=="z":
+            ax = 2
+        else:
+            raise Exception("Could not parse axis.")
 
+        print("{ Rotation of %.2f° around axis %s }" % (angle,axis[0]))
+        
+        if self._mask_vals is not None:
+            raise Exception("You should always call set_mask after rotate")
+        
+        u = np.zeros(3)
+        u[ax] = 1
+        rot_mat = R.from_rotvec(angle*np.pi/180*u).as_dcm()
+        rot_mat_inv = R.from_rotvec(-angle*np.pi/180*u).as_dcm()
+            
+        x = np.linspace(-self._Lx/2, self._Lx/2, self._Nx)
+        y = np.linspace(-self._Ly/2, self._Ly/2, self._Ny)
+        z = np.linspace(-self._Lz/2, self._Lz/2, self._Nz)
+        Z,Y,X = np.meshgrid(z,y,x,indexing="ij")
+        
+        pos = np.stack((X.flatten(),Y.flatten(),Z.flatten()), axis=1)
+        pos_rot = np.dot(rot_mat_inv,pos.transpose()).transpose()
+ 
+        tmp = interpn((z,y,x), self._vals, np.flip(pos_rot, axis=1), bounds_error=False, fill_value=fill_value)
+        self._vals = np.dot(rot_mat,tmp.transpose()).transpose().reshape((self._Nz,self._Ny,self._Nx,3))
+        
+        
+    def rescale_mesh(self, scaling_factor):
+        """
+        Scale the mesh using the given scaling factor.
+        
+        Parameters
+        ----------
+        scaling_factor : factor
+            The mesh lengths and spacings will be multiplied by this factor.
+        """
+        (self._Lx,self._Ly,self._Lz) = tuple(scaling_factor*np.array(self.get_mesh_lengths()))
+        (self._dx,self._dy,self._dz) = tuple(scaling_factor*np.array(self.get_mesh_spacings()))
+        
 
     @property
     def vals(self):
@@ -350,12 +398,10 @@ class DirectorField:
         """Initialize the director field from three functions for each of its component. The
         functions must depends on the space variables ``x``, ``y`` and ``z``. We recall that
         the mesh is centered on the origin.
-
         If the given function are numpy-vectorizable, this function should be pretty fast. If
         not, a warning will be printed and the given function will be vectorized with the
         numpy method ``vectorize`` (in which case you should expect a much slower execution
         time).
-
         """
 
         print("{ Calculating director values from user functions }")
@@ -397,7 +443,6 @@ class DirectorField:
 
     def save_to_vti(self, filename):
         """Save the director field into a vti file.
-
         The ".vti" extension is automatically appended, no need to include it in the filename
         parameter (but in case you do only one extension will be added)
         """ 
@@ -430,7 +475,6 @@ class DirectorField:
 
     def get_pos(self, ix, iy, iz):
         """Returns the spatial position associated with the mesh indices (ix,iy,iz)
-
         It is assumed that the mesh is centered on the origin (0,0,0).
         """
         return (ix*self._dx-self._Lx/2, iy*self._dy-self._Ly/2, iz*self._dz-self._Lz/2)
