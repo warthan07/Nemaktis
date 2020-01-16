@@ -166,8 +166,8 @@ void ParaxialPrimaryEvolutionOperator::update() {
 	#pragma omp parallel for
 	for(int i=0; i<2*N; i++) {
 		int mesh_idx = i%N;
-		Index3D p({mesh_idx%Nx,mesh_idx/Nx,iz});
-		Index3D p_pz({p.x,p.y,p.z+1});
+		Index3D p{mesh_idx%Nx,mesh_idx/Nx,iz};
+		Index3D p_pz{p.x,p.y,p.z+1};
 		auto val = (i<N) ?
 			(eps.xz(p)/eps.zz(p)+eps.xz(p_pz)/eps.zz(p_pz))*std::complex<double>(0,0.25) :
 			(eps.yz(p)/eps.zz(p)+eps.yz(p_pz)/eps.zz(p_pz))*std::complex<double>(0,0.25);
@@ -206,8 +206,8 @@ void ParaxialPrimaryEvolutionOperator::update() {
 	#pragma omp parallel for private(exx_sqrt,exy_sqrt,eyy_sqrt,det,exx_sqrt_inv, \
 			exy_sqrt_inv,eyy_sqrt_inv)
 	for(int mesh_idx=0; mesh_idx<N; mesh_idx++) {
-		Index3D p({mesh_idx%Nx,mesh_idx/Nx,iz});
-		Index3D p_pz({p.x,p.y,p.z+1});
+		Index3D p{mesh_idx%Nx,mesh_idx/Nx,iz};
+		Index3D p_pz{p.x,p.y,p.z+1};
 
 		exx_sqrt = (eps.xx_sqrt(p)+eps.xx_sqrt(p_pz))/2;
 		eyy_sqrt = (eps.yy_sqrt(p)+eps.yy_sqrt(p_pz))/2;
@@ -251,8 +251,8 @@ void ParaxialPrimaryEvolutionOperator::update() {
 	#pragma omp parallel for private(exx_sqrt,exy_sqrt,eyy_sqrt,det,exx_sqrt_inv, \
 			exy_sqrt_inv,eyy_sqrt_inv)
 	for(int mesh_idx=0; mesh_idx<N; mesh_idx++) {
-		Index3D p({mesh_idx%Nx,mesh_idx/Nx,iz});
-		Index3D p_pz({p.x,p.y,p.z+1});
+		Index3D p{mesh_idx%Nx,mesh_idx/Nx,iz};
+		Index3D p_pz{p.x,p.y,p.z+1};
 
 		exx_sqrt = (eps.xx_sqrt(p)+eps.xx_sqrt(p_pz))/2;
 		eyy_sqrt = (eps.yy_sqrt(p)+eps.yy_sqrt(p_pz))/2;
@@ -317,8 +317,8 @@ void ParaxialPrimaryEvolutionOperator::update_D() {
 	// We add D1*K to D
 	#pragma omp parallel for private(exx_tr, exy_tr, eyy_tr)
 	for(int mesh_idx=0; mesh_idx<N; mesh_idx++) {
-		Index3D p({mesh_idx%Nx,mesh_idx/Nx,iz});
-		Index3D p_pz({p.x,p.y,p.z+1});
+		Index3D p{mesh_idx%Nx,mesh_idx/Nx,iz};
+		Index3D p_pz{p.x,p.y,p.z+1};
 
 		exx_tr = (eps.xx_tr(p)+eps.xx_tr(p_pz))/2;
 		eyy_tr = (eps.yy_tr(p)+eps.yy_tr(p_pz))/2;
@@ -366,17 +366,17 @@ void ParaxialPrimaryEvolutionOperator::update_D1() {
 	#pragma omp parallel for private(ezz_inv,ezz_inv_px,ezz_inv_mx,ezz_inv_py,ezz_inv_my)
 	for(int iy=0; iy<Ny; iy++) {
 		for(int ix=0; ix<Nx; ix++) {
-			Index3D p({ix,iy,iz});
-			Index3D p_px({(ix==Nx-1)?1:ix+1,iy,iz});
-			Index3D p_mx({(ix==0)?Nx-2:ix-1,iy,iz});
-			Index3D p_py({ix,(iy==Ny-1)?1:iy+1,iz});
-			Index3D p_my({ix,(iy==0)?Ny-2:iy-1,iz});
+			Index3D p{ix,iy,iz};
+			Index3D p_px{(ix==Nx-1)?1:ix+1,iy,iz};
+			Index3D p_mx{(ix==0)?Nx-2:ix-1,iy,iz};
+			Index3D p_py{ix,(iy==Ny-1)?1:iy+1,iz};
+			Index3D p_my{ix,(iy==0)?Ny-2:iy-1,iz};
 
-			Index3D p_pz({p.x,p.y,iz+1});
-			Index3D p_px_pz({p_px.x,p_px.y,iz+1});
-			Index3D p_mx_pz({p_mx.x,p_mx.y,iz+1});
-			Index3D p_py_pz({p_py.x,p_py.y,iz+1});
-			Index3D p_my_pz({p_my.x,p_my.y,iz+1});
+			Index3D p_pz{p.x,p.y,iz+1};
+			Index3D p_px_pz{p_px.x,p_px.y,iz+1};
+			Index3D p_mx_pz{p_mx.x,p_mx.y,iz+1};
+			Index3D p_py_pz{p_py.x,p_py.y,iz+1};
+			Index3D p_my_pz{p_my.x,p_my.y,iz+1};
 
 			ezz_inv = (1./eps.zz(p)+1./eps.zz(p_pz))/2;
 			ezz_inv_px = (1./eps.zz(p_px)+1./eps.zz(p_px_pz))/2;
