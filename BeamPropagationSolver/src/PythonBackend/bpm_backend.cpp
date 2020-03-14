@@ -21,7 +21,8 @@ void run_backend(
 		CartesianMesh mesh(
 			{spacings[0], spacings[1], spacings[2]},
 			{dims[0], dims[1], dims[2]});
-		auto nfield = std::make_shared<VectorField<double> >(mesh, 3, director_vals, n_director);
+		auto nfield = std::make_shared<VectorField<double> >(
+			mesh, 3, director_vals, n_director);
 
 		PhysicsCoefficients coefs(settings, nfield->mesh);
 		std::vector<VectorField<std::complex<double> > >  bpm_sol[2] = {
