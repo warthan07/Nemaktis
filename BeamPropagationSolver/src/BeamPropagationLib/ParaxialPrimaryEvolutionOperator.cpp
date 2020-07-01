@@ -3,7 +3,7 @@
 ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 		const PermittivityTensorField& eps,
 		double wavelength, const RootSettings &settings) :
-	BaseBPMOperator(eps, wavelength, settings.algorithm.bpm),
+	BaseBPMOperator(eps, wavelength),
 	d_ovr_dX_csr(Nx*Ny,Nx*Ny),
 	d_ovr_dX_csc(Nx*Ny,Nx*Ny),
 	d_ovr_dY_csr(Nx*Ny,Nx*Ny),
@@ -323,10 +323,6 @@ void ParaxialPrimaryEvolutionOperator::update_D() {
 		exx_tr = (eps.xx_tr(p)+eps.xx_tr(p_pz))/2;
 		eyy_tr = (eps.yy_tr(p)+eps.yy_tr(p_pz))/2;
 		exy_tr = (eps.xy_tr(p)+eps.xy_tr(p_pz))/2;
-		
-		// exx_tr = eps.zz(p);
-		// eyy_tr = eps.zz(p);
-		// exy_tr = 0;
 
 		for(auto diff_type : {DiffDX,DiffDY,DiffDXDY}) {
 			// We add the left blocks (Block00 and Block10) of D1*K to D_matrix

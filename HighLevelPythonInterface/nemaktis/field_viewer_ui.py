@@ -38,13 +38,13 @@ class OpticalElementSettings(HasTraits):
                 Spring(width=-50),
                 Spring(width=-50),
                 Spring(width=-50),
-                Item("polariser_angle", enabled_when="polariser==\"Yes\"", editor=RangeEditor(
+                Item("polariser_angle",enabled_when="polariser==\"Yes\"",editor=RangeEditor(
                     mode="slider", format="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
-                Item("compensator_angle", enabled_when="compensator!=\"No\"", editor=RangeEditor(
+                Item("compensator_angle",enabled_when="compensator!=\"No\"",editor=RangeEditor(
                     mode="slider", format="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
-                Item("analyser_angle", enabled_when="analyser==\"Yes\"", editor=RangeEditor(
+                Item("analyser_angle",enabled_when="analyser==\"Yes\"",editor=RangeEditor(
                     mode="slider", format="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 orientation="horizontal",
@@ -55,8 +55,14 @@ class OpticalElementSettings(HasTraits):
             show_border = True),
         resizable=True)
 
-    def __init__(self, callback_dict):
+    def __init__(self, callback_dict, default_val_dict):
         self._callback_dict = callback_dict
+        self.polariser = "Yes" if default_val_dict["polariser"] else "No"
+        self.analyser = "Yes" if default_val_dict["analyser"] else "No"
+        self.compensator = default_val_dict["compensator"]
+        self.polariser_angle = default_val_dict["polariser_angle"]
+        self.analyser_angle = default_val_dict["analyser_angle"]
+        self.compensator_angle = default_val_dict["compensator_angle"]
 
     def _polariser_changed(self):
         self._callback_dict["set_polariser"](self.polariser)
@@ -82,6 +88,13 @@ class MicroscopeSettings(HasTraits):
     min_focus = Float(-10)
     max_focus = Float(10)
 
+    NA_condenser = Float(0)
+    max_NA_condenser = Float(1)
+    activate_NA_condenser = Bool(True)
+
+    NA_objective = Float(0)
+    max_NA_objective = Float(1)
+
     color_mode = Enum(("RGB", "Grayscale"))
     n_tiles_x = Int(1)
     n_tiles_y = Int(1)
@@ -96,16 +109,31 @@ class MicroscopeSettings(HasTraits):
                 Item("z_focus", label="Z-focus", editor=RangeEditor(
                     mode="slider", format="%.2f", is_float=True,
                     low_name="min_focus", high_name="max_focus")),
+                Item("NA_condenser", enabled_when="activate_NA_condenser==True",
+                    label="Condenser NA", editor=RangeEditor(
+                    mode="slider", format="%.2f",
+                    low=0., high_name="max_NA_condenser", low_label="0", high_label="1")),
+                Item("NA_objective", label="Objective NA", editor=RangeEditor(
+                    mode="slider", format="%.2f",
+                    low=0., high_name="max_NA_objective", low_label="0", high_label="1")),
+                Spring(width=-50),
+                Spring(width=-50),
                 Spring(width=-50),
                 Spring(width=-50),
                 Item("min_intensity", label="Min", width=-40),
                 Item("min_focus", label="Min", width=-40),
+                Spring(width=-40),
+                Spring(width=-40),
+                Spring(width=-50),
+                Spring(width=-50),
                 Spring(width=-50),
                 Spring(width=-50),
                 Item("max_intensity", label="Max", width=-40),
                 Item("max_focus", label="Max", width=-40),
+                Spring(width=-40),
+                Spring(width=-40),
                 orientation="horizontal",
-                columns=2),
+                columns=4),
             Spring(),
             Group(
                 Item("n_tiles_x", width=-40, editor=RangeEditor(
@@ -126,13 +154,30 @@ class MicroscopeSettings(HasTraits):
             label="Microscope settings"),
         resizable=True)
 
-    def __init__(self, callback_dict):
+    def __init__(self, callback_dict, default_val_dict):
         self._callback_dict = callback_dict
+        self.intensity = default_val_dict["intensity"]
+        self.z_focus = default_val_dict["z_focus"]
+        self.max_NA_objective = default_val_dict["max_NA_objective"]
+        self.NA_condenser = default_val_dict["NA_condenser"]
+        self.NA_objective = default_val_dict["NA_objective"]
+        self.n_tiles_x = default_val_dict["n_tiles_x"]
+        self.n_tiles_y = default_val_dict["n_tiles_y"]
+        self.color_mode = "Grayscale" if default_val_dict["grayscale"] else "RGB"
+
+        if default_val_dict["max_NA_condenser"]>0:
+            self.max_NA_condenser = default_val_dict["max_NA_condenser"]
+        else:
+            self.activate_NA_condenser = False
 
     def _intensity_changed(self):
         self._callback_dict["set_intensity"](self.intensity)
     def _z_focus_changed(self):
         self._callback_dict["set_z_focus"](self.z_focus)
+    def _NA_condenser_changed(self):
+        self._callback_dict["set_NA_condenser"](self.NA_condenser)
+    def _NA_objective_changed(self):
+        self._callback_dict["set_NA_objective"](self.NA_objective)
     def _color_mode_changed(self):
         self._callback_dict["set_color_mode"](self.color_mode)
     def _n_tiles_x_changed(self):
@@ -220,7 +265,7 @@ class SettingPanels(HasTraits):
                 style='custom', show_label=False, height=-140),
             Spring(height=-20),
             Item("microscope_settings",
-                style='custom', show_label=False, height=-200),
+                style='custom', show_label=False, height=-240),
             Spring(height=-20),
             Item("save_settings",
                 style='custom', show_label=False, height=-140),
@@ -228,9 +273,11 @@ class SettingPanels(HasTraits):
             orientation="vertical"),
         resizable=True)
 
-    def __init__(self, callback_dict):
-        self.optical_elements_settings = OpticalElementSettings(callback_dict)
-        self.microscope_settings = MicroscopeSettings(callback_dict)
+    def __init__(self, callback_dict, default_val_dict):
+        self.optical_elements_settings = OpticalElementSettings(
+            callback_dict, default_val_dict)
+        self.microscope_settings = MicroscopeSettings(
+            callback_dict, default_val_dict)
         self.save_settings = SaveSettings(callback_dict)
 
 
@@ -283,8 +330,8 @@ class FieldViewerUI(HasTraits):
         kind="live",
         resizable=True)
 
-    def __init__(self, figure, callback_dict):
-        self.setting_panels = SettingPanels(callback_dict)
+    def __init__(self, figure, callback_dict, default_val_dict):
+        self.setting_panels = SettingPanels(callback_dict, default_val_dict)
         self.figure_panel = FigurePanel(figure)
 
         self.edit_traits()

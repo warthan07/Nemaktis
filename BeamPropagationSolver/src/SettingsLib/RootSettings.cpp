@@ -17,58 +17,43 @@ void runFromSettings(RootSettings &settings) {
 	 * Solution vectors initialization *
 	 ***********************************/
 
-	// We initialize the director and bpm vectors
 	std::cout <<
 		std::endl << "Setting up the initial solution..." << std::endl;
 
 	std::string initial_solution_file =
 		settings.physics.initial_conditions.initial_solution_file;
-	std::shared_ptr<VectorField<double> > lc_sol;
+	std::shared_ptr<VectorField<double> > nfield;
 
 	if(initial_solution_file.substr(initial_solution_file.size()-4, 4) == ".vti") {
 		VTIReader vti_reader(
 			initial_solution_file,
 			(settings.algorithm.general.lc_field_type=="Director") ? 3 : 6);
 		vti_reader.fill_solution_vector(
-			lc_sol, settings.physics.initial_conditions.basis_convention());
-		lc_sol->set_mask_from_nonzeros();
+			nfield, settings.physics.initial_conditions.basis_convention());
+		nfield->set_mask_from_nonzeros();
 	}
 	else
 		throw std::string(
 			"Unrecognised initial solution filetype: must be a path to a vti file.");
 
-	PhysicsCoefficients coefs(settings, lc_sol->mesh);
-	std::vector<VectorField<std::complex<double> > >  bpm_sol[2] = {
-		{coefs.wavelengths().size(), VectorField<std::complex<double> >(lc_sol->mesh, 2)},
-		{coefs.wavelengths().size(), VectorField<std::complex<double> >(lc_sol->mesh, 2)}};
+	PhysicsCoefficients coefs(settings, nfield->mesh);
+	ScreenOpticalFieldCollection screen_optical_fields(nfield->mesh, coefs);
 
 
-	/*********************************
-	 * Postprocessors Initialization *
-	 *********************************/
-
-	typedef std::vector<std::shared_ptr<PostprocessorBase> > PostprocessorVec;
-	
-	PostprocessorVec postprocessors;
-	PostprocessorSettings& pp_stg =
-		settings.postprocessor;
-
-	if(pp_stg.volume_output.activate)
-		postprocessors.push_back(std::make_shared<VolumeOutput>(settings, coefs));
-	if(pp_stg.micrograph_output.activate)
-		postprocessors.push_back(std::make_shared<ScreenOutput>(settings, coefs));
-
-	
 	/*******************
 	 * Problem solving * 
 	 *******************/
 	
-	auto bpm_iteration = new BPMIteration(*lc_sol, bpm_sol, coefs, settings);
+	BPMIteration bpm_iteration(*nfield, screen_optical_fields, coefs, settings);
+	bpm_iteration.propagate_fields();
 
-	bpm_iteration->update_optical_field();
-	for(auto postprocessor : postprocessors) {
-		postprocessor->apply(*lc_sol,bpm_sol);
+	if(settings.postprocessor.volume_output.activate) {
+		VolumeOutput volume_output(settings, coefs);
+		volume_output.apply(*bpm_iteration.get_bulk_optical_fields());
+	}
+	if(settings.postprocessor.micrograph_output.activate) {
+		ScreenOutput micrograph_output(settings, coefs);
+		micrograph_output.apply(screen_optical_fields);
 	}
 
-	postprocessors.clear();
 }

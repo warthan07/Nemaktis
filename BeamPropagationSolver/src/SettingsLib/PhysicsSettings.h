@@ -29,12 +29,17 @@ public:
 	const std::string no_expression;
 	const std::string nhost_expression;
 	const std::string nin_expression;
+	const std::string nout_expression;
 	std::vector<double> wavelengths() const {
 		return _wavelengths;
+	}
+	std::vector<std::pair<double,double> > q_vals() const {
+		return _q_vals;
 	}
 
 private:
 	std::vector<double> _wavelengths;
+	std::vector<std::pair<double,double> > _q_vals;
 };
 
 class PhysicsSettings : public BaseSettings {

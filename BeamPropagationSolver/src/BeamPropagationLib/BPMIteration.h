@@ -8,16 +8,21 @@
 
 #include "BeamProfile.h"
 #include "VectorField.h"
+#include "OpticalFieldCollection.h"
 
 class BPMIteration {
 public:
 	BPMIteration(
 		const VectorField<double> &lc_sol,
-		std::vector<VectorField<std::complex<double> > > (&bpm_sol)[2],
+		ScreenOpticalFieldCollection &screen_optical_fields,
 		const PhysicsCoefficients &coefs,
 		const RootSettings &settings);
 
-	void update_optical_field();
+	void propagate_fields();
+
+	std::shared_ptr<BulkOpticalFieldCollection> get_bulk_optical_fields() {
+		return bulk_optical_fields;
+	}
 
 private:
 	/**
@@ -57,15 +62,30 @@ private:
 	 * Shortcut reference to the LC solution.
 	 */
 	const VectorField<double> &lc_sol;
+
 	/**
-	 * Shortcut reference to the BPM solution.
+	 * Reference to the object storing the values of the optical fields for the current
+	 * transverse plane.
 	 */
-	std::vector<VectorField<std::complex<double> > > (&bpm_sol)[2];
+	ScreenOpticalFieldCollection &screen_optical_fields;
+
+	/**
+	 * Do we need to export bulk values of the optical field?
+	 */
+	bool bulk_output;
+	/**
+	 * Object storing the bulk values of the optical field, if bulk_output is true.
+	 */
+	std::shared_ptr<BulkOpticalFieldCollection> bulk_optical_fields;
 
 	/**
 	 * Array containing all the wavelengths in the light spectrum.
 	 */
 	std::vector<double> wavelengths;
+	/**
+	 * Array containing the incoming wavectors.
+	 */
+	std::vector<std::pair<double,double> > q_vals;
 };
 
 #endif

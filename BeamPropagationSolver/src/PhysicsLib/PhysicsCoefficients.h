@@ -36,6 +36,9 @@ public:
 	std::vector<double> wavelengths() const {
 		return _wavelengths;
 	}
+	std::vector<std::pair<double,double> > q_vals() const {
+		return _q_vals;
+	}
 
 private:
 	std::string ne_expression;
@@ -62,6 +65,10 @@ private:
 	 * Array containing all the wavelengths in the light spectrum.
 	 */
 	std::vector<double> _wavelengths;
+	/**
+	 * Array containing x and y components of the incoming wavectors.
+	 */
+	std::vector<std::pair<double,double> > _q_vals;
 };
 
 #endif

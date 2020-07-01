@@ -22,28 +22,43 @@ VectorField<T>::VectorField(CartesianMesh mesh, int field_dim, T val) :
 	mask_exists(false) {}
 
 template <typename T>
-VectorField<T>::VectorField(CartesianMesh mesh, int field_dim, T* user_vals, int n_user_vals) :
+VectorField<T>::VectorField(
+		CartesianMesh mesh, int field_dim,
+		T* user_vals, int n_user_vals) :
 	field_dim(field_dim),
 	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
 	mask_exists(false) {
 
-	if(n_user_vals!=n_vertex*field_dim && n_user_vals!=n_vertex*(field_dim+1))
-		throw std::string("Wrong dimension for the raw pointer array");
+	if(n_user_vals!=n_vertex*field_dim)
+		throw std::string("Wrong dimension for the user pointer array");
 
-	if(n_user_vals==n_vertex*field_dim)
-		for(int i=0; i<n_vertex*field_dim; i++)
-			vals[i] = user_vals[i];
-	else {
-		mask_exists = true;
-		mask_vals.resize(n_vertex);
-		for(int i=0; i<n_vertex; i++) {
-			for(int c=0; c<field_dim; c++)
-				(*this)(i,c) = user_vals[(field_dim+1)*i+c];
-			mask_vals[i] = (std::real(user_vals[(field_dim+1)*i+field_dim])>=0);
-		}
-	}
+	for(int i=0; i<n_vertex*field_dim; i++)
+		vals[i] = user_vals[i];
+}
+
+template <typename T>
+VectorField<T>::VectorField(
+		CartesianMesh mesh, int field_dim,
+		T* user_vals, int n_user_vals,
+		double* user_mask_vals, int n_mask_vals) :
+	field_dim(field_dim),
+	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
+	mesh(mesh),
+	vals(n_vertex * field_dim),
+	mask_exists(true) {
+
+	if(n_user_vals!=n_vertex*field_dim)
+		throw std::string("Wrong dimension for the user pointer array");
+	for(int i=0; i<n_vertex*field_dim; i++)
+		vals[i] = user_vals[i];
+
+	if(n_mask_vals!=n_vertex)
+		throw std::string("Wrong dimension for the mask pointer array");
+	mask_vals.resize(n_vertex);
+	for(int i=0; i<n_vertex; i++)
+		mask_vals[i] = (user_mask_vals[i]>=0);
 }
 
 template <typename T>

@@ -132,23 +132,24 @@ class DirectorField:
 
 
     def set_mask(self, *,  mask_type, mask_formula = None, mask_ndarray = None):
-        """Set a boolean mask for the LC domain. This method allows to specifify complex shape
+        """Set a mask for the LC domain. This method allows to specifify complex shape
         for the LC domain inside the regular cartesian mesh specified at construction. 
-        Three possible ways of initializing the mask are possible. If you simply want to
-        specify a spherical domain for a droplet centered on the mesh and of diameter equal to
-        the mesh length along z, call:
+        Positive mask value are associated with the LC domain, while negative values are
+        associated with the embedding fluid.  Three possible ways of initializing the mask
+        are possible. If you simply want to specify a spherical domain for a droplet
+        centered on the mesh and of diameter equal to the mesh length along z, call:
         .. code-block:: python
             
             nfield.set_mask(mask_type="droplet")
         You can also use a string formula depending on the space variables ``x``, ``y`` and
-        ``z`` and which must evaluates to True if the associated point is inside the LC
-        domain, else False:
+        ``z`` and which must evaluates to a value >=0 if the associated point is inside the LC
+        domain, else to a value <=0:
         .. code-block:: python
             
             nfield.set_mask(mask_type="formula", mask_formula="your formula")
-        Finally, you can directly gives a boolean numpy array of shape (Nz,Ny,Nx), where each
-        value in this array must be True if the associated mesh point is inside the LC domain,
-        else False:
+        Finally, you can directly gives a numpy array of shape (Nz,Ny,Nx), where each value
+        in this array must be >=0 if the associated mesh point is inside the LC domain,
+        else <=0:
         
         .. code-block:: python
             
@@ -156,7 +157,7 @@ class DirectorField:
         """
         if mask_type=="droplet":
             self._mask_type = mask_type
-            self._mask_formula = str((self._Lz/2)**2)+">x**2+y**2+z**2"
+            self._mask_formula = str((self._Lz/2)**2)+"-x**2-y**2-z**2"
         elif mask_type=="formula":
             self._mask_type = mask_type
             self._mask_formula = mask_formula.replace("^","**")
@@ -194,15 +195,12 @@ class DirectorField:
         if self._mask_type=="raw":
             return self._mask_vals
         elif self._mask_type=="formula" or self._mask_type=="droplet":
-            mask_vals = np.ndarray((self._Nz,self._Ny,self._Nx))
-            for iz in range(0,self._Nz):
-                z = self._dz*(iz-0.5*(self._Nz-1))
-                for iy in range(0,self._Ny):
-                    y = self._dy*(iy-0.5*(self._Ny-1))
-                    for ix in range(0,self._Nx):
-                        x = self._dx*(ix-0.5*(self._Nx-1))
-                        mask_vals[iz,iy,ix] = eval(self._mask_formula)
-            return mask_vals
+            z,y,x = np.meshgrid(
+                np.linspace(-0.5*self._dz*(self._Nz-1),0.5*self._dz*(self._Nz-1),self._Nz),
+                np.linspace(-0.5*self._dy*(self._Ny-1),0.5*self._dy*(self._Ny-1),self._Ny),
+                np.linspace(-0.5*self._dx*(self._Nx-1),0.5*self._dx*(self._Nx-1),self._Nx),
+                indexing="ij")
+            return eval(self._mask_formula)
         else:
             return None
 

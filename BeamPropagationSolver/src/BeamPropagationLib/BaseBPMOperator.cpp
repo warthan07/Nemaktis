@@ -1,8 +1,6 @@
 #include "BaseBPMOperator.h"
 
-BaseBPMOperator::BaseBPMOperator(
-		const PermittivityTensorField &eps,
-		double wavelength, const BPMSettings& bpm_settings) :
+BaseBPMOperator::BaseBPMOperator(const PermittivityTensorField &eps, double wavelength) :
 	wavevector(2*PI/wavelength),
 	delta_X(wavevector*eps.mesh.delta_x),
 	delta_Y(wavevector*eps.mesh.delta_y),
