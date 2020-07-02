@@ -41,7 +41,8 @@ else:
     #  mat.add_isotropic_layer(nlayer=1.51, thickness=1000)
 
     wavelengths = np.linspace(0.4, 0.8, 11)
-    sim = nm.LightPropagator(material=mat, wavelengths=wavelengths, numerical_aperture=0.4)
+    sim = nm.LightPropagator(
+        material=mat, wavelengths=wavelengths, max_NA_objective=0.4)
     output_fields = sim.propagate_fields(method="bpm")
 
     # We save the optical fields in a vti file

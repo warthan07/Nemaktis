@@ -24,22 +24,33 @@ simplefilter(action='ignore', category=FutureWarning)
 
 
 class LightPropagator:
-    """The LightPropagator class allows to propagate optical fields through a LC sample.
+    """The LightPropagator class allows to propagate optical fields through a LC sample as
+    in a real microscope: a set of plane waves with different wavevectors and wavelengths
+    are sent on the LC sample, and the associated transmitted optical fields (which can now
+    longer be represented as plane waves due to diffraction) are calculated using one of the
+    backend. 
+
+    The actual set of wavelengths for the plane waves (choosen at construction) approximate
+    the relevant part of the spectrum of the illumination light, whereas the set of
+    wavevectors (also calculated at construction) are determined from the numerical aperture
+    of the input condenser. The more open the condenser aperture is, the smoother the
+    micrograph will look, since an open condenser aperture is associated with a wide range
+    of angle for the wavectors of the incident plane waves. Conversely, an almost closed
+    condenser aperture is associated with a single plane wave incident normally on the
+    sample.
+
+    Note that with the FieldViewer class, the transmitted optical fields calculated with
+    this class can be projected on a visualisation screen through an objective of given
+    numerical aperture. The numerical apertures of both the objective and condenser aperture
+    can be set interactively in the FieldViewer class, whereas in this class we only
+    specify the maximum value allowed for both quantities.
+
     The simulation and choice of backend is done by calling the method ``propagate_field``. 
-    For each wavelength specified at construction, two simulations are done: one with a light
-    source polarised along x, and one with a light source polarised along y. This allows us to
-    fully caracterize the transmission of the LC sample and reconstruct any kind of optical
-    micrograph.
 
-    !!!!
-    UPDATE NEEDED FOR MULTIPLANEWAVE
-    !!!!
-
-    Currently, we only support single plane-wave source with input fields propagating along
-    ``z``. If you want to take into account input numerical aperture effect, you need to use
-    the ``dtmm`` backend directly (this may change in a future version). However, we do
-    support numerical aperture effect due to the microscope objective (i.e. on the output
-    side).
+    For each wavelength and wavevector of the incident plane wave, two simulations are done:
+    one with a light source polarised along x, and one with a light source polarised along
+    y. This allows us to fully caracterize the transmission of the LC sample and reconstruct
+    any kind of optical micrograph.
 
     Parameters
     ----------
@@ -54,8 +65,8 @@ class LightPropagator:
         dynamically adjust this quantity later on with a FieldViewer).
     N_radial_wavevectors : int
         Sets the number of wavevectors in the radial direction for the illumination plane
-        waves. If Nr is this number, the total number of plane waves for each wavelength is
-        1+3*Nr*(Nr-1).
+        waves. The total number of plane waves for each wavelength is 1+3*Nr*(Nr-1), where
+        Nr correspond to the value of this parameter.
     """
     def __init__(self, *, material, wavelengths, max_NA_objective,
             max_NA_condenser = 0, N_radial_wavevectors = 1):
@@ -243,11 +254,20 @@ class LightPropagator:
            thickness = spacings[2]/spacings[0]*np.ones(dims[2]))
 
         wavelengths = 1000*np.array(self._wavelengths)
+        beta = np.zeros((len(self._wavevectors),))
+        phi = np.zeros((len(self._wavevectors),))
+        intensity = np.ones((len(self._wavevectors),))
+        for ir in range(1,self._N_radial_wavevectors):
+            for iphi in range(0,6*ir):
+                beta[1+3*ir*(ir-1)+iphi] = ir*self._max_NA_condenser/(self._N_radial_wavevectors-1)
+                phi[1+3*ir*(ir-1)+iphi] = iphi*np.pi/3
+
         field_data_in = dtmm.illumination_data(
-            (dims[1],dims[0]), wavelengths, pixelsize = 1000*spacings[0], n = nin)
+            (dims[1],dims[0]), wavelengths, pixelsize=1000*spacings[0], n=nin,
+            beta=beta, phi=phi, intensity=intensity)
         field_data_out = dtmm.transfer_field(
             field_data_in, optical_data, nin=nin,
-            betamax=self._numerical_aperture, diffraction=diffraction,
+            betamax=self._max_NA_objective, diffraction=diffraction,
             ret_bulk=bulk_filename is not None)[0]
         print("")
 
@@ -260,25 +280,39 @@ class LightPropagator:
             vti_data.SetOrigin(-lengths[0]/2, -lengths[1]/2, -lengths[2]/2)
             vti_data.SetSpacing(spacings[0], spacings[1], spacings[2]*(dims[2]-1)/dims[2])
 
-            for i in range(0,len(wavelengths)):
-                E_inputX = field_data_out[:-1,0,i,[0,2],:,:].transpose(
-                    (1,0,2,3)).reshape((2,dims[0]*dims[1]*(dims[2]+1))).transpose()
-                E_inputY = field_data_out[:-1,1,i,[0,2],:,:].transpose(
-                    (1,0,2,3)).reshape((2,dims[0]*dims[1]*(dims[2]+1))).transpose()
+            wavelengths_data = vn.numpy_to_vtk(self._wavelengths)
+            wavelengths_data.SetName("lambda")
+            vti_data.GetFieldData().AddArray(wavelengths_data)
 
-                E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
-                E_real_inputX.SetName("E_real_inputX_%sum" % self._wavelengths[i])
-                vti_data.GetPointData().AddArray(E_real_inputX)
-                E_imag_inputX = vn.numpy_to_vtk(np.imag(E_inputX))
-                E_imag_inputX.SetName("E_imag_inputX_%sum" % self._wavelengths[i])
-                vti_data.GetPointData().AddArray(E_imag_inputX)
+            qx_data = vn.numpy_to_vtk(self._wavevectors[:,0])
+            qx_data.SetName("qx")
+            vti_data.GetFieldData().AddArray(qx_data)
 
-                E_real_inputY = vn.numpy_to_vtk(np.real(E_inputY))
-                E_real_inputY.SetName("E_real_inputY_%sum" % self._wavelengths[i])
-                vti_data.GetPointData().AddArray(E_real_inputY)
-                E_imag_inputY = vn.numpy_to_vtk(np.imag(E_inputY))
-                E_imag_inputY.SetName("E_imag_inputY_%sum" % self._wavelengths[i])
-                vti_data.GetPointData().AddArray(E_imag_inputY)
+            qy_data = vn.numpy_to_vtk(self._wavevectors[:,1])
+            qy_data.SetName("qy")
+            vti_data.GetFieldData().AddArray(qy_data)
+
+            Np = dims[0]*dims[1]*(dims[2]+1)
+            for wave_idx in range(0,len(self._wavelengths)):
+                for q_idx in range(0,len(self._wavevectors)):
+                    E_inputX = field_data_out[:-1,q_idx,0,wave_idx,[0,2],:,:].transpose(
+                        (1,0,2,3)).reshape((2,Np)).transpose()
+                    E_inputY = field_data_out[:-1,q_idx,1,wave_idx,[0,2],:,:].transpose(
+                        (1,0,2,3)).reshape((2,Np)).transpose()
+
+                    E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
+                    E_real_inputX.SetName("E_real_inputX_%d_%d" % (wave_idx,q_idx))
+                    vti_data.GetPointData().AddArray(E_real_inputX)
+                    E_imag_inputX = vn.numpy_to_vtk(np.imag(E_inputX))
+                    E_imag_inputX.SetName("E_imag_inputX_%d_%d" % (wave_idx,q_idx))
+                    vti_data.GetPointData().AddArray(E_imag_inputX)
+
+                    E_real_inputY = vn.numpy_to_vtk(np.real(E_inputY))
+                    E_real_inputY.SetName("E_real_inputY_%d_%d" % (wave_idx,q_idx))
+                    vti_data.GetPointData().AddArray(E_real_inputY)
+                    E_imag_inputY = vn.numpy_to_vtk(np.imag(E_inputY))
+                    E_imag_inputY.SetName("E_imag_inputY_%d_%d" % (wave_idx,q_idx))
+                    vti_data.GetPointData().AddArray(E_imag_inputY)
 
             writer = vtkXMLImageDataWriter()
             writer.SetFileName(bulk_filename+".vti")
@@ -286,14 +320,20 @@ class LightPropagator:
             writer.Write()
 
             # We only keep the last slice to compute micrographs
-            field_data_out = field_data_out[-1,:,:,:,:,:]
+            field_data_out = field_data_out[-1,:,:,:,:,:,:]
 
         output_fields = OpticalFields(
             wavelengths = self._wavelengths,
+            max_NA_objective = self._max_NA_objective,
+            max_NA_condenser = self._max_NA_condenser,
+            N_radial_wavevectors = self._N_radial_wavevectors,
             mesh_lengths = (spacings[0]*(dims[0]-1), spacings[1]*(dims[1]-1)),
             mesh_dimensions = (dims[0], dims[1]))
-        output_fields.vals = field_data_out[:,:,[0,2],:,:].transpose(
-            (1,0,2,3,4)).reshape((len(wavelengths),4,dims[1],dims[0]))
+
+        Nl = len(self._wavelengths)
+        Nq = len(self._wavevectors)
+        output_fields.vals = field_data_out[:,:,:,[0,2],:,:].transpose(
+            (2,0,1,3,4,5)).reshape((Nl,Nq,4,dims[1],dims[0]))
         return output_fields
 
 
@@ -306,9 +346,8 @@ class OpticalFields:
     ``y``.  In case multiple wavelengths/wavectors were used in the simulation, we store these
     quantities separately for each wavelength/wavevector.
 
-    This class is initialised given either a wavelength array and the lengths and dimensions
-    of the 2D mesh for the transverse fields or a path to a vti file containing previously
-    calculated optical fields and mesh details.
+    This class is initialised either manually or with a path to a vti file containing
+    previously calculated optical fields and mesh details.
     
     In the first version of this constructor:
 

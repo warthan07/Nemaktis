@@ -48,7 +48,7 @@ addition to these variables, one needs to specify the total lengths of
 the mesh in each spatial direction, which we will call ``Lx``, ``Ly``
 and ``Lz`` in the following. All lengths are in micrometer in
 ``nemaktis``, and the mesh for the director field is always centerered
-on the origin (which means that the spatial coordinate ``u=x,y,z`` are
+on the origin (which means that the spatial coordinate ``u=x,y,z`` is
 always running from ``-Lu/2`` to ``Lu/2``).
 
 Here, we will start by defining an empty
@@ -72,8 +72,8 @@ this array to the :class:`~nemaktis.lc_material.DirectorField` object
     nfield.vals = my_director_vals_numpy_array
 
 Or you have an analytical formula for the director field, in which case you can define three
-python functions and give these to the :class:`~nemaktis.lc_material.DirectorField` object. In
-this tutorial, we will assume the latter option and define the director field of a double
+python functions and give these to the :class:`~nemaktis.lc_material.DirectorField` object.
+In this tutorial, we will assume the latter option and define the director field of a double
 twist cylinder:
 
 .. code-block:: python
@@ -98,8 +98,10 @@ you can still normalize manually the director values after importing them:
     nfield.normalize()
 
 Finally, you can apply geometric transformation to the director field with the methods
+:meth:`~nemaktis.lc_material.DirectorField.rotate`,
 :meth:`~nemaktis.lc_material.DirectorField.rotate_90deg`,
 :meth:`~nemaktis.lc_material.DirectorField.rotate_180deg`,
+:meth:`~nemaktis.lc_material.DirectorField.rescale_mesh`,
 :meth:`~nemaktis.lc_material.DirectorField.extend`,
 as well as specify a non-trivial domain for the LC phase with the method
 :meth:`~nemaktis.lc_material.DirectorField.set_mask`,
@@ -114,9 +116,9 @@ droplet mask centered on the mesh with a diameter equal to the mesh height:
     nfield.extend(2,2)
     nfield.set_mask(mask_type="droplet")
 
-Note that extending the mesh in the xy direction is essential if you define a non-trivial
-LC mask, because you need to leave enough room for the optical fields to propagate around the LC
-domain.
+Note that extending the mesh in the xy direction is essential if you define a non-trivial LC
+mask, because you need to leave enough room for the optical fields to propagate around the
+LC domain.
 
 And that's it, we now have set-up the director field of a double-twist
 droplet with the polar axis oriented along the axis ``y``! If you want
@@ -147,11 +149,12 @@ time.
 Defining a LCMaterial
 ---------------------
 
-The next step is to define possible isotropic layers above the LC layer (which can distort the
-optical fields on the focal plane), as well as the refractive indices of all the materials in the
-sample. Since our system here consists of a droplet embedded in another fluid, we need to specify
-both extraordinay and ordinary indices for the LC droplet and the refractive index of the host
-fluid. All these informations are stored in the class :class:`~nemaktis.lc_material.LCMaterial`:
+The next step is to define possible isotropic layers above the LC layer (which can distort
+the optical fields on the focal plane), as well as the refractive indices of all the
+materials in the sample. Since our system here consists of a droplet embedded in another
+fluid, we need to specify both extraordinay and ordinary indices for the LC droplet and the
+refractive index of the host fluid. All these informations are stored in the class
+:class:`~nemaktis.lc_material.LCMaterial`:
 
 .. code-block:: python
 
@@ -170,20 +173,32 @@ between the droplet and the glass plate:
     mat.add_isotropic_layer(nlayer=1.55, thickness=5) # 5 µm space between the droplet and glass plate
     mat.add_isotropic_layer(nlayer=1.51, thickness=1000) # 1mm-thick glass plate
 
-We don't specify isotropic layers below the sample because the high-level interface only support
-input optical fields propagating in the ``z`` direction (in which case the amplitude of the
-fields is uniformly affected by any isotropic layers orthogonal to ``z``). This may change in
-the future, since the backend ``dtmm`` does support multiple plane-waves source as in a real
-Köhler illumination setup.
+We don't specify isotropic layers below the sample because in ``nemaktis`` the incident
+optical fields always correspond to a set of plane waves whose wavectors are weakly tilted
+with respect to the ``z`` direction (in which case the amplitude of the fields is uniformly
+affected by any isotropic layers orthogonal to ``z``).
 
 .. _prop:
 
 Propagating optical fields through the sample
 ---------------------------------------------
 
-Now that the sample geometry is fully caracterized, we can propagate fields through the sample
-and back to the central focal plane. This is simple as defining an array of wavelengths defining
-the spectrum of the light source, creating a
+Now that the sample geometry is fully caracterized, we can propagate fields through the
+sample and through an objective into the visualisation plane (which we initially assume to be
+conjugate to the center of the sample), as in a real microscope: a set of plane waves with
+different wavevectors and wavelengths are sent on the LC sample, and the associated
+transmitted optical fields are calculated using one of the backend. 
+
+The actual set of wavelengths for the plane waves approximate the relevant part of the
+spectrum of the illumination light, whereas the set of wavevectors is determined from the
+numerical aperture of the input condenser. The more open the condenser aperture is, the
+smoother the micrograph will look, since an open condenser aperture is associated with a
+wide range of angle for the wavectors of the mutually incoherent incident plane waves.
+Conversely, an almost closed condenser aperture is associated with a single plane wave
+incident normally on the sample.
+
+With ``nemaktis``, the propagation of optical field through a LC sample is as simple as
+defining an array of wavelengths defining the spectrum of the light source, creating a
 :class:`~nemaktis.light_propagator.LightPropagator` object, and calling the method
 :class:`~nemaktis.light_propagator.LightPropagator.propagate_fields`:
 
@@ -191,21 +206,38 @@ the spectrum of the light source, creating a
 
     wavelengths = np.linspace(0.4, 0.8, 11)
     sim = nm.LightPropagator(
-        material=mat, wavelengths=wavelengths, numerical_aperture=0.4)
+        material=mat, wavelengths=wavelengths, max_NA_objective=0.4,
+        max_NA_condenser=0, N_radial_wavevectors=1)
     output_fields = sim.propagate_fields(method="bpm")
 
-The numerical aperture defined in this code snippet corresponds to the one of the microscope
-objective. The :class:`~nemaktis.light_propagator.LightPropagator.propagate_fields` method uses
+The parameter ``max_NA_objective`` defined in this code snippet corresponds to the maximal
+numerical aperture of the microscope objective. The parameters ``max_NA_condenser`` and
+``N_radial_wavevectors`` respectively sets the maximal numerical aperture of the input
+condenser aperture and the number ``Nr`` of incident wavevectors in the radial direction of the
+condenser (the total number of wavevectors will be ``1+3*Nr*(Nr-1)``, so be carefull to not
+set a value too big to avoid memory overflow or long running time). Here, we assume an
+almost fully closed condenser aperture, so we set the numerical aperture to zero and the
+total number of wavevectors to 1. Note that omitting the two parameters ``max_NA_objective``
+and ``N_radial_wavevectors`` during the construction of the
+:class:`~nemaktis.light_propagator.LightPropagator` object will default to these values,
+i.e. this class will assume that there is only one single plane wave incident normally on
+the sample. Finally, we mention that you will be able to dynamically set the actual values
+of the numerical aperture of the objective and  condenser later on when visualizing the
+optical fields (with the constraints that these quantities must always be comprised between
+0 and the max bounds set here).
+
+The :class:`~nemaktis.light_propagator.LightPropagator.propagate_fields` method uses
 the specified backend to propagate fields (here, ``bpm-solver``) and returns an
 :class:`~nemaktis.light_propagator.OpticalFields` object containing the results of the
 simulation.  Periodic boundary conditions in the ``x`` and ``y`` directions are systematically
 assumed, so you should always extend apropriately your director field in order to have a
 uniform field near the mesh boundaries.
 
-Note that internally two simulations are run for each wavelength, one with an input light
-source polarised along ``x`` and the other with an input light source polarised along ``y``.
-This allows us to fully caracterize the transmission matrix of the sample and reconstruct any
-type of micrographs (bright field, crossed polariser...), as we will see in the next section.
+Note that internally two simulations are run for each wavelength and wavevector, one with an
+input light source polarised along ``x`` and the other with an input light source polarised
+along ``y``.  This allows us to fully caracterize the transmission matrix of the sample and
+reconstruct any type of micrographs (bright field, crossed polariser...), as we will see in
+the next section.
 
 Similaryly to the :class:`~nemaktis.lc_material.DirectorField` object, you can save the output
 fields to a XML VTK file, and reimport them in other scripts:
