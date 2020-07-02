@@ -17,9 +17,7 @@
  */
 class BaseBPMOperator {
 public:
-	BaseBPMOperator(
-		const PermittivityTensorField &eps,
-		double wavelength, const BPMSettings& bpm_settings);
+	BaseBPMOperator(const PermittivityTensorField &eps, double wavelength);
 
 	/**
 	 * Apply this operator to a transverse optical field.

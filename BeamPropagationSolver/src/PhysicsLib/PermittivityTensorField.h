@@ -21,6 +21,9 @@ public:
 	double get_no() const {
 		return no;
 	}
+	double get_nref() const {
+		return nref;
+	}
 
 	/**
 	 * Get xx component of the permittivity tensor
@@ -81,6 +84,10 @@ private:
 	 * Extraordinary refractive index sqrt(eps_parallel)
 	 */
 	const double ne;
+	/**
+	 * Reference index (mean eigenvalue of the averaged square root transverse permittivity)
+	 */
+	double nref;
 	/**
 	 * Relative permittivity in the direction orthogonal to the director.
 	 */

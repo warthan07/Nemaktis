@@ -6,7 +6,8 @@ PhysicsCoefficients::PhysicsCoefficients(
 		const RootSettings &settings,
 		const CartesianMesh &mesh) :
 	physics_settings(settings.physics),
-    _wavelengths(settings.physics.coefs.wavelengths()) {
+    _wavelengths(settings.physics.coefs.wavelengths()),
+	_q_vals(settings.physics.coefs.q_vals()) {
 
 	ne_expression = physics_settings.coefs.ne_expression;
 	no_expression = physics_settings.coefs.no_expression;

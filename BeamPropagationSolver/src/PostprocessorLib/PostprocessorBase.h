@@ -24,13 +24,6 @@ public:
 		const std::string &results_dirname,
 		const PhysicsCoefficients &coefs);
 
-	/**
-	 * Postprocessing operator, defined here as a pure virtual method.
-	 */
-	virtual void apply(
-		VectorField<double> &lc_sol,
-		std::vector<VectorField<std::complex<double> > > (&bpm_sol)[2]) = 0;
-
 protected:
 	/**
 	 * A method which format the main output path+filename from

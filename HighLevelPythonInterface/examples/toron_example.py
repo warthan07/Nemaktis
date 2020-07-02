@@ -57,7 +57,8 @@ mat = nm.LCMaterial(
     nhost=1.55)
 
 wavelengths = np.linspace(0.4, 0.8, 11)
-sim = nm.LightPropagator(material=mat, wavelengths=wavelengths, numerical_aperture=0.4)
+sim = nm.LightPropagator(
+    material=mat, wavelengths=wavelengths, max_NA_objective=0.4)
 output_fields = sim.propagate_fields(method="dtmm")
 
 # Finally, the optical fields are visualized as in a real microscope

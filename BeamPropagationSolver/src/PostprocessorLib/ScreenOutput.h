@@ -1,7 +1,10 @@
 #ifndef SCREENOUTPUT_H
 #define SCREENOUTPUT_H
 
+#include <Eigen/Core>
+
 #include "PostprocessorBase.h"
+#include "OpticalFieldCollection.h"
 
 class ScreenOutput : public PostprocessorBase {
 public:
@@ -9,14 +12,11 @@ public:
 		const RootSettings &settings,
 		const PhysicsCoefficients &coefs);
 
-	virtual void apply(
-		VectorField<double> &lc_sol,
-		std::vector<VectorField<std::complex<double> > > (&bpm_sol)[2]);
+	void apply(ScreenOpticalFieldCollection &screen_optical_fields);
 
 	void apply_no_export(
-		VectorField<double> &lc_sol,
-		std::vector<VectorField<std::complex<double> > > (&bpm_sol)[2],
-		std::complex<double>* fields_vals);
+		ScreenOpticalFieldCollection &screen_optical_fields,
+		std::complex<double>* output_fields_vals);
 
 private:
 	/**
@@ -24,8 +24,8 @@ private:
 	 * forward through the isotropic layers and backward to the
 	 * focalisation plane.
 	 */
-	std::shared_ptr<std::vector<std::complex<double> > > assemble_iso_filter(
-		double wavelength) const;
+	std::shared_ptr<std::vector<Eigen::Matrix2cd> > assemble_fourier_filter(
+		double wavelength, std::pair<double,double> q_val) const;
 
 	int Nx, Ny, Nz;
 	double delta_x, delta_y;
@@ -35,6 +35,13 @@ private:
 	double focalisation_z_shift;
 	double numerical_aperture;
 
+	/**
+	 * Array containing all the wavelengths in the light spectrum.
+	 */
 	std::vector<double> wavelengths;
+	/**
+	 * Array containing the incoming wavectors.
+	 */
+	std::vector<std::pair<double,double> > q_vals;
 };
 #endif

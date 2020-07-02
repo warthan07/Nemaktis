@@ -23,54 +23,33 @@ public:
 		vec += scaling_factor*src.vec;
 	}
 	inline void set_block_to_zero(int comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},comp) = 0;
+		vec.segment(comp*N, N).setZero();
 	}
 	inline void add_block(
 			const TransverseOpticalField &src, int comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},comp) += src({ix,iy},comp);
+		vec.segment(comp*N, N) += src().segment(comp*N, N);
 	}
 	inline void add_block(
 			int dst_comp, const TransverseOpticalField &src, int src_comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},dst_comp) += src({ix,iy},src_comp);
+		vec.segment(dst_comp*N, N) += src().segment(src_comp*N, N);
 	}
 	inline void copy_block(
 			const TransverseOpticalField &src, int comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},comp) = src({ix,iy},comp);
+		vec.segment(comp*N, N) = src().segment(comp*N, N);
 	}
 	inline void copy_block(
 			int dst_comp, const TransverseOpticalField &src, int src_comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},dst_comp) = src({ix,iy},src_comp);
+		vec.segment(dst_comp*N, N) = src().segment(src_comp*N, N);
 	}
 	inline void scale_block(
 			const std::complex<double> &scaling_factor, int comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},comp) *= scaling_factor;
+		vec.segment(comp*N, N) *= scaling_factor;
 	}
 	inline void scale_and_add_block(
 			const std::complex<double> &scaling_factor,
 			TransverseOpticalField &src, int comp) {
-		#pragma omp parallel for
-		for(int iy=0; iy<Ny; iy++) 
-			for(int ix=0; ix<Nx; ix++) 
-				(*this)({ix,iy},comp) =
-					src({ix,iy},comp) + scaling_factor*(*this)({ix,iy},comp);
+		vec.segment(comp*N, N) *= scaling_factor;
+		vec.segment(comp*N, N) += src().segment(comp*N, N);
 	}
 
 	const Eigen::VectorXcd& operator()() const {

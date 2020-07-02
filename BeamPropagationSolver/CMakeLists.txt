@@ -208,8 +208,8 @@ target_link_libraries(bpm-lib
 swig_link_libraries(${PYTHONBACKEND_BASENAME} bpm-lib ${Python3_LIBRARIES})
 
 vtk_module_autoinit(
-  TARGETS Postprocessor Utilities bpm-lib
-  MODULES ${VTK_LIBRARIES}
+	TARGETS Postprocessor Utilities bpm-lib
+	MODULES ${VKT_LIBRARIES}
 )
 
 #################

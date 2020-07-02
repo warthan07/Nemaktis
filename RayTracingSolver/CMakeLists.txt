@@ -158,8 +158,8 @@ target_link_libraries(Mapping Utilities)
 target_link_libraries(Propagation Utilities)
 target_link_libraries(Utilities ${VTK_LIBRARIES})
 vtk_module_autoinit(
-  TARGETS Utilities
-  MODULES ${VTK_LIBRARIES}
+	TARGETS Utilities
+	MODULES ${VKT_LIBRARIES}
 )
 
 

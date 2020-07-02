@@ -62,9 +62,11 @@ PermittivityTensorField::PermittivityTensorField(
 		}
 	}
 
-	// Values of the components of the transverse permittivity tensor and its square root
-	double det, tr, neff;
-	#pragma omp parallel for private(det, tr, neff)
+	// Values of the components of the transverse permittivity tensor and its square root.
+	// We also estimate the reference index for the shift operator from the mean of the
+	// eigenvalues of the mesh-averaged square root transverse permittivity tensor.
+	double det, tr, neff, nref_sum;
+	#pragma omp parallel for private(det, tr, neff) reduction(+:nref_sum)
 	for(int iz=0; iz<mesh.Nz; iz++) {
 		for(int iy=0; iy<mesh.Ny; iy++) {
 			for(int ix=0; ix<mesh.Nx; ix++) {
@@ -82,12 +84,16 @@ PermittivityTensorField::PermittivityTensorField(
 					neff = 
 						( std::sqrt(tr+std::sqrt(tr*tr-det)) 
 						+ std::sqrt(tr-std::sqrt(tr*tr-det)) ) / 2.;
+				
 				(*this)(p,9)  = neff+(xx_tr(p)-yy_tr(p))/(4*neff);
 				(*this)(p,10) = neff+(yy_tr(p)-xx_tr(p))/(4*neff);
 				(*this)(p,11) = xy_tr(p)/(2*neff);
+
+				nref_sum += neff;
 			}
 		}
 	}
+	nref = nref_sum/(mesh.Nx*mesh.Ny*mesh.Nz);
 }
 
 double PermittivityTensorField::xx(const Index3D &p) const {

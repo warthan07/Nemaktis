@@ -3,7 +3,7 @@
 PhaseEvolutionOperator::PhaseEvolutionOperator(
 		const PermittivityTensorField& eps,
 		double wavelength, const RootSettings &settings) :
-	BaseBPMOperator(eps, wavelength, settings.algorithm.bpm),
+	BaseBPMOperator(eps, wavelength),
 	op_xx(Nx*Ny),
 	op_yy(Nx*Ny),
 	op_xy(Nx*Ny),

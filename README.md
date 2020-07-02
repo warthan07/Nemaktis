@@ -18,21 +18,34 @@ The three backends implemented in ``nemaktis`` correspond to:
    allows to propagate rays through any media with a sufficiently regular orientational field (i.e.
    with *C1* regularity). Optical fields can be reconstructed along rays or interpolated on a
    regular mesh using an advanced homotopy continuation algorithm. The main advantage of this
-   scheme is the ability to access ray trajectories.
+   scheme is the ability to access ray trajectories and get an intuitive feeling of how
+   light is deflected by a liquid crystal structure, but can be inacurate when this
+   structure is thick and/or has sharp features. For this reason, we advise to use this
+   backend only for visualisation of light deflection, not for accurate simulation of
+   optical field propagation (although in practice reasonable agreement can be obtained for simple
+   structures, as explained in the Soft Matter paper cited below).
 
 2. ``bpm-solver``, a beam propagation C++ code which simply propagates optical fields through any
    birefringent layers (no limitation on the regularity of the orientational field, although
-   accurate results are expected only when the orientational fields vary over lengths greater than
-   a few wavelengths). This module relies on a novel operator-splitting scheme and accurate
-   expressions of the operators for the beam walk-off, anisotropic diffraction, and phase evolution.
-   The main advantage of this scheme is its accuracy (2-5\% of relative error in comparison
-   to a full resolution of Maxwell equations in a system with paraxial propagation).
+   only paraxial components of the optical fields will be modeled accurately). This module
+   relies on a novel operator-splitting scheme and accurate expressions of the operators for
+   the beam walk-off, anisotropic diffraction, and phase evolution.  The main advantage of
+   this scheme is its accuracy (1-5\% of relative error in comparison to a full resolution
+   of Maxwell equations in a system with paraxial propagation) and efficiency (parallel
+   implementation in C++ based on sparse matrices), as explained in the Optics Express paper
+   cited below. This scheme is particularly well suited for efficient simulation of optical
+   micrographs as in a real transmission micrographs.
 
-3. ``dtmm``, a diffractive transfer matrix python code which offer similar functionalities as
-   ``bpm-solver`` but relies on a less accurate scheme (the diffraction is assumed to be isotropic,
-   and the beam walk-off is neglected). The main advantages of this backend is that it is
-   much faster than the other schemes and that it supports advanced simulations (Köhler
-   illumination setup, iterative scheme for reflections...).
+3. ``dtmm``, a FFT-based diffractive transfer matrix python code which offer similar functionalities
+   as ``bpm-solver`` but relies on a slightly less accurate scheme in its default version
+   (although the accuracy can be improved at the cost of computational efficiency
+   using a dedicated parameter). In most cases, this scheme will show similar accuracy as
+   ``bpm-solver`` for micrograph simulations, and will in general be faster than
+   ``bpm-solver`` on small meshes and slower on big meshes, as expected from the
+   computational complexity of both methods (O(N) for ``bpm-solver``, O(N log[N]) for
+   ``dtmm``). We also note that the underlying python library for ``dtmm`` offer a lot of
+   advanced features (most notably the calculation of reflection) which are currently not
+   implemented in the  ``bpm-solver`` backend. 
 
 The high-level interface corresponds to a python package named ``nemaktis`` and allows to set-up
 a director field for a LC sample (non-trivial shapes for the LC domain are supported), define
@@ -69,12 +82,11 @@ documentation to learn the fine details of this software:
 <https://nemaktis.readthedocs.io>
 
 Note that the high-level interface does not give you access to the full range of features
-offered by the backends. For example, ``bpm-solver`` supports transparent boundary conditions,
-but periodic boundary conditions are always assumed in the high-level interface; *dtmm-solver*
-supports Köhler illumination setup, while in the high-level interface, only input beams with a
-single propagation direction are supported. If you want to use such advanced features, you will
-have to learn how to use directly the backends. The documentation of the backends is available
-in a dedicated section of the nemaktis wiki (link above).
+offered by the backends. For example,  ``dtmm`` supports the calculation of reflected
+fields, while in the high-level interface only forward-propagating fields are currently
+supported. If you want to use such advanced features, you will have to learn how to use
+directly the backends. The documentation of the backends is available in a dedicated section
+of the nemaktis wiki (link above).
 
 
 ## License
@@ -83,5 +95,7 @@ in a dedicated section of the nemaktis wiki (link above).
 encouraged to cite the following papers if you use this package for published research:
 
 G. Poy, S. Žumer, Soft Matter **15**, 3659-3670 (2019).
+
+G. Poy, S. Žumer, Optics Express, submitted (2020).
 
 A. Petelin *et al.*, in preparation.
