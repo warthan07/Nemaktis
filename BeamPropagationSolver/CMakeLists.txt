@@ -42,8 +42,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
-find_package(VTK REQUIRED COMPONENTS vtkCommonCore vtkCommonDataModel vtkIOXML)
-include(${VTK_USE_FILE})
+find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOXML)
 
 cmake_policy(SET CMP0078 NEW)
 cmake_policy(SET CMP0086 NEW)
@@ -202,11 +201,16 @@ target_link_libraries(Postprocessor Physics
 	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES})
 target_link_libraries(BPM ${Boost_LIBRARIES} Utilities Physics)
 target_link_libraries(Physics ${MUPARSER_LIBRARIES})
+target_link_libraries(Utilities ${VTK_LIBRARIES})
 
 target_link_libraries(bpm-lib
 	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES})
 swig_link_libraries(${PYTHONBACKEND_BASENAME} bpm-lib ${Python3_LIBRARIES})
 
+vtk_module_autoinit(
+  TARGETS Postprocessor Utilities bpm-lib
+  MODULES ${VTK_LIBRARIES}
+)
 
 #################
 # Install targets
