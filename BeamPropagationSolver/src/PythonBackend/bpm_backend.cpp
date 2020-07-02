@@ -9,8 +9,6 @@ void run_backend_without_mask(
 
 	try {
 		std::cout <<
-			"[TESTING BRANCH]" << std::endl;
-		std::cout <<
 			"Setting up the director field..." << std::endl;
 	
 		auto j = nlohmann::json::parse(json_str);
@@ -87,8 +85,6 @@ void run_backend_with_mask(
 		std::complex<double>* fields_vals, int n_fields) {
 
 	try {
-		std::cout <<
-			"[TESTING BRANCH]" << std::endl;
 		std::cout <<
 			"Setting up the director field..." << std::endl;
 	
