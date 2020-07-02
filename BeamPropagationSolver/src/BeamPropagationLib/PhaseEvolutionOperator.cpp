@@ -37,8 +37,8 @@ void PhaseEvolutionOperator::update() {
 	#pragma omp parallel for
 	for(int iy=0; iy<Ny; iy++) {
 		for(int ix=0; ix<Nx; ix++) {
-			Index3D p({ix,iy,iz});
-			Index3D p_pz({ix,iy,iz+1});
+			Index3D p{ix,iy,iz};
+			Index3D p_pz{ix,iy,iz+1};
 
 			// Components of tensor d = (sqrt(eps_tr)-nref)*delta_Z/2
 			double dxx = 0.25*delta_Z*(eps.xx_sqrt(p)+eps.xx_sqrt(p_pz)-2*nref);

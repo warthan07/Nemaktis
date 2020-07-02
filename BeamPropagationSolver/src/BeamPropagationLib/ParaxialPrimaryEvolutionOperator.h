@@ -92,8 +92,8 @@ private:
 	 */
 	TransverseOpticalField tmp;
 	/**
-	 * The evolution operator is rigourously defined as exp(2*mu*R_matrix), where mu=I*delta_Z/2
-	 * is stored in this variable.
+	 * The evolution operator is rigourously defined as exp(2*mu*R_matrix), where
+	 * mu=I*delta_Z/2 is stored in this variable.
 	 */
 	std::complex<double> mu;
 };

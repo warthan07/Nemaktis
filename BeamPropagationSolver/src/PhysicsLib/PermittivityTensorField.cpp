@@ -18,7 +18,7 @@ PermittivityTensorField::PermittivityTensorField(
 		for(int iz=0; iz<mesh.Nz; iz++) {
 			for(int iy=0; iy<mesh.Ny; iy++) {
 				for(int ix=0; ix<mesh.Nx; ix++) {
-					Index3D p({ix,iy,iz});
+					Index3D p{ix,iy,iz};
 					mask_val = lc_sol.get_mask_val(p);
 					(*this)(p,0) = mask_val ?
 						eps_perp + eps_a * std::pow(lc_sol(p,0),2.) : eps_host;
@@ -43,7 +43,7 @@ PermittivityTensorField::PermittivityTensorField(
 		for(int iz=0; iz<mesh.Nz; iz++) {
 			for(int iy=0; iy<mesh.Ny; iy++) {
 				for(int ix=0; ix<mesh.Nx; ix++) {
-					Index3D p({ix,iy,iz});
+					Index3D p{ix,iy,iz};
 					mask_val = lc_sol.get_mask_val(p);
 					(*this)(p,0) = mask_val ? 
 						eps_iso + eps_a_eff * lc_sol(p,0) : eps_host;
@@ -68,7 +68,7 @@ PermittivityTensorField::PermittivityTensorField(
 	for(int iz=0; iz<mesh.Nz; iz++) {
 		for(int iy=0; iy<mesh.Ny; iy++) {
 			for(int ix=0; ix<mesh.Nx; ix++) {
-				Index3D p({ix,iy,iz});
+				Index3D p{ix,iy,iz};
 
 				(*this)(p,6) = xx(p) - std::pow(xz(p),2)/zz(p);
 				(*this)(p,7) = yy(p) - std::pow(yz(p),2)/zz(p);
