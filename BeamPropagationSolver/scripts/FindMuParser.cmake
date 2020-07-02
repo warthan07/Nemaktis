@@ -30,49 +30,14 @@ find_path ( MUPARSER_INCLUDE_DIR muParser.h
             ${MUPARSER_ROOT_DIR}/include
             PATHS
             C:/muparser/include
-            PATH_SUFFIXES muParser )
-            
+            PATH_SUFFIXES muParser )            
 set ( MUPARSER_INCLUDE_DIRS ${MUPARSER_INCLUDE_DIR} )
-
-# version
-set ( _VERSION_FILE ${MUPARSER_INCLUDE_DIR}/muParserDef.h )
-if ( EXISTS ${_VERSION_FILE} )
-  file ( STRINGS ${_VERSION_FILE} _MUPARSER_VERSION_LINE REGEX "#define[ ]+MUP_VERSION[ ]+_T\\(\".*\"\\)" )
-  if ( _MUPARSER_VERSION_LINE )
-    string ( REGEX REPLACE ".*_T\\(\"(.*)\"\\)" "\\1" MUPARSER_VERSION_STRING ${_MUPARSER_VERSION_LINE} )
-    if ( MUPARSER_VERSION_STRING )
-      string ( REGEX REPLACE "([0-9]+)\\..*" "\\1" MUPARSER_MAJOR_VERSION ${MUPARSER_VERSION_STRING} )
-      string ( REGEX REPLACE "[0-9]+\\.([0-9]+).*" "\\1" MUPARSER_MINOR_VERSION ${MUPARSER_VERSION_STRING} )
-      string ( REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" MUPARSER_PATCH_VERSION ${MUPARSER_VERSION_STRING} )
-      if ( MUPARSER_PATCH_VERSION STREQUAL MUPARSER_VERSION_STRING )
-        set ( MUPARSER_PATCH_VERSION )
-      endif ()
-    endif ()
-  endif ()
-endif ()
-
-# check version
-set ( _MUPARSER_VERSION_MATCH TRUE )
-if ( MuParser_FIND_VERSION AND MUPARSER_VERSION_STRING )
-  if ( MuParser_FIND_VERSION_EXACT )
-    if ( ${MuParser_FIND_VERSION} VERSION_EQUAL ${MUPARSER_VERSION_STRING} )
-    else()
-      set ( _MUPARSER_VERSION_MATCH FALSE)
-    endif ()
-  else ()
-    if ( ${MuParser_FIND_VERSION} VERSION_GREATER ${MUPARSER_VERSION_STRING} )
-      set ( _MUPARSER_VERSION_MATCH FALSE )
-    endif ()
-  endif ()
-endif ()
 
 find_library ( MUPARSER_LIBRARY
                NAMES muparser
                HINTS
                ${MUPARSER_ROOT_DIR}/lib
-               PATH_SUFFIXES muparser )
-               
-# set MUPARSER_LIBRARIES
+               PATH_SUFFIXES muparser )    
 set ( MUPARSER_LIBRARIES ${MUPARSER_LIBRARY} )
 
 # root dir
@@ -87,15 +52,11 @@ endif ()
 
 # handle REQUIRED and QUIET options
 include ( FindPackageHandleStandardArgs )
-find_package_handle_standard_args ( muParser DEFAULT_MSG MUPARSER_LIBRARY
-  _MUPARSER_VERSION_MATCH
+find_package_handle_standard_args ( MuParser DEFAULT_MSG MUPARSER_LIBRARY
   MUPARSER_LIBRARIES
   MUPARSER_INCLUDE_DIR
   MUPARSER_INCLUDE_DIRS
   MUPARSER_ROOT_DIR
-  MUPARSER_VERSION_STRING
-  MUPARSER_MAJOR_VERSION
-  MUPARSER_MINOR_VERSION
 )
 
 mark_as_advanced (
@@ -103,9 +64,5 @@ mark_as_advanced (
   MUPARSER_LIBRARIES
   MUPARSER_INCLUDE_DIR
   MUPARSER_INCLUDE_DIRS
-  MUPARSER_ROOT_DIR 
-  MUPARSER_VERSION_STRING
-  MUPARSER_MAJOR_VERSION
-  MUPARSER_MINOR_VERSION
-  MUPARSER_PATCH_VERSION
+  MUPARSER_ROOT_DIR
 )
