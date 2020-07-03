@@ -375,10 +375,14 @@ void ParaxialPrimaryEvolutionOperator::update_D1() {
 			Index3D p_my_pz{p_my.x,p_my.y,iz+1};
 
 			ezz_inv = (1./eps.zz(p)+1./eps.zz(p_pz))/2;
-			ezz_inv_px = (1./eps.zz(p_px)+1./eps.zz(p_px_pz))/2;
-			ezz_inv_mx = (1./eps.zz(p_mx)+1./eps.zz(p_mx_pz))/2;
-			ezz_inv_py = (1./eps.zz(p_py)+1./eps.zz(p_py_pz))/2;
-			ezz_inv_my = (1./eps.zz(p_my)+1./eps.zz(p_my_pz))/2;
+			if(Nx>3) {
+				ezz_inv_px = (1./eps.zz(p_px)+1./eps.zz(p_px_pz))/2;
+				ezz_inv_mx = (1./eps.zz(p_mx)+1./eps.zz(p_mx_pz))/2;
+			}
+			if(Ny>3) {
+				ezz_inv_py = (1./eps.zz(p_py)+1./eps.zz(p_py_pz))/2;
+				ezz_inv_my = (1./eps.zz(p_my)+1./eps.zz(p_my_pz))/2;
+			}
 
 			if(ix<Nx-1 && Nx>3) {
 				D1_matrix(DiffDX, Block00, {ix,iy}, mxShift) = 

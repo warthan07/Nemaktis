@@ -88,7 +88,15 @@ void create_default_settings_file(std::string filename) {
 			"Spectral FWHM":	0.2,
 
 			# Number of wavelengths in the spectrum of the input beam
-			"N wavelengths":	1
+			"N wavelengths":	1,
+
+			# Numerical aperture for the condenser aperture of the Koehler illumination
+			# setup
+			"Condenser numerical aperture": 0,
+
+			# Number Nr of wavevectors in the radial direction of the condenser aperture.
+			# The total number of incident wavevectors will be 1+3*Nr*(Nr-1).
+			"N radial illumination directions": 1
 		}
 	},
 

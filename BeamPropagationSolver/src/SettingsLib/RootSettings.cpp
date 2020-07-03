@@ -55,5 +55,4 @@ void runFromSettings(RootSettings &settings) {
 		ScreenOutput micrograph_output(settings, coefs);
 		micrograph_output.apply(screen_optical_fields);
 	}
-
 }

@@ -52,7 +52,7 @@ public:
 		int wave_idx, int q_idx, int pol_idx, int comp, int mesh_idx,
 		std::complex<double> val);
 
-	const vtkSmartPointer<vtkImageData>& get_vti_data() const {
+	vtkSmartPointer<vtkImageData> get_vti_data() const {
 		return vti_data;
 	}
 	const std::vector<double> get_wavelengths() const {

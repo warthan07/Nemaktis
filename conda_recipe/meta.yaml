@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.3"
+    version: "1.3.3"
 
 source:
     - path: ../BeamPropagationSolver

@@ -25,8 +25,8 @@ void VolumeOutput::apply(BulkOpticalFieldCollection &bulk_optical_fields) {
 
 	auto writer = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 	writer->SetFileName(filename.c_str());
-	writer->SetInputData(bulk_optical_fields.get_vti_data());
 	writer->SetDataModeToAppended();
 	writer->EncodeAppendedDataOff();
+	writer->SetInputData(bulk_optical_fields.get_vti_data());
 	writer->Write();
 }

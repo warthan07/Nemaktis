@@ -15,6 +15,8 @@ PostprocessorBase::PostprocessorBase(
 	results_dirname(results_dirname),
 	coefs(coefs) {
 
+	vtkObject::GlobalWarningDisplayOn();
+
     if(results_dirname!="" && results_dirname!=".")
     	boost::filesystem::create_directory(results_dirname);
 }
