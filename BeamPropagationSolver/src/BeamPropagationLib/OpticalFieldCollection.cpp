@@ -22,7 +22,7 @@ BulkOpticalFieldCollection::BulkOpticalFieldCollection(
 	double delta_y = mesh.delta_y;
 	double delta_z = mesh.delta_z;
 
-	auto vti_data = vtkSmartPointer<vtkImageData>::New();
+	vti_data = vtkSmartPointer<vtkImageData>::New();
 	vti_data->SetDimensions(Nx, Ny, Nz);
 	vti_data->SetSpacing(delta_x, delta_y, delta_z);
 	vti_data->SetOrigin(-delta_x*(Nx-1)/2., -delta_y*(Ny-1)/2., -delta_z*(Nz-1)/2.);
