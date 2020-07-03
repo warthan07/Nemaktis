@@ -144,7 +144,7 @@ void BPMIteration::propagate_fields() {
 						for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 							for(int comp=0; comp<2; comp++)
 								bulk_optical_fields->set_field_val(
-									wave_idx, 0, pol_idx, comp, global_index,
+									wave_idx, q_idx, pol_idx, comp, global_index,
 									screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,comp));
 						}
 					}

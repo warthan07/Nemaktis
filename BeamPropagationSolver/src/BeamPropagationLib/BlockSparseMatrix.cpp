@@ -132,18 +132,6 @@ void BlockSparseMatrixDX<T,S>::block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int iy=0; iy<this->Ny; iy++) {
-				// int ix = 0;
-				// dst({ix,iy},dst_comp) +=
-					// (*this)(block_idx,{ix,iy},mxShift) * src({ix+this->Nx-2,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// dst({ix,iy},dst_comp) +=
-						// (*this)(block_idx,{ix,iy},mxShift) * src({ix-1,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy},dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy},dst_comp);
 			}
 		}
@@ -156,18 +144,6 @@ void BlockSparseMatrixDX<T,S>::block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int iy=0; iy<this->Ny; iy++) {
-				// int ix = 0;
-				// dst({ix,iy},dst_comp) =
-					// (*this)(block_idx,{ix,iy},mxShift) * src({ix+this->Nx-2,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// dst({ix,iy},dst_comp) =
-						// (*this)(block_idx,{ix,iy},mxShift) * src({ix-1,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy},dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy},dst_comp);
 			}
 		}
@@ -194,22 +170,6 @@ void BlockSparseMatrixDX<T,S>::shifted_block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int iy=0; iy<this->Ny; iy++) {
-				// int ix = 0;
-				// val =
-					// (*this)(block_idx,{ix,iy},mxShift) * src({ix+this->Nx-2,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-				// dst({ix,iy},dst_comp) +=
-					// src({ix,iy},src_comp) + scaling_factor*val;
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// val =
-						// (*this)(block_idx,{ix,iy},mxShift) * src({ix-1,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-					// dst({ix,iy},dst_comp) +=
-						// src({ix,iy},src_comp) + scaling_factor*val;
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy},dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy},dst_comp);
 			}
 		}
@@ -225,22 +185,6 @@ void BlockSparseMatrixDX<T,S>::shifted_block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int iy=0; iy<this->Ny; iy++) {
-				// int ix = 0;
-				// val =
-					// (*this)(block_idx,{ix,iy},mxShift) * src({ix+this->Nx-2,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-				// dst({ix,iy},dst_comp) =
-					// src({ix,iy},src_comp) + scaling_factor*val;
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// val =
-						// (*this)(block_idx,{ix,iy},mxShift) * src({ix-1,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxShift) * src({ix+1,iy},src_comp);
-					// dst({ix,iy},dst_comp) =
-						// src({ix,iy},src_comp) + scaling_factor*val;
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy},dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy},dst_comp);
 			}
 		}
@@ -381,18 +325,6 @@ void BlockSparseMatrixDY<T,S>::block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++) {
-				// int iy = 0;
-				// dst({ix,iy},dst_comp) +=
-					// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-				// for(iy=1; iy<this->Ny-1; iy++) {
-					// dst({ix,iy},dst_comp) +=
-						// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-				// }
-				// dst({ix,iy},dst_comp) = dst({ix,0},dst_comp);
 				dst({ix,this->Ny-1},dst_comp) = dst({ix,0},dst_comp);
 			}
 		}
@@ -405,18 +337,6 @@ void BlockSparseMatrixDY<T,S>::block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++) {
-				// int iy = 0;
-				// dst({ix,iy},dst_comp) =
-					// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-				// for(iy=1; iy<this->Ny-1; iy++) {
-					// dst({ix,iy},dst_comp) =
-						// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-				// }
-				// dst({ix,iy},dst_comp) = dst({ix,0},dst_comp);
 				dst({ix,this->Ny-1},dst_comp) = dst({ix,0},dst_comp);
 			}
 		}
@@ -443,22 +363,6 @@ void BlockSparseMatrixDY<T,S>::shifted_block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++) {
-				// int iy = 0;
-				// val =
-					// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-				// dst({ix,iy},dst_comp) +=
-					// src({ix,iy},src_comp) + scaling_factor*val;
-				// for(int iy=1; iy<this->Ny-1; iy++) {
-					// val =
-						// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-					// dst({ix,iy},dst_comp) +=
-						// src({ix,iy},src_comp) + scaling_factor*val;
-				// }
-				// dst({ix,iy},dst_comp) = dst({ix,0},dst_comp);
 				dst({ix,this->Ny-1},dst_comp) = dst({ix,0},dst_comp);
 			}
 		}
@@ -474,22 +378,6 @@ void BlockSparseMatrixDY<T,S>::shifted_block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++) {
-				// int iy = 0;
-				// val =
-					// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-					// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-				// dst({ix,iy},dst_comp) =
-					// src({ix,iy},src_comp) + scaling_factor*val;
-				// for(iy=1; iy<this->Ny-1; iy++) {
-					// val =
-						// (*this)(block_idx,{ix,iy},myShift) * src({ix,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},noShift) * src({ix,iy},src_comp) +
-						// (*this)(block_idx,{ix,iy},pyShift) * src({ix,iy+1},src_comp);
-					// dst({ix,iy},dst_comp) =
-						// src({ix,iy},src_comp) + scaling_factor*val;
-				// }
-				// dst({ix,iy},dst_comp) = dst({ix,0},dst_comp);
 				dst({ix,this->Ny-1},dst_comp) = dst({ix,0},dst_comp);
 			}
 		}
@@ -637,38 +525,8 @@ void BlockSparseMatrixDXDY<T,S>::block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int iy=1; iy<this->Ny-1; iy++) {
-				// int ix = 0;
-				// dst({ix,iy},dst_comp) +=
-					// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxpyShift) * src({this->Nx-2,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxmyShift) * src({this->Nx-2,iy-1},src_comp);
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// dst({ix,iy},dst_comp) +=
-						// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxpyShift) * src({ix-1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxmyShift) * src({ix-1,iy-1},src_comp);
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy}, dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy}, dst_comp);
 			}
-			// int ix = 0;
-			// dst({ix,0},dst_comp) +=
-				// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-				// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,this->Ny-2},src_comp) +
-				// (*this)(block_idx,{ix,0},mxpyShift) * src({this->Nx-2,1},src_comp) +
-				// (*this)(block_idx,{ix,0},mxmyShift) * src({this->Nx-2,this->Ny-2},src_comp);
-			// for(ix=1; ix<this->Nx-1; ix++) {
-				// dst({ix,0},dst_comp) +=
-					// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,0},mxpyShift) * src({ix-1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},mxmyShift) * src({ix-1,+this->Ny-2},src_comp);
-			// }
-			// dst({ix,0},dst_comp) = dst({0,0}, dst_comp);
-			// for(ix=0; ix<this->Nx; ix++)
-				// dst({ix,this->Ny-1},dst_comp) = dst({ix,0}, dst_comp);
 			dst({this->Nx-1,0},dst_comp) = dst({0,0}, dst_comp);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++)
@@ -683,38 +541,8 @@ void BlockSparseMatrixDXDY<T,S>::block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for
 			for(int iy=1; iy<this->Ny-1; iy++) {
-				// int ix = 0;
-				// dst({ix,iy},dst_comp) =
-					// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxpyShift) * src({this->Nx-2,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxmyShift) * src({this->Nx-2,iy-1},src_comp);
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// dst({ix,iy},dst_comp) =
-						// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxpyShift) * src({ix-1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxmyShift) * src({ix-1,iy-1},src_comp);
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy}, dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy}, dst_comp);
 			}
-			// int ix = 0;
-			// dst({ix,0},dst_comp) =
-				// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-				// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,this->Ny-2},src_comp) +
-				// (*this)(block_idx,{ix,0},mxpyShift) * src({this->Nx-2,1},src_comp) +
-				// (*this)(block_idx,{ix,0},mxmyShift) * src({this->Nx-2,this->Ny-2},src_comp);
-			// for(ix=1; ix<this->Nx-1; ix++) {
-				// dst({ix,0},dst_comp) =
-					// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,0},mxpyShift) * src({ix-1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},mxmyShift) * src({ix-1,+this->Ny-2},src_comp);
-			// }
-			// dst({ix,0},dst_comp) = dst({0,0}, dst_comp);
-			// for(ix=0; ix<this->Nx; ix++)
-				// dst({ix,this->Ny-1},dst_comp) = dst({ix,0}, dst_comp);
 			dst({this->Nx-1,0},dst_comp) = dst({0,0}, dst_comp);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++)
@@ -742,46 +570,8 @@ void BlockSparseMatrixDXDY<T,S>::shifted_block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for private(val)
 			for(int iy=1; iy<this->Ny-1; iy++) {
-				// int ix = 0;
-				// val =
-					// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxpyShift) * src({this->Nx-2,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxmyShift) * src({this->Nx-2,iy-1},src_comp);
-				// dst({ix,iy},dst_comp) +=
-					// src({ix,iy},src_comp) + scaling_factor*val;
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// val =
-						// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxpyShift) * src({ix-1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxmyShift) * src({ix-1,iy-1},src_comp);
-					// dst({ix,iy},dst_comp) +=
-						// src({ix,iy},src_comp) + scaling_factor*val;
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy}, dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy}, dst_comp);
 			}
-			// int ix = 0;
-			// val =
-				// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-				// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,this->Ny-2},src_comp) +
-				// (*this)(block_idx,{ix,0},mxpyShift) * src({this->Nx-2,1},src_comp) +
-				// (*this)(block_idx,{ix,0},mxmyShift) * src({this->Nx-2,this->Ny-2},src_comp);
-			// dst({ix,0},dst_comp) +=
-				// src({ix,0},src_comp) + scaling_factor*val;
-			// for(ix=1; ix<this->Nx-1; ix++) {
-				// val =
-					// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,0},mxpyShift) * src({ix-1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},mxmyShift) * src({ix-1,+this->Ny-2},src_comp);
-				// dst({ix,0},dst_comp) +=
-					// src({ix,0},src_comp) + scaling_factor*val;
-			// }
-			// dst({ix,0},dst_comp) = dst({0,0}, dst_comp);
-			// for(ix=0; ix<this->Nx; ix++)
-				// dst({ix,this->Ny-1},dst_comp) = dst({ix,0}, dst_comp);
 			dst({this->Nx-1,0},dst_comp) = dst({0,0}, dst_comp);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++)
@@ -799,46 +589,8 @@ void BlockSparseMatrixDXDY<T,S>::shifted_block_vmult(
 						src().segment(src_comp*this->N,this->N);
 			#pragma omp parallel for private(val)
 			for(int iy=1; iy<this->Ny-1; iy++) {
-				// int ix = 0;
-				// val =
-					// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxpyShift) * src({this->Nx-2,iy+1},src_comp) +
-					// (*this)(block_idx,{ix,iy},mxmyShift) * src({this->Nx-2,iy-1},src_comp);
-				// dst({ix,iy},dst_comp) =
-					// src({ix,iy},src_comp) + scaling_factor*val;
-				// for(ix=1; ix<this->Nx-1; ix++) {
-					// val =
-						// (*this)(block_idx,{ix,iy},pxpyShift) * src({ix+1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},pxmyShift) * src({ix+1,iy-1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxpyShift) * src({ix-1,iy+1},src_comp) +
-						// (*this)(block_idx,{ix,iy},mxmyShift) * src({ix-1,iy-1},src_comp);
-					// dst({ix,iy},dst_comp) =
-						// src({ix,iy},src_comp) + scaling_factor*val;
-				// }
-				// dst({ix,iy},dst_comp) = dst({0,iy}, dst_comp);
 				dst({this->Nx-1,iy},dst_comp) = dst({0,iy}, dst_comp);
 			}
-			// int ix = 0;
-			// val =
-				// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-				// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,this->Ny-2},src_comp) +
-				// (*this)(block_idx,{ix,0},mxpyShift) * src({this->Nx-2,1},src_comp) +
-				// (*this)(block_idx,{ix,0},mxmyShift) * src({this->Nx-2,this->Ny-2},src_comp);
-			// dst({ix,0},dst_comp) =
-				// src({ix,0},src_comp) + scaling_factor*val;
-			// for(ix=1; ix<this->Nx-1; ix++) {
-				// val =
-					// (*this)(block_idx,{ix,0},pxpyShift) * src({ix+1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},pxmyShift) * src({ix+1,+this->Ny-2},src_comp) +
-					// (*this)(block_idx,{ix,0},mxpyShift) * src({ix-1,1},src_comp) +
-					// (*this)(block_idx,{ix,0},mxmyShift) * src({ix-1,+this->Ny-2},src_comp);
-				// dst({ix,0},dst_comp) =
-					// src({ix,0},src_comp) + scaling_factor*val;
-			// }
-			// dst({ix,0},dst_comp) = dst({0,0}, dst_comp);
-			// for(ix=0; ix<this->Nx; ix++)
-				// dst({ix,this->Ny-1},dst_comp) = dst({ix,0}, dst_comp);
 			dst({this->Nx-1,0},dst_comp) = dst({0,0}, dst_comp);
 			#pragma omp parallel for
 			for(int ix=0; ix<this->Nx; ix++)

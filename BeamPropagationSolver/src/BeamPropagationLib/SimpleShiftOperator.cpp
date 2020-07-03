@@ -64,6 +64,9 @@ int SimpleShiftOperator::apply(TransverseOpticalField &src) {
 			}
 		}
 	}
+	else
+		tmp = src;
+
 	if(Ny>3) {
 		#pragma omp parallel for
 		for(int ix=0; ix<Nx; ix++) {
@@ -77,6 +80,9 @@ int SimpleShiftOperator::apply(TransverseOpticalField &src) {
 			}
 		}
 	}
+	else
+		src = tmp;
+
 	#pragma omp parallel for
 	for(int ix=0; ix<Nx; ix++)
 		for(int comp=0; comp<2; comp++)
