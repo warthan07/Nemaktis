@@ -83,7 +83,7 @@ class LightPropagator:
         for ir in range(1,N_radial_wavevectors):
             beta = ir*self._max_NA_condenser/(N_radial_wavevectors-1)
             for iphi in range(0,6*ir):
-                phi = iphi*np.pi/3
+                phi = iphi*np.pi/(3*ir)
                 self._wavevectors[1+3*ir*(ir-1)+iphi,0] = beta*np.cos(phi)
                 self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
 
@@ -483,7 +483,7 @@ class OpticalFields:
             for ir in range(1,Nr):
                 beta = ir*self._max_NA_condenser/(Nr-1)
                 for iphi in range(0,6*ir):
-                    phi = iphi*np.pi/3
+                    phi = iphi*np.pi/(3*ir)
                     self._wavevectors[1+3*ir*(ir-1)+iphi,0] = beta*np.cos(phi)
                     self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
 
