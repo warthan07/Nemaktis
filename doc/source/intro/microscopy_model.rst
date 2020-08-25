@@ -78,7 +78,7 @@ field and condenser apertures:
         return () => window.removeEventListener("resize", resized);
       });
     }
-    (new Runtime).module(define, name => {
+    (new Runtime).module(notebook, name => {
       if (name === "viewof cond_ap_opening") return Inspector.into("#observablehq-160b543c .observablehq-viewof-cond_ap_opening")();
       if (name === "viewof field_ap_opening") return Inspector.into("#observablehq-160b543c .observablehq-viewof-field_ap_opening")();
       if (name === "chart_koehler") return Inspector.into("#observablehq-160b543c .observablehq-chart_koehler")();
