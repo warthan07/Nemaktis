@@ -54,6 +54,7 @@ provided below, where the reader can dynamically adjust the sliders for opening/
 field and condenser apertures:
 
 .. raw:: html
+
   <div id="observablehq-160b543c">
     <div class="observablehq-viewof-cond_ap_opening"></div>
     <div class="observablehq-viewof-field_ap_opening"></div>
