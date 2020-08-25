@@ -61,8 +61,23 @@ field and condenser apertures:
     <div class="observablehq-chart_koehler"></div>
   </div>
   <script type="module">
-    import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import define from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+    import {Runtime, Inspector,Library} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+    const stdlib = new Library;
+    const library = Object.assign({}, stdlib, {width});
+    function width() {
+      return stdlib.Generators.observe(notify => {
+        let width = notify(test.clientWidth);
+    
+        function resized() {
+          let width1 = test.clientWidth;
+          if (width1 !== width) notify(width = width1);
+        }
+    
+        window.addEventListener("resize", resized);
+        return () => window.removeEventListener("resize", resized);
+      });
+    }
     (new Runtime).module(define, name => {
       if (name === "viewof cond_ap_opening") return Inspector.into("#observablehq-160b543c .observablehq-viewof-cond_ap_opening")();
       if (name === "viewof field_ap_opening") return Inspector.into("#observablehq-160b543c .observablehq-viewof-field_ap_opening")();
