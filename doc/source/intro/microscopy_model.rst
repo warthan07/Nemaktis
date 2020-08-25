@@ -61,7 +61,7 @@ field and condenser apertures:
     <div class="observablehq-chart_koehler"></div>
   </div>
   <script type="module">
-    import {getRuntime} from "_static/observable.js"
+    import {getRuntime} from "../_static/observable.js"
     import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
     import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
     getRuntime("koehler-fig").module(notebook, name => {
