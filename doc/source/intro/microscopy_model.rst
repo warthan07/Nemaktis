@@ -64,7 +64,6 @@ field and condenser apertures:
     import {Runtime, Inspector,Library} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
     import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
     const stdlib = new Library;
-    const library = Object.assign({}, stdlib, {width});
     const target = document.querySelector("#koehler-fig");
     function width() {
       return stdlib.Generators.observe(notify => {
@@ -77,9 +76,9 @@ field and condenser apertures:
         return () => window.removeEventListener("resize", resized);
       });
     }
-    (new Runtime).module(notebook, name => {
-      if (name === "viewof cond_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-cond_ap_opening")();
-      if (name === "viewof field_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-field_ap_opening")();
-      if (name === "chart_koehler") return Inspector.into("#koehler-fig .observablehq-chart_koehler")();
+    Runtime.load(notebook, Object.assign({}, stdlib, {width}), cell => {
+      if (cell.name === "viewof cond_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-cond_ap_opening")();
+      if (cell.name === "viewof field_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-field_ap_opening")();
+      if (cell.name === "chart_koehler") return Inspector.into("#koehler-fig .observablehq-chart_koehler")();
     });
   </script>
