@@ -60,10 +60,15 @@ lighting even with non-uniform light source. In short, it allows to map each poi
 light source to a single uniform plane wave incident on the object with a certain angle; the
 maximum angle of incidence for the plane waves is set by an aperture called the **condenser
 aperture**, thus the set of plane waves incident on the object all have wavevectors included
-inside a cone of illumination whose opening is set by the condenser aperture. In addition, a
-**field aperture** allows to control the size of the lighting spot on the object, but this
-feature is irrelevant in Nemaktis since we always assume that the whole computational box
-representing the object is illuminated.
+inside a cone of illumination whose opening is set by the condenser aperture.
+
+In addition, a **field aperture** allows to control the size of the lighting spot on the
+object. In practice, the mapping between points on the light source and incident plane waves
+is only approximate due the imperfection of the optical elements and the wave nature of
+light, especially near the boundary of the lighting spot on the object. However, this is not
+a problem in Nemaktis since we always assume that the lighting spot is much bigger than the
+typical size of the observed object, thus justifying the representation in terms of incoming
+plane waves.
 
 In order to better understand how this illumination setup works, an interactive example is
 provided below, where the reader can dynamically adjust the sliders for opening/closing the
@@ -124,8 +129,8 @@ Here, :math:`\mathrm{NA}_\mathrm{max}=\sin\psi_\mathrm{max}` (with :math:`\psi_\
 the maximal angle of opening of the wavevectors) is the maximal numerical aperture of the
 Koehler illumination setup, and :math:`N_r` correspond to the number of discretization steps
 in the radial direction. This choice of wavevectors correspond to a standard discretization
-of a circular aperture in the transverse plane, which can be interactively visualized by
-adjusting the sliders for :math:`N_r` and :math:`\mathrm{NA}`.
+of a circular aperture in the transverse plane, which can be interactively visualized below
+by adjusting the sliders for :math:`N_r` and :math:`\mathrm{NA}`.
 
 .. raw:: html
 
@@ -156,10 +161,11 @@ To conclude this section, we mention the final approximation made in Nemaktis fo
 illumination setup: we assume that all the incoming plane waves have the same intensity.
 This approximation is probably not true in a real microscope, but has the advantage of
 always yielding rotationally invariant images when observing rotationally invariant objects
-(e.g. isotropic droplets), as empirically observed in most microscopes. In any case, the
-goal of our simple model of Koehler illumination setup for Nematkis is only to provide a
-qualitatively correct description of the "smoothing" effect (due to the increasing number of
-incident planewaves) of a real microscope when opening the condenser aperture.
+(e.g. isotropic droplets) with natural light, as empirically observed in most microscopes.
+In any case, the goal of our simple model of Koehler illumination setup for Nematkis is only
+to provide a qualitatively correct description of the "smoothing" effect (due to the
+increasing number of incident planewaves) of a real microscope when opening the condenser
+aperture.
 
 
 3. Transmission/Reflection of light inside the object
@@ -197,20 +203,20 @@ framework relies on a minimal set of physical assumptions (most notably a relati
 refractive index contrast :math:`\Delta n<0.4` inside the object) and admits two Beam
 Propagation Methods (BPM):
 
-- Wide-angle BPM, which can accurately propagate optical fields up to deviation angles of
+* Wide-angle BPM, which can accurately propagate optical fields up to deviation angles of
   20-30°.
-- Paraxial BPM, which can accurately propagate optical fields up to deviation angles of
+* Paraxial BPM, which can accurately propagate optical fields up to deviation angles of
   5-10°. 
 
 The second version of BPM is especially suite for microscopy applications, since in most
 microscopes (exluding confocal microscopes with high numerical aperture objective) only the
 paraxial components of light contributes to the final image. In our open-source package
 Nemaktis, only paraxial BPM is included as a backend for microscopy, but we are open to new
-collaborations on our closed-source wide-angle BPM for advanced use (nonlinear optics,
+collaborations on our closed-source wide-angle BPM for advanced uses (nonlinear optics,
 modeling of complex photonics devices, steering of light using birefringent structures...).
 
 At its core, the beam propagation works by decomposing the optical (electric) field
-:math:`\vec{E}` in forward and backward propagating fields inside a series of layers
+:math:`\vec{E}` into forward and backward propagating fields inside a series of layers
 approximating the full permittivity profile :math:`\bar{\bar\epsilon}(x,y,z)`:
 
 .. image::  ../_static/bpm_layers.png
@@ -241,7 +247,7 @@ degree-of-freedoms for the computational mesh).
 Since we only take into account forward-propagating fields, reflection microscopy is
 currently not supported in Nemaktis, but we hope to implement this feature in the future
 since we already derived the associated theoretical framework. Note that internally, each
-imaging simulation includes a lot of different paraxial BPM sub-simulation for each incident
+imaging simulation includes a lot of different paraxial BPM sub-simulations for each incident
 plane-wave, source wavelength, and input polarisations. Using the same notation as in
 Sec. 2 and assuming a single input wavelength, the incident optical fields for all
 these sub-simulations are written as:
@@ -253,9 +259,9 @@ these sub-simulations are written as:
 where :math:`k` and :math:`l` are the indices for the input wavevector
 :math:`\vec{k}^{(k,l)}` and :math:`\vec{u}_m` (:math:`m=1,2`) is an orthogonal basis for the
 input polarisation. The use of repeated simulations based on orthogonal polarisations allows
-efficient imaging simulations of arbitrary polarized optical micrographs (using polariser,
-analyzer, waveplate...), with a dynamic adjustment of the associated parameters (e.g.
-polariser and analyzer angle) in the graphical user interface.
+the caching of relevant data for efficiently simulating arbitrary polarized optical
+micrographs (using polariser, analyzer, waveplate...), with a dynamic real-time adjustment of the
+associated parameters (e.g.  polariser and analyzer angle) in the graphical user interface.
 
 Readers interested in our beam propagation framework can read the associated publication:
 
@@ -285,14 +291,19 @@ account variations of fields in the :math:`x` and :math:`y` directions.
 Since this is a Fourier-based method, its complexity is :math:`O(N\log\left[N/N_z\right])`
 with :math:`N` the total number of mesh points and :math:`N_z` the number of layers. It is
 also based on a user-defined parameter allowing to define the accuracy of diffraction in the
-simulation: low value of this parameter provide quick (but inacurate) simulations with
-faster running times than BPM on relatively small meshes (for big meshes, the logarithmic
-complexity of dtmm kicks in and DTMM is slower than BPM), whereas high value provide
-accurate simulations (computational errors slightly worse than the ones obtained with BPM,
-but still relatively good) with slower running times than with BPM. In short, DTMM is the
-perfect backend if you want to quickly try imaging simulations without worrying too much
-about the accuracy, whereas BPM is more suited for efficient accurate simulations on
-arbitrary big meshes (provided that enough random-access-memory is available!).
+simulation:
+
+* low value of this parameter provide quick (but inacurate) simulations with faster running
+  times than BPM on relatively small meshes (for big meshes, the logarithmic complexity of
+  dtmm kicks in and DTMM is slower than BPM);
+* high value of this parameter provide accurate simulations (computational errors slightly
+  worse than the ones obtained with BPM, but still relatively good) with slower running
+  times than with BPM.
+
+In short, DTMM is the perfect backend if you want to quickly try imaging simulations without
+worrying too much about the accuracy, whereas BPM is more suited for efficient accurate
+simulations on arbitrary big meshes (provided that enough random-access-memory is
+available!).
 
 In Nemaktis, DTMM is closely integrated in the high-level python package allowing to run
 imaging simulations, but we emphasize that DTMM also has a dedicated python package with
@@ -346,7 +357,7 @@ inside the object. As a general rule, this system is always associated with two 
 which the final image is formed. Since this is a linear optical system, the optical fields
 on both planes are always related by a linear transform:
 
-.. mah::
+.. math::
 
   \vec{E}\left[\vec{r}^{\rm (im)}\right] =
     \int G\left[\vec{r}^{\rm (im)},\vec{r}^{\rm (foc)}\right]
