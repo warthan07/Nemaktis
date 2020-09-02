@@ -259,4 +259,166 @@ polariser and analyzer angle) in the graphical user interface.
 
 Readers interested in our beam propagation framework can read the associated publication:
 
-`[G. Poy and S. Žumer, Optics Express 28, 24327 (2020)]<https://doi.org/10.1364/OE.400984>`_
+`[G. Poy and S. Žumer, Optics Express 28, 24327 (2020)] <https://doi.org/10.1364/OE.400984>`_
+
+3.2 The diffraction transfer matrix backend (dtmm)
+..................................................
+
+This backend correspond to a python package originally written by a colleague, Dr. Andrej
+Petelin, and that we decided to include in Nemaktis for easy comparison between different
+approaches of electromagnetic field propagation. At its core, the diffractive transfer
+matrix method (DTMM) of Dr. Petelin is conceptually very close to the beam propagation
+backend presented above in Sec. 3.1: the permittivity tensor field representing the
+object is also split in a series of birefringent slabs, evolution operators are similarly
+used to propagate the fields inside the slabs, and continuity equations are used to transfer
+the fields between the layers. The difference between DTMM and our BPM framework mainly lie
+in the way that the evolution operators are calculated: in DTMM, this evolution operator is
+calculated with a clever heuristic combination of the Berreman method and diffraction
+transfer matrix applied in Fourier space. The Berreman method was originally developped for
+the calculation of transmitted and reflected light in layered system (permittivity tensor
+field independent from :math:`x` and :math:`y`) and neglects diffraction (the redistribution
+of optical energy due to non-uniformity of the optical and permittivity fields); in DTMM,
+the evolution operators derived by Berreman are combined with a powerful treatment of
+diffraction in Fourier space based on local mode grouping, thus allowing to take into
+account variations of fields in the :math:`x` and :math:`y` directions.
+
+Since this is a Fourier-based method, its complexity is :math:`O(N\log\left[N/N_z\right])`
+with :math:`N` the total number of mesh points and :math:`N_z` the number of layers. It is
+also based on a user-defined parameter allowing to define the accuracy of diffraction in the
+simulation: low value of this parameter provide quick (but inacurate) simulations with
+faster running times than BPM on relatively small meshes (for big meshes, the logarithmic
+complexity of dtmm kicks in and DTMM is slower than BPM), whereas high value provide
+accurate simulations (computational errors slightly worse than the ones obtained with BPM,
+but still relatively good) with slower running times than with BPM. In short, DTMM is the
+perfect backend if you want to quickly try imaging simulations without worrying too much
+about the accuracy, whereas BPM is more suited for efficient accurate simulations on
+arbitrary big meshes (provided that enough random-access-memory is available!).
+
+In Nemaktis, DTMM is closely integrated in the high-level python package allowing to run
+imaging simulations, but we emphasize that DTMM also has a dedicated python package with
+advanced features such as iterative algorithms for the calculation of reflected fields (a
+feature which is currently missing in the BPM backend):
+
+`[DTMM: a Diffractive Transfer Matrix Method] <https://github.com/IJSComplexMatter/dtmm>`_
+
+3.3 The ray-tracing backend (rt-solver)
+.......................................
+
+This backend relies on the so-called geometrical optics approximation and works by
+decomposing the incoming plane wave in a series of light rays, which are propagated through
+the object using Hamiltonian ray-tracing equations. The validity of this method is quite
+restricted: the permittivity tensor field :math:`\bar{\bar\epsilon}(x,y,z)` must correspond
+to a uniaxial birefringent medium whose optical axis is smoothly varying in space, with
+typical variation lengths much bigger than the wavelength of light. It also necessitates
+some tweaking in order to correctly reconstruct the optical fields on a cartesian mesh
+(since the ray-tracing method only gives optical fields along rays, which can be deflected
+by the object).
+
+.. image::  ../_static/rt_method.png
+   :height: 180px
+
+Since this method cannot be really used as a "blackbox" simulation tool, it is provided as
+such (i.e. as a low-level C++ code) without any integration in the easy-to-use high-level
+python interface in Nemaktis. Nevertheless, this method can still be useful to get some
+physics insight on how light is deflected in particular systems (see for example `[J. Hess,
+G. Poy, J.-S. B. Tai, S. Žumer and I. I. Smalyukh, Phys. Rev. X 10, 031042 (2020)]
+<https://doi.org/10.1103/PhysRevX.10.031042>`_ or to make attractive scientific
+visualizations like the image below (cover of the paper presenting our method, which is
+cited below):
+
+.. image::  ../_static/rt_cover.png
+   :height: 300px
+
+Readers interesting with further details on our ray-tracing method can refer to the following publication:
+
+`[G. Poy and S. Žumer, Soft Matter 15, 3659 (2019)] <https://doi.org/10.1039/C8SM02448K>`_
+
+
+4. Imaging of the object
+------------------------
+
+The final step of light propagation inside the microscope is the proper imaging of the
+object using the light coming from the object (i.e. the output of the backends presented in
+Sec. 3). In a real microscope, this is done by combining an objective with an eyepiece
+lens allowing to project on the user's retina the optical fields coming from a plane aligned
+inside the object. As a general rule, this system is always associated with two planes: the
+**focusing plane** which is roughly aligned with the object, and the **imaging plane** in
+which the final image is formed. Since this is a linear optical system, the optical fields
+on both planes are always related by a linear transform:
+
+.. mah::
+
+  \vec{E}\left[\vec{r}^{\rm (im)}\right] =
+    \int G\left[\vec{r}^{\rm (im)},\vec{r}^{\rm (foc)}\right]
+    \vec{E}\left[\vec{r}^{\rm (foc)}\right] {\rm d}^2\vec{r}^{\rm (foc)}
+    
+where :math:`\vec{r}^{\rm (im)}` (:math:`\vec{r}^{\rm (foc)}`) correspond to coordinates on
+the imaging (focusing) plane and :math:`G` is called the point-spread-function (PSF) of the
+imaging system. The actual expression of the PSF depends on the implementation of the
+imaging lens, but in general is acts as a low-pass filter because it is aperture-limited,
+i.e. one cannot observe details below the diffraction limit (typical width of a detail
+smaller than the wavelength). In Nemaktis, we use a very simple model of imaging system
+based on a single objective lens and the imaging/focusing planes placed at distance
+:math:`2f` on each side of the lens (with :math:`f` the focal length of the objective). We
+assume that the objective is an ideal thin-lens, which allows us to obtain a very simple
+form of the linear transform above in the transverse Fourier space (see details in [J. W.
+Goodman, *Introduction to Fourier optics*, Roberts & Company Publishers (2005)]):
+
+.. math::
+
+  \tilde{\vec{E}}\left[\vec{k}_\perp,z^{\rm (im)}\right] =
+    \Pi\left[\frac{\left|\vec{k}_\perp\right|}{2k_0 {\rm NA}}\right]
+    \tilde{\vec{E}}\left[\vec{k}_\perp,z^{\rm (foc)}\right]
+    
+where :math:`\rm NA` is the numerical aperture of the objective, :math:`\Pi` is the
+rectangular function (:math:`\Pi(u)` is equal to 1 if :math:`|u|<0.5`, else it it equal to
+0), and a tilde indicate a partial Fourier transform along the :math:`x` and :math:`y`
+coordinates (associated with a Fourier frequency :math:`\vec{k}_\perp`). Note that this
+formula neglects the reversal of the image due to the negative magnification of a single
+converging lens; in practice, this can be easily remedied by adding a second lens (as in a
+real microscope) or by reversing the axes' orientations in the imaging plane, in which case
+the formula above is perfectly valid.
+
+The formula above shows that Fourier components with :math:`\left|\vec{k}_\perp\right|\ge
+k_0 {\rm NA}` are filtered out by the objective while Fourier components with
+:math:`\left|\vec{k}_\perp\right|<k_0 {\rm NA}` are preserved as such, which indeed
+corresponds to a low-pass filter. However, this formula is insufficient to completely model
+our imaging system since the **object plane** (which we define as the output plane of the
+object, i.e. the output of the backends presented in Sec. 3) can be slightly shifted
+with respect to the focusing plane: in a real microscope, this shift is usually controled by
+a knob allowing to set the vertical position of the sample with respect to the objective
+lens.  Therefore, we need to propagate the fields from the object plane to the focusing
+plane before applying the formula above. Since this propagation step happens in free space
+with :math:`\epsilon=1`, this can be done by exactly solving Helmoltz equation in Fourier
+space:
+
+.. math::
+
+  \tilde{\vec{E}}\left[\vec{k}_\perp,z^{\rm (foc)}\right] =
+    \exp\left\{i\left[z^{\rm (foc)}-z^{\rm (obj)}\right]\sqrt{k_0^2-\vec{k}_\perp^2}\right\}
+    \tilde{\vec{E}}\left[\vec{k}_\perp,z^{\rm (obj)}\right]
+    
+The final image on the imaging plane is defined as the squared amplitude of
+:math:`\vec{E}\left[\vec{r}^{\rm (im)}\right]`, which can be calculated from the two
+formulas above via the Fast-Fourier-Transform algorithm. To get an idea on how the numerical
+aperture of the objective and the position of the object plane affect the final image, we
+provide a simple interactive example showing how the image of a perfect circular mask is
+distorted through the imaging system:
+
+.. raw:: html
+
+  <div id="imaging-fig">
+    <div class="observablehq-viewof-z_foc"></div>
+    <div class="observablehq-viewof-NA_objective"></div>
+    <div class="observablehq-chart_imaging"></div>
+  </div>
+  <script type="module">
+    import {getRuntime} from "../_static/observable.js"
+    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+    getRuntime("#imaging-fig").module(notebook, name => {
+      if(name === "viewof NA_objective") return Inspector.into("#imaging-fig .observablehq-viewof-NA_objective")();
+      if(name === "viewof z_foc") return Inspector.into("#imaging-fig .observablehq-viewof-z_foc")();
+      if(name === "chart_imaging") return Inspector.into("#imaging-fig .observablehq-chart_imaging")();
+    });
+  </script>
