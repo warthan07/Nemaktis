@@ -185,7 +185,7 @@ Propagating optical fields through the sample
 
 Now that the sample geometry is fully caracterized, we can propagate fields through the
 sample and through an objective into the visualisation plane (which we initially assume to be
-conjugate to the center of the sample), as in a real microscope (see `microscopy_model`_ for
+conjugate to the center of the sample), as in a real microscope (see :ref:`microscopy_model` for
 more details): a set of plane waves with different wavevectors and wavelengths are sent on
 the LC sample, and the associated transmitted optical fields are calculated using one of the
 backend. 
@@ -238,7 +238,7 @@ Note that internally two simulations are run for each wavelength and wavevector,
 input light source polarised along ``x`` and the other with an input light source polarised
 along ``y``.  This allows us to fully caracterize the transmission matrix of the sample and
 reconstruct any type of micrographs (bright field, crossed polariser...), as explained in
-`microscopy_model`_.  Similaryly to the :class:`~nemaktis.lc_material.DirectorField` object,
+:ref:`microscopy_model`.  Similaryly to the :class:`~nemaktis.lc_material.DirectorField` object,
 you can save the output fields to a XML VTK file, and reimport them in other scripts:
 
 .. code-block:: python

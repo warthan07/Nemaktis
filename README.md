@@ -1,5 +1,10 @@
 # Nemaktis
 
+[![Generic badge](https://anaconda.org/warthan07/nemaktis/badges/platforms.svg)](https://anaconda.org/warthan07/nemaktis)
+[![Generic badge](https://anaconda.org/warthan07/nemaktis/badges/version.svg)](https://anaconda.org/warthan07/nemaktis)
+[![Documentation Status](https://readthedocs.org/projects/nemaktis/badge/?version=latest)](https://nemaktis.readthedocs.io/en/latest/?badge=latest)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+
 ``Nemaktis`` is an open-source platform including tools for propagating and visualising optical field in
 complex birefringent media such as liquid crystal (LC) layers. It includes three backends
 implementing advanced numerical methods for light propagation, as well as an easy-to-use high
