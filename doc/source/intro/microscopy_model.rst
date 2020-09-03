@@ -472,8 +472,8 @@ change much for the calculation of POMs.
 ....................................................
 
 Let us start with the simplest optical setup possible, without any polarisers or waveplates.
-Based on Sec. 2-4, the mapping between incoming plane waves and output fields may be
-described with a set of special matrices:
+Based on Sec. 2-4, the mapping between incoming plane waves and final optical fields on the
+imaging plane may be described with a set of special matrices:
 
 .. math::
 
@@ -485,8 +485,8 @@ described with a set of special matrices:
   \end{aligned}\right),
 
 where :math:`\vec{E}^{(k,l,m)}_{\rm out}` correspond to the output transverse optical field
-of one of the backend in Sec. 3 for an incoming plane wave ${tex`\vec{E}^{(k,l,m)}_{\rm
-in}`}, :math:`\vec{u}_m` (:math:`m=1,2`) correspond to an orthogonal basis of polarisations
+of one of the backend in Sec. 3 for an incoming plane wave :math:`\vec{E}^{(k,l,m)}_{\rm
+in}`, :math:`\vec{u}_m` (:math:`m=1,2`) correspond to an orthogonal basis of polarisations
 in the transverse plane, and the operation :math:`P \star` correspond to a convolution with
 the linear filter :math:`P` representing the full imaging system, including the
 point-spread-function of the objective and the propagation from the output object plane to
@@ -509,12 +509,14 @@ representation is consistent and accurate.
 We also assume that the illuminating source is unpolarised and that the detector in the
 imaging plane is polarisation-independent: it simply measures the squared amplitude of the
 transverse optical field. This means that the final image associated with the incoming
-wavevector :math:`\vec{k}^{(k,l)}` can be calculated as:
+wavevector :math:`\vec{k}^{(k,l)}` can be calculated as (up to a constant multiplicative
+factor):
 
 .. math::
 
   I^{(k,l)} = \int_0^{2\pi}\left|\bar{\bar{T}}^{(k,l)}_{\rm obj}
-    \left(\begin{aligned}\cos\theta \\ \sin\theta\end{aligned}\right)\right|^2 {\rm d}\theta
+    \left(\begin{aligned}\cos\theta \\ \sin\theta\end{aligned}\right)\right|^2
+    \frac{{\rm d}\theta}{\pi}
 
 A direct calculation shows that we do not even need to perform an integration, we can simply sum the squared amplitude of the transfer matrix entries:
 
@@ -574,7 +576,7 @@ images is really simple:
 .. math::
 
   \bar{\bar{T}}^{(k,l)}_{\rm tot} =
-    \bar{\bar{T}}_{\rm pol} \bar{\bar{T}}_{\rm wp}
+    \bar{\bar{T}}_{\rm an} \bar{\bar{T}}_{\rm wp}
     \bar{\bar{T}}^{(k,l)}_{\rm obj}\bar{\bar{T}}_{\rm pol}
 
 * Calculate the final image as in the last subsection by summing the squared amplitude of

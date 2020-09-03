@@ -162,8 +162,8 @@ refractive index of the host fluid. All these informations are stored in the cla
         director_field=nfield, ne=1.5, no=1.7, nhost=1.55)
 
 Note that you can also specify refractive indices with a string expression depending on the
-wavelength variable "lambda", in case you want to take into account the dispersivity of the
-materials of your sample. 
+wavelength variable "lambda" (in µm), in case you want to take into account the dispersivity
+of the materials of your sample. 
 
 We also want to add a glass plate above the sample and additional space for the host fluid
 between the droplet and the glass plate:
@@ -185,9 +185,10 @@ Propagating optical fields through the sample
 
 Now that the sample geometry is fully caracterized, we can propagate fields through the
 sample and through an objective into the visualisation plane (which we initially assume to be
-conjugate to the center of the sample), as in a real microscope: a set of plane waves with
-different wavevectors and wavelengths are sent on the LC sample, and the associated
-transmitted optical fields are calculated using one of the backend. 
+conjugate to the center of the sample), as in a real microscope (see `microscopy_model`_ for
+more details): a set of plane waves with different wavevectors and wavelengths are sent on
+the LC sample, and the associated transmitted optical fields are calculated using one of the
+backend. 
 
 The actual set of wavelengths for the plane waves approximate the relevant part of the
 spectrum of the illumination light, whereas the set of wavevectors is determined from the
@@ -236,11 +237,9 @@ uniform field near the mesh boundaries.
 Note that internally two simulations are run for each wavelength and wavevector, one with an
 input light source polarised along ``x`` and the other with an input light source polarised
 along ``y``.  This allows us to fully caracterize the transmission matrix of the sample and
-reconstruct any type of micrographs (bright field, crossed polariser...), as we will see in
-the next section.
-
-Similaryly to the :class:`~nemaktis.lc_material.DirectorField` object, you can save the output
-fields to a XML VTK file, and reimport them in other scripts:
+reconstruct any type of micrographs (bright field, crossed polariser...), as explained in
+`microscopy_model`_.  Similaryly to the :class:`~nemaktis.lc_material.DirectorField` object,
+you can save the output fields to a XML VTK file, and reimport them in other scripts:
 
 .. code-block:: python
 
@@ -266,11 +265,11 @@ with the following lines of code:
     viewer = nm.FieldViewer(output_fields)
     viewer.plot()
 
-All parameters in this user interface should be pretty self-explanatory. We will simply mention
-here that the quarter-wavelength and half-wavelength compensators are
-assumed to be achromatic, while the full-wave "tint sensitive"
-compensator is aproximated with a slab of wavelength-independent
-refractive index with a full-wave shift at a wavelength of 540 nm.
+All parameters in this user interface should be pretty self-explanatory, with lengths
+expressed in µm and optical element angles in ° with respect to ``x``. We will simply
+mention here that the quarter-wavelength and half-wavelength compensators are assumed to be
+achromatic, while the full-wave "tint sensitive" compensator is aproximated with a slab of
+wavelength-independent refractive index with a full-wave shift at a wavelength of 540 nm.
 
 Concerning color management, we assume a D65 light source and project the output light spectrum
 first on the XYZ space, then on the sRGB color space, to finally obtain a usual RGB picture. 

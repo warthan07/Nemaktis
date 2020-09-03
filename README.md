@@ -94,8 +94,8 @@ of the nemaktis wiki (link above).
 ``Nemaktis`` is released under the MIT license, so you can use it freely. You are strongly
 encouraged to cite the following papers if you use this package for published research:
 
-G. Poy, S. Žumer, Soft Matter **15**, 3659-3670 (2019).
+G. Poy, S. Žumer, Soft Matter **15**, 3659-3670 (2019): <https://doi.org/10.1039/C8SM02448K>
 
-G. Poy, S. Žumer, Optics Express, submitted (2020).
+G. Poy, S. Žumer, Optics Express **16**, 24327-24342 (2020): <https://doi.org/10.1364/OE.400984>
 
 A. Petelin *et al.*, in preparation.

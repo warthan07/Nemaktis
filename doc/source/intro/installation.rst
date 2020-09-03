@@ -21,21 +21,20 @@ the package manager ``conda``. If you already have the full python distribution 
 installed on your machine, this step is not necessary. The installation files for Windows/Linux
 are available at this address: https://docs.conda.io/en/latest/miniconda.html
 
-If you don't want to copy-paste commands in a terminal, the next step is as simple as running
-the following installation script:
+If you are a Windows user and do not want to copy-paste commands in a terminal, the next step is
+as simple as running the following installation script 
 
-- Windows: https://github.com/warthan07/Nemaktis/releases/download/v1.0/Install.Nemaktis.cmd
-- Linux: soon
+https://github.com/warthan07/Nemaktis/releases/download/v1.0/Install.Nemaktis.cmd
 
-Both scripts will create a special environment for ``Nemaktis`` named *nm* and will install
-everything needed in it. The windows script will also install the python editor ``Spyder``
-and create a shortcut named *Spyder (Nemakis environment)* for it on your Desktop (this is
-necessary even if you already installed Spyder, since it has to be run from inside the conda
-environment *nm*).
+This script will create a special environment for ``Nemaktis`` named *nm* and will install
+everything needed in it. It will also install the python editor ``Spyder`` and create a
+shortcut named *Spyder (Nemakis environment)* for it on your Desktop (this is necessary even
+if you already installed Spyder, since it has to be run from inside the conda environment
+*nm*).
 
-If you want to type the installation commands yourselves (they are not very complicated after
-all!), open a terminal (Windows: application "Conda terminal" installed with miniconda, Linux:
-any terminal) and type the following command: ::
+If you are a Linux user or want to type the installation commands yourselves (they are not
+very complicated after all!), open a terminal (Windows: application "Conda terminal"
+installed with miniconda, Linux: any terminal) and type the following command: ::
 
   conda create -n nm -c conda-forge -c warthan07 -y nemaktis
 
