@@ -49,6 +49,9 @@ transmission mode:
     });
   </script>
 
+We also provide an additional Sec. 5 to explain the modeling of optical elements for
+polarized micrographs, which are mostly ignored in Sec. 2-4.
+
 
 2. Koehler illumination setup
 --------------------------
@@ -366,7 +369,7 @@ on both planes are always related by a linear transform:
 where :math:`\vec{r}^{\rm (im)}` (:math:`\vec{r}^{\rm (foc)}`) correspond to coordinates on
 the imaging (focusing) plane and :math:`G` is called the point-spread-function (PSF) of the
 imaging system. The actual expression of the PSF depends on the implementation of the
-imaging lens, but in general is acts as a low-pass filter because it is aperture-limited,
+imaging lens, but in general it acts as a low-pass filter because it is aperture-limited,
 i.e. one cannot observe details below the diffraction limit (typical width of a detail
 smaller than the wavelength). In Nemaktis, we use a very simple model of imaging system
 based on a single objective lens and the imaging/focusing planes placed at distance
@@ -433,3 +436,162 @@ distorted through the imaging system:
       if(name === "chart_imaging") return Inspector.into("#imaging-fig .observablehq-chart_imaging")();
     });
   </script>
+
+
+5. Optical elements for polarized optical micrographs
+-----------------------------------------------------
+
+In Sec. 2-4, we mostly focused on the general principles of microscopy and neglected
+the presence of optical elements such as polarisers and waveplates, which play an important
+role in polarised optical microscopy. In this section, we introduce the method used in
+Nemaktis for taking into account these optical elements in the calculation of the final
+images, which are usually called polarised optical micrographs (POM). Nemaktis support two
+classes of optical elements for polarised optical microscopy: polarisers/analysers which
+allows us to project the light polarisation on a single axis, and waveplates which introduce
+a given phase shift between two given orthogonal polarisation axes. The disposition of these
+elements in our virtual microscope model is schematized below. In a real microscope, the
+exact disposition of these elements may be a bit different (they are often directly embedded
+inside the illumination/imaging setups) but we will see in a moment that this does not
+change much for the calculation of POMs.
+
+.. raw:: html
+
+  <div id="pom-fig">
+    <div class="observablehq-chart_pom"></div>
+  </div>
+  <script type="module">
+    import {getRuntime} from "../_static/observable.js"
+    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+    getRuntime("#pom-fig").module(notebook, name => {
+      if(name === "chart_pom") return Inspector.into("#pom-fig .observablehq-chart_pom")();
+    });
+  </script>
+
+5.1 Calculation of natural light optical micrographs
+....................................................
+
+Let us start with the simplest optical setup possible, without any polarisers or waveplates.
+Based on Sec. 2-4, the mapping between incoming plane waves and output fields may be
+described with a set of special matrices:
+
+.. math::
+
+  \bar{\bar{T}}^{(k,l)}_{\rm obj} = \left(\begin{aligned}
+    \left[P \star \vec{E}^{(k,l,1)}_{\rm out}\right]\cdot\vec{u}_1 \quad
+    \left[P \star \vec{E}^{(k,l,2)}_{\rm out}\right]\cdot\vec{u}_1 \\
+    \left[P \star \vec{E}^{(k,l,1)}_{\rm out}\right]\cdot\vec{u}_2 \quad
+    \left[P \star \vec{E}^{(k,l,2)}_{\rm out}\right]\cdot\vec{u}_2
+  \end{aligned}\right),
+
+where :math:`\vec{E}^{(k,l,m)}_{\rm out}` correspond to the output transverse optical field
+of one of the backend in Sec. 3 for an incoming plane wave ${tex`\vec{E}^{(k,l,m)}_{\rm
+in}`}, :math:`\vec{u}_m` (:math:`m=1,2`) correspond to an orthogonal basis of polarisations
+in the transverse plane, and the operation :math:`P \star` correspond to a convolution with
+the linear filter :math:`P` representing the full imaging system, including the
+point-spread-function of the objective and the propagation from the output object plane to
+the the focusing plane (see Sec. 4).
+
+So why use this complicated representation in terms of matrices? The advantage is that it
+allows to easily calculate the final optical fields for an arbitrary input polarisation
+:math:`\vec{v}` (not simply :math:`\vec{u}_1` and :math:`\vec{u}_2`) by multiplying the
+matrix :math:`\bar{\bar{T}}^{(k,l)}_{\rm obj}` with the vector :math:`\vec{v}`. This is very
+similar to the classical Jones calculus, except here the entries of the 2x2 matrices are not
+scalars but rather scalar fields (which can depends on the transverse coordinates and can be
+submitted to convolution operation including diffraction effects). Note that this
+representation is accurate only when the same polarisation basis can be used for all
+incoming plane waves. This is true only in the paraxial regime of propagation, where the
+longitudinal components of the polarisation can be neglected (second order in the angle
+between the wavevector and the main propagation axis :math:`z`). Since we already assumed
+paraxial propagation in Sec. 2-4, we can therefore assume that our transfer matrix
+representation is consistent and accurate.
+
+We also assume that the illuminating source is unpolarised and that the detector in the
+imaging plane is polarisation-independent: it simply measures the squared amplitude of the
+transverse optical field. This means that the final image associated with the incoming
+wavevector :math:`\vec{k}^{(k,l)}` can be calculated as:
+
+.. math::
+
+  I^{(k,l)} = \int_0^{2\pi}\left|\bar{\bar{T}}^{(k,l)}_{\rm obj}
+    \left(\begin{aligned}\cos\theta \\ \sin\theta\end{aligned}\right)\right|^2 {\rm d}\theta
+
+A direct calculation shows that we do not even need to perform an integration, we can simply sum the squared amplitude of the transfer matrix entries:
+
+.. math::
+
+  I^{(k,l)} = \sum_{m=1}^2\sum_{n=1}^2
+    \left|\left[\bar{\bar{T}}^{(k,l)}_{\rm obj}\right]_{mn}\right|^2
+
+5.2 Calculation of polarised optical micrographs
+................................................
+
+Now, how do we generalize the calculation of the previous subsection by including any
+combination of optical elements for polarised microscopy? Let us introduce the usual Jones
+matrices :math:`\bar{\bar{T}}_{\rm pol}`, :math:`\bar{\bar{T}}_{\rm an}` and
+:math:`\bar{\bar{T}}_{\rm wp}` respectively associated with a polariser, analyser or
+waveplate. The expression of the transfer matrix for a polariser or analyser only depends on
+the angle :math:`\psi_{\rm pol,an}` of the optical element axis with respect to
+:math:`\vec{u}_1` in the transverse plane (horizontal axis in Nemaktis):
+
+.. math::
+
+  \bar{\bar{T}}_{\rm pol,an} = \begin{bmatrix}
+    \cos^2\psi_{\rm pol,an} & \cos\psi_{\rm pol,an}\sin\psi_{\rm pol,an} \\
+    \cos\psi_{\rm pol,an}\sin\psi_{\rm pol,an} & \sin^2\psi_{\rm pol,an} \end{bmatrix}
+
+The expression of the transfer matrix for a waveplate depends on the angle :math:`\psi_{\rm
+wp}` of the fast axis of the optical element with respect to :math:`\vec{u}_1` and the
+phasor :math:`\eta=\exp\left[i\Gamma/2\right]`, with :math:`\Gamma` the retardance of the
+waveplate:
+
+.. math::
+
+  \bar{\bar{T}}_{\rm wp} = \begin{bmatrix}
+    \eta^*\cos^2\psi_{\rm wp}+\eta\sin^2\psi_{\rm wp} &
+      \left(\eta^*-\eta\right)\cos\psi_{\rm wp}\sin\psi_{\rm wp} \\
+    \left(\eta^*-\eta\right)\cos\psi_{\rm wp}\sin\psi_{\rm wp} &
+      \eta^*\sin^2\psi_{\rm wp}+\eta\cos^2\psi_{\rm wp} \end{bmatrix}
+
+Nemaktis supports three different kinds of waveplates:
+
+* Achromatic quarter-wave plate: :math:`\Gamma=\pi/2` independently of the wavelength;
+* Achromatic half-wave plate: :math:`\Gamma=\pi` independently of the wavelength;
+* Tint-sensitive full-wave plate: :math:`\Gamma=2\pi\left[0.54/\lambda\right]`, where
+  :math:`\lambda` is the wavelength in :math:`\mu{\rm m}`; the advantage of this waveplate
+  is that it allows the visualization of in-plane molecular angular deviation as color
+  shifts when illuminating an inhomogenenous birefringent sample with white light.
+
+Now that this set of transfer matrices is introduced, the calculation of the final POM
+images is really simple:
+
+* Multiply right to left the transfer matrices associated by each elements of the microscope
+  in the same order that they are crossed by the illumination beam, and store the result in
+  a global transfer matrix :math:`\bar{\bar{T}}^{(k,l)}_{\rm tot}`. For example, if the
+  setup includes a polariser, the object, a waveplate and an analyser, the total transfer
+  matrix associated with the wavevector :math:`\vec{k}^{(k,l)}` is:
+
+.. math::
+
+  \bar{\bar{T}}^{(k,l)}_{\rm tot} =
+    \bar{\bar{T}}_{\rm pol} \bar{\bar{T}}_{\rm wp}
+    \bar{\bar{T}}^{(k,l)}_{\rm obj}\bar{\bar{T}}_{\rm pol}
+
+* Calculate the final image as in the last subsection by summing the squared amplitude of
+  each components of the total transfer matrix:
+
+.. math::
+
+  I^{(k,l)} = \sum_{m=1}^2\sum_{n=1}^2
+    \left|\left[\bar{\bar{T}}^{(k,l)}_{\rm tot}\right]_{mn}\right|^2
+
+The validity of our method is again ensured by our assumption of paraxial propagation:
+
+* Since in this regime of propagation the operation :math:`P\star` representing the imaging
+  setup is polarisation-independent, it can be commuted with any operation on the
+  polarisation state (such as the transfer matrices introduced above); this is why the real
+  position of the waveplate and analyser inside the imaging setup of a real microscope do
+  not matter in our simple and ideal model of microscopy.
+* The transfer matrices of the polariser/analyser and waveplate, as introduced above, do not
+  depend on the wavevector of the incoming plane wave, which is not true for wide-angle
+  incoming plane waves.

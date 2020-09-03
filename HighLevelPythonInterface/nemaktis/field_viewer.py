@@ -377,8 +377,8 @@ def half_waveplate_matrix(angle):
 def tint_sensitive_matrix(wavelengths, angle):
     cosA = np.cos(angle*np.pi/180)
     sinA = np.sin(angle*np.pi/180)
-    #  expG = np.exp(1j*np.pi*0.540/wavelengths) # Full-wave at 540 nm
-    expG = np.exp(1j*2*np.pi*(1.25*(0.540/wavelengths-1)+1)) # Andrew's full-wave plate
+    expG = np.exp(1j*np.pi*0.540/wavelengths) # Full-wave at 540 nm
+    #  expG = np.exp(1j*np.pi*(1.25*(0.540/wavelengths-1)+1)) # Andrew's full-wave plate
     return np.array([
         [np.conj(expG)*cosA**2+expG*sinA**2, (np.conj(expG)-expG)*cosA*sinA],
         [(np.conj(expG)-expG)*cosA*sinA, np.conj(expG)*sinA**2+expG*cosA**2]]).transpose(
