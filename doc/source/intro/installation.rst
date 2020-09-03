@@ -24,7 +24,7 @@ are available at this address: https://docs.conda.io/en/latest/miniconda.html
 If you are a Windows user and do not want to copy-paste commands in a terminal, the next step is
 as simple as running the following installation script 
 
-https://github.com/warthan07/Nemaktis/releases/download/v1.0/Install.Nemaktis.cmd
+https://github.com/warthan07/Nemaktis/releases/download/v1.3/Install.Nemaktis.cmd
 
 This script will create a special environment for ``Nemaktis`` named *nm* and will install
 everything needed in it. It will also install the python editor ``Spyder`` and create a

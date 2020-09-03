@@ -66,5 +66,5 @@ send me a quick message explaining the optics problem that you want to solve.
 Contact
 -------
 
-Personal website: https://www.syncpoint.fr
-Email: guilhempoy07 [AT] gmail [DOT] com
+* Personal website: https://www.syncpoint.fr
+* Email: guilhempoy07 [*at*] gmail [*dot*] com
