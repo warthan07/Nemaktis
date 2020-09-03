@@ -36,7 +36,7 @@ If you are a Linux user or want to type the installation commands yourselves (th
 very complicated after all!), open a terminal (Windows: application "Conda terminal"
 installed with miniconda, Linux: any terminal) and type the following command: ::
 
-  conda create -n nm -c conda-forge -c warthan07 -y nemaktis
+  conda create -n nm -c conda-forge -c warthan07 -y nemaktis=1.3.4
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
 to install and run it from the same environment. You can search https://anaconda.org/ to find

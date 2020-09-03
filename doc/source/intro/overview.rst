@@ -54,4 +54,17 @@ Limitations
 The last two limitations should be lifted in the future since the associated theoretical
 framework is already ready (I just need to find students or the time to code everything!).
 If you want to implement new features that you think could benefit the whole software,
-please contact me (guilhempoy07 [AT] gmail [DOT] com)!
+please contact me (address below)!
+
+Concerning the paraxial approximation, I can mention that I have also developped a
+closed-source wide-angle beam propagation method, which can model non-linear optical
+systems, wide-angle deflection of light beams by birefringent structures, waveguiding...
+If you are interested in starting a collaboration on this closed-source software, please
+send me a quick message explaining the optics problem that you want to solve.
+
+
+Contact
+-------
+
+Personal website: https://www.syncpoint.fr
+Email: guilhempoy07 [AT] gmail [DOT] com
