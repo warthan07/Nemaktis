@@ -3,26 +3,37 @@
 Installation
 ============
 
-``Nemaktis`` is a mixture of C++ and python codes, and have been successfully tested both on
-Windows and Linux (note that it should be straightforward to adapt it for Mac, since it is
-a Unix-based OS). The next two subsections present the two possible ways of installing this
-package.
+``Nemaktis`` is a mixture of C++ and python codes, and has been successfully tested both on
+Windows 10 and Linux. The recommended way of installing and using Nematkis is through the
+package manager ``conda`` (see next subsection).
+
+If you are an experienced Mac user and want to become maintainer of a MacOS version of
+Nematkis (using conda), please contact me
+(https://nemaktis.readthedocs.io/en/latest/intro/overview.html#contact). Otherwise, it is
+probably possible to compile and use the software by hand on other OSs than the ones
+mentioned above (windows 7, macOS...), provided you know what you are doing :)
 
 With Conda (windows or linux)
 -----------------------------
 
+a. Install Anaconda
+...................
+
 The simplest way of installing the ``Nemaktis`` package is through the package manager
 ``conda`` (no compilation and no dependency to be installed by hand). I provide precompiled
-packages for both **Linux** and **Windows**, which means the following method will work on these two
-operating systems.
+packages for both **Linux** and **Windows 10**, which means the following method will work
+on these two operating systems.
 
 The first step is to install the software ``miniconda``, which contains a barebone version of
 the package manager ``conda``. If you already have the full python distribution ``Anaconda``
 installed on your machine, this step is not necessary. The installation files for Windows/Linux
 are available at this address: https://docs.conda.io/en/latest/miniconda.html
 
-If you are a Windows user and do not want to copy-paste commands in a terminal, the next step is
-as simple as running the following installation script 
+b1. (Windows) Install Nemaktis automatically
+............................................
+
+If you are a Windows 10 user and do not want to copy-paste commands in a terminal, the next
+step is as simple as running the following installation script 
 
 https://github.com/warthan07/Nemaktis/releases/download/v1.3/Install.Nemaktis.cmd
 
@@ -32,20 +43,48 @@ shortcut named *Spyder (Nemakis environment)* for it on your Desktop (this is ne
 if you already installed Spyder, since it has to be run from inside the conda environment
 *nm*).
 
-If you are a Linux user or want to type the installation commands yourselves (they are not
-very complicated after all!), open a terminal (Windows: application "Conda terminal"
-installed with miniconda, Linux: any terminal) and type the following command: ::
+b2. (Windows/Linux) Install Nemaktis on the command line
+........................................................
+
+Alternatively, if you are a Linux user or want to type the installation commands yourself
+(they are not very complicated after all!), open a terminal (Windows: application "Conda
+terminal" installed with miniconda, Linux: any terminal) and type the following command: ::
 
   conda create -n nm -c conda-forge -c warthan07 -y nemaktis=1.3.4
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
-to install and run it from the same environment. You can search https://anaconda.org/ to find
-the associated package and installation command. For example, to install ``Spyder`` you just
-need to type: ::
+to install and run it from the same conda environment. You can search https://anaconda.org/
+to find the associated package and installation command. For example, to install ``Spyder``
+you just need to type: ::
 
   conda activate nm
   conda install spyder
 
+c. (Windows/Linux) How to update
+................................
+
+I do not recommend updating nematkis using the command ``conda update``, since I do not
+compile Nematkis sufficiently often for a correct update of all dependencies. In other
+words, running ``conda update`` has the risk of breaking your conda environment! I
+apologize for this current limitation, which mostly stems from my inexperience at conda
+packaging with complex dependencies. 
+
+In this case, how can you safely update Nemaktis? The simplest way is to fully remove the
+conda environment *nm*, either by removing the folder "envs/nm" inside the root folder of
+Anaconda or by opening a terminal ("Conda terminal" for windows, any terminal for linux) and
+typing: ::
+
+  conda remove --name nm --all 
+
+Then, simply repeat the installation step b1 or b2 above, eventually adjusting the version
+number of Nemaktis (it can be obtained from https://anaconda.org/warthan07/nemaktis/files)
+inside the commands or script if I forgot to do it :)
+
+Another possibility is to repeat the installation step b1/b2 with a different environment
+name than *nm* (for the windows script method, you need to manually edit the script file),
+for example *nm[version number]*. Although this method is probably fine to test new features
+of the software without removing the old version , it is probably not very good in the long
+term since each conda environment takes a non-negligible portion of disk space. 
 
 Developper method (only linux)
 ------------------------------
