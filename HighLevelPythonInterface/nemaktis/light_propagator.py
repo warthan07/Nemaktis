@@ -37,7 +37,8 @@ class LightPropagator:
     micrograph will look, since an open condenser aperture is associated with a wide range
     of angle for the wavectors of the incident plane waves. Conversely, an almost closed
     condenser aperture is associated with a single plane wave incident normally on the
-    sample.
+    sample. For more details, see `[Koehler illumination setup] 
+    <https://nemaktis.readthedocs.io/en/latest/intro/microscopy_model.html#koehler-illumination-setup>`_.
 
     Note that with the FieldViewer class, the transmitted optical fields calculated with
     this class can be projected on a visualisation screen through an objective of given
@@ -98,8 +99,10 @@ class LightPropagator:
         Parameters
         ----------
         method : "bpm" | "dtmm(D)"
-            If equal to "bpm", the beam propagation backend will be used. Should be used
-            if accuracy is privileged over speed.
+            If equal to "bpm", the beam propagation backend will be used (see
+            `[The beam-propagation backend (bpm-solver)]
+            <https://nemaktis.readthedocs.io/en/latest/intro/microscopy_model.html#the-beam-propagation-backend-bpm-solver>`_
+            for details). Should be used if accuracy is privileged over speed.
 
             If equal to "dtmm(D)" (with D a positive integer), the diffractive transfer
             matrix backend will be used with the "diffraction" parameter set to D (see

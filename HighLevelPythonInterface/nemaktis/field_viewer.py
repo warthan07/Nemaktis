@@ -15,7 +15,10 @@ import time
 
 class FieldViewer:
     """A class allowing to recombine optical fields to generate optical micrographs like in
-    a real microscope.
+    a real microscope. For more details, see `[Imaging of the object] 
+    <https://nemaktis.readthedocs.io/en/latest/intro/microscopy_model.html#imaging-of-the-object>`_
+    and `[Optical elements for polarized optical micrographs]
+    <https://nemaktis.readthedocs.io/en/latest/intro/microscopy_model.html#optical-elements-for-polarized-optical-micrographs>`_
 
     Parameters
     ----------
