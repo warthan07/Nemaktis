@@ -363,16 +363,16 @@ on both planes are always related by a linear transform:
 .. math::
 
   \vec{E}\left[\vec{r}^{\rm (im)}\right] =
-    \int G\left[\vec{r}^{\rm (im)},\vec{r}^{\rm (foc)}\right]
+    \int \bar{\bar{G}}\left[\vec{r}^{\rm (im)},\vec{r}^{\rm (foc)}\right]
     \vec{E}\left[\vec{r}^{\rm (foc)}\right] {\rm d}^2\vec{r}^{\rm (foc)}
     
 where :math:`\vec{r}^{\rm (im)}` (:math:`\vec{r}^{\rm (foc)}`) correspond to coordinates on
-the imaging (focusing) plane and :math:`G` is called the point-spread-function (PSF) of the
-imaging system. The actual expression of the PSF depends on the implementation of the
-imaging lens, but in general it acts as a low-pass filter because it is aperture-limited,
-i.e. one cannot observe details below the diffraction limit (typical width of a detail
-smaller than the wavelength). In Nemaktis, we use a very simple model of imaging system
-based on a single objective lens and the imaging/focusing planes placed at distance
+the imaging (focusing) plane and :math:`\bar{\bar{G}}` is called the point-spread-function
+(PSF) of the imaging system. The actual expression of the PSF depends on the implementation
+of the imaging lens, but in general it acts as a low-pass filter because it is
+aperture-limited, i.e. one cannot observe details below the diffraction limit (typical width
+of a detail smaller than the wavelength). In Nemaktis, we use a very simple model of imaging
+system based on a single objective lens and the imaging/focusing planes placed at distance
 :math:`2f` on each side of the lens (with :math:`f` the focal length of the objective). We
 assume that the objective is an ideal thin-lens, which allows us to obtain a very simple
 form of the linear transform above in the transverse Fourier space (see details in [J. W.
