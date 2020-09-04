@@ -97,13 +97,15 @@ class LightPropagator:
 
         Parameters
         ----------
-        method : "bpm" | "dtmm"
+        method : "bpm" | "dtmm(D)"
             If equal to "bpm", the beam propagation backend will be used. Should be used
             if accuracy is privileged over speed.
 
-            If equal to "dtmm", the diffractive transfer matrix backend
-            will be used (in its simplest version). Should be used if
-            speed is privileged over accuracy.
+            If equal to "dtmm(D)" (with D a positive integer), the diffractive transfer
+            matrix backend will be used with the "diffraction" parameter set to D (see
+            `The diffraction transfer matrix backend (dtmm)
+            <https://nemaktis.readthedocs.io/en/latest/intro/microscopy_model.html#the-diffraction-transfer-matrix-backend-dtmm)>`_
+            for details). Should be used if speed is privileged over accuracy.
         bulk_filename : None or string
             If none, the backend will not export the bulk value of the optical fields in the
             LC layer.  Else, the bulk fields values will be exported to a vti file whose

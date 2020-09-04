@@ -298,10 +298,10 @@ simulation:
 
 * low value of this parameter provide quick (but inacurate) simulations with faster running
   times than BPM on relatively small meshes (for big meshes, the logarithmic complexity of
-  dtmm kicks in and DTMM is slower than BPM);
-* high value of this parameter provide accurate simulations (computational errors slightly
-  worse than the ones obtained with BPM, but still relatively good) with slower running
-  times than with BPM.
+  dtmm kicks in and DTMM can be slower than BPM);
+* high value of this parameter provide accurate simulations (computational errors similar
+  than the ones obtained with BPM) with slower running times than with BPM whatever the mesh
+  size.
 
 In short, DTMM is the perfect backend if you want to quickly try imaging simulations without
 worrying too much about the accuracy, whereas BPM is more suited for efficient accurate
@@ -311,7 +311,9 @@ available!).
 In Nemaktis, DTMM is closely integrated in the high-level python package allowing to run
 imaging simulations, but we emphasize that DTMM also has a dedicated python package with
 advanced features such as iterative algorithms for the calculation of reflected fields (a
-feature which is currently missing in the BPM backend):
+feature which is currently missing in the BPM backend). If you absolutely need these
+advanced features, please directly use the python package ``dtmm`` (which is automatically
+installed with Nematkis!):
 
 `[DTMM: a Diffractive Transfer Matrix Method] <https://github.com/IJSComplexMatter/dtmm>`_
 
