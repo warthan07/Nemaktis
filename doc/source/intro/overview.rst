@@ -8,8 +8,8 @@ fields in complex birefringent media such as liquid crystal (LC) layers. It incl
 backends implementing advanced numerical methods for light propagation, as well as an
 easy-to-use high level interface in python allowing to quickly setup a simulation and visualize
 optical microraphs of a LC structure as in a real microscope. It goes well beyond the
-Jones method usually used in LC research, by acurately modeling diffraction, walk-off,
-focusing effects, Koëhler illumination... 
+Jones method usually used in LC research, by accurately modeling diffraction, walk-off,
+focusing effects, Koehler illumination... 
 
 If you want a platform for easily comparing experimental images and numerical micrographs from
 simulated or theoretical birefringent structures, you are in the right place!
