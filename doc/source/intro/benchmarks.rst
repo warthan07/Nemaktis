@@ -60,7 +60,7 @@ paraxial Fourier frequencies and :math:`z` coordinates. The exact solution
 :math:`\tilde{\vec{E}}_{\rm exact}\left[\vec{k}_\perp,z\right]` is obtained directly from an
 eigenmode decomposition of Maxwell equations in transverse Fourier space, which can be done
 analytically since we assumed a uniform optical axis (see python script `propagate_fields.py
-<https://github.com/warthan07/Nemaktis/blob/master/HighLevelPythonInterface/examples/benchmarks/3D/propagate_fields.py>`).
+<https://github.com/warthan07/Nemaktis/blob/master/HighLevelPythonInterface/examples/benchmarks/3D/propagate_fields.py>`_).
 The maximum angle of propagation :math:`\theta_m\approx24°` was choosen based on the typical
 numerical aperture :math:`\sin\theta_m=0.4` of microscope objectives.
 
@@ -129,7 +129,6 @@ years old laptop with a processor i7-4600M (4 threads).
     <div class="observablehq-viewof-dy_idx_2D"></div>
     <div class="observablehq-viewof-order_by_2D"></div>
     <div class="observablehq-err_times_chart_2D"></div>
-    <div class="observablehq-err_times_chart_2D_update"></div>
   </div>
   <script type="module">
     import {getRuntime} from "../_static/observable.js"
@@ -139,7 +138,7 @@ years old laptop with a processor i7-4600M (4 threads).
       if(name === "viewof dy_idx_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-dy_idx_2D")();
       if(name === "viewof order_by_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-order_by_2D")();
       if(name === "err_times_chart_2D") return Inspector.into("#times-2D-fig .observablehq-err_times_chart_2D")();
-      if(name === "err_times_chart_2D_update") return Inspector.into("#times-2D-fig .observablehq-err_times_chart_2D_update")();
+      if(name === "err_times_chart_2D_update") return true;
     });
   </script>
 
@@ -209,7 +208,7 @@ i7-7800X (12 threads).
       if(name === "viewof dy_idx_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-dy_idx_3D")();
       if(name === "viewof order_by_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-order_by_3D")();
       if(name === "err_times_chart_3D") return Inspector.into("#times-3D-fig .observablehq-err_times_chart_3D")();
-      if(name === "err_times_chart_3D_update") return Inspector.into("#times-3D-fig .observablehq-err_times_chart_3D_update")();
+      if(name === "err_times_chart_3D_update") return true;
     });
   </script>
 
