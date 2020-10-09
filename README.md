@@ -42,7 +42,7 @@ The three backends implemented in ``nemaktis`` correspond to:
    micrographs as in a real transmission micrographs.
 
 3. ``dtmm``, a FFT-based diffractive transfer matrix python code which offer similar functionalities
-   as ``bpm-solver`` but relies on a slightly less accurate scheme in its default version
+   as ``bpm-solver`` but relies on a less accurate scheme in its default version
    (although the accuracy can be improved at the cost of computational efficiency
    using a dedicated parameter). In most cases, this scheme will show similar accuracy as
    ``bpm-solver`` for micrograph simulations, and will in general be faster than

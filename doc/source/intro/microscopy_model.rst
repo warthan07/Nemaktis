@@ -300,8 +300,7 @@ simulation:
   times than BPM on relatively small meshes (for big meshes, the logarithmic complexity of
   dtmm kicks in and DTMM can be slower than BPM);
 * high value of this parameter provide accurate simulations (computational errors similar
-  than the ones obtained with BPM) with slower running times than with BPM whatever the mesh
-  size.
+  than the ones obtained with BPM) with generally slower running times than with BPM.
 
 In short, DTMM is the perfect backend if you want to quickly try imaging simulations without
 worrying too much about the accuracy, whereas BPM is more suited for efficient accurate
