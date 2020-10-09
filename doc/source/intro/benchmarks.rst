@@ -11,17 +11,17 @@ DTMM and BPM. The javascript code for the interactive graphs of this page can be
 1. Introduction
 ---------------
 
-As explained in `Microscopy model for Nemaktis
-<https://observablehq.com/@warthan07/microscopy-model-for-nemaktis>`_, the two main backends
-of Nemaktis (DTMM and BPM) propagate optical fields through a series of inhomonogeneous
-birefringent layers based on different formulation of the evolution operator of Maxwell
-equations. Both schemes include diffraction effects due to inhomogeneities in the optical
-and/or permittivity fields. Since analytical solutions of Maxwell equations are readily
-available only on homogeneous birefringent media, we propose here to evaluate the accuracy
-of both schemes by simulating the diffraction of a highly-focused Gaussian beam in a uniform
-uniaxial crystal. This has the advantage of evaluating in one simulation the propagation
-accuracy of many different plane waves since a focused Gaussian beam spans a wide-area in
-the transverse Fourier plane.
+As explained in `[Transmission/Reflection of light inside the object]
+<https://nemaktis.readthedocs.io/en/latest/intro/microscopy_model.html#transmission-reflection-of-light-inside-the-object>`_,
+the two main backends of Nemaktis (DTMM and BPM) propagate optical fields through a series
+of inhomonogeneous birefringent layers based on different formulation of the evolution
+operator of Maxwell equations. Both schemes include diffraction effects due to
+inhomogeneities in the optical and/or permittivity fields. Since analytical solutions of
+Maxwell equations are readily available only on homogeneous birefringent media, we propose
+here to evaluate the accuracy of both schemes by simulating the diffraction of a
+highly-focused Gaussian beam in a uniform uniaxial crystal. This has the advantage of
+evaluating in one simulation the propagation accuracy of many different plane waves since a
+focused Gaussian beam spans a wide-area in the transverse Fourier plane.
 
 However, the reader should keep in mind that "real-life" computational errors of simulations
 on inhomogeneous birefringent media can be higher than the ones presented here, since they
@@ -36,7 +36,7 @@ Our methodology to calculate the computational error is as follows:
 
 1. Define an input optical field with polarisation :math:`\vec{u}`:
 
-   .. math::
+.. math::
 
   \vec{E}(\vec{r}_\perp,z=0)=\exp\left[-\frac{\left|\vec{r}_\perp\right|^2}{2w^2}\right]\vec{u}
 
@@ -50,7 +50,7 @@ Our methodology to calculate the computational error is as follows:
   \epsilon=\left\langle\frac{\left|
   \tilde{\vec{E}}\left[\vec{k}_\perp,z\right]-\tilde{\vec{E}}_{\rm exact}\left[\vec{k}_\perp,z\right]
   \right|}{2\left|\tilde{\vec{E}}_{\rm exact}\left[\vec{k}_\perp,z\right]\right|}
-  \right\rangle_{\theta(\bm{k}_\perp)<\theta_m}
+  \right\rangle_{\theta(\vec{k}_\perp)<\theta_m}
 
 In the definition above, a tilde indicate a partial Fourier transform along the :math:`x`
 and :math:`y` coordinates (associated with a Fourier frequency :math:`\vec{k}_\perp`),
@@ -59,9 +59,10 @@ direction of propagation :math:`z`, and the bracket indicate a constrained avera
 paraxial Fourier frequencies and :math:`z` coordinates. The exact solution
 :math:`\tilde{\vec{E}}_{\rm exact}\left[\vec{k}_\perp,z\right]` is obtained directly from an
 eigenmode decomposition of Maxwell equations in transverse Fourier space, which can be done
-analytically since we assumed a uniform optical axis. The maximum angle of propagation
-:math:`\theta_m\approx24°` was choosen based on the typical numerical aperture
-:math:`\sin\theta_m=0.4` of microscope objectives.
+analytically since we assumed a uniform optical axis (see python script `propagate_fields.py
+<https://github.com/warthan07/Nemaktis/blob/master/HighLevelPythonInterface/examples/benchmarks/3D/propagate_fields.py>`).
+The maximum angle of propagation :math:`\theta_m\approx24°` was choosen based on the typical
+numerical aperture :math:`\sin\theta_m=0.4` of microscope objectives.
 
 Note that this definition of the error is roughly independent from the choice of input
 profile, since it basically measure the relative error made on phase evolution in Fourier
@@ -128,6 +129,7 @@ years old laptop with a processor i7-4600M (4 threads).
     <div class="observablehq-viewof-dy_idx_2D"></div>
     <div class="observablehq-viewof-order_by_2D"></div>
     <div class="observablehq-err_times_chart_2D"></div>
+    <div class="observablehq-err_times_chart_2D_update"></div>
   </div>
   <script type="module">
     import {getRuntime} from "../_static/observable.js"
@@ -137,6 +139,7 @@ years old laptop with a processor i7-4600M (4 threads).
       if(name === "viewof dy_idx_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-dy_idx_2D")();
       if(name === "viewof order_by_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-order_by_2D")();
       if(name === "err_times_chart_2D") return Inspector.into("#times-2D-fig .observablehq-err_times_chart_2D")();
+      if(name === "err_times_chart_2D_update") return Inspector.into("#times-2D-fig .observablehq-err_times_chart_2D_update")();
     });
   </script>
 
@@ -196,6 +199,7 @@ i7-7800X (12 threads).
     <div class="observablehq-viewof-dy_idx_3D"></div>
     <div class="observablehq-viewof-order_by_3D"></div>
     <div class="observablehq-err_times_chart_3D"></div>
+    <div class="observablehq-err_times_chart_3D_update"></div>
   </div>
   <script type="module">
     import {getRuntime} from "../_static/observable.js"
@@ -205,6 +209,7 @@ i7-7800X (12 threads).
       if(name === "viewof dy_idx_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-dy_idx_3D")();
       if(name === "viewof order_by_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-order_by_3D")();
       if(name === "err_times_chart_3D") return Inspector.into("#times-3D-fig .observablehq-err_times_chart_3D")();
+      if(name === "err_times_chart_3D_update") return Inspector.into("#times-3D-fig .observablehq-err_times_chart_3D_update")();
     });
   </script>
 
