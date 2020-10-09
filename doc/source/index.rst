@@ -16,6 +16,7 @@ Welcome to Nemaktis's documentation!
     intro/overview.rst
     intro/installation.rst
     intro/microscopy_model.rst
+    intro/benchmarks.rst
 
 
 .. _high_level:
