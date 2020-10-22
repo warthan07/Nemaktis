@@ -8,6 +8,16 @@ DirectorField
 
 .. autoclass:: nemaktis.lc_material.DirectorField
     :members:
+    :inherited-members:
+
+QTensorField
++++++++++++++
+
+.. _QTensorField:
+
+.. autoclass:: nemaktis.lc_material.QTensorField
+    :members:
+    :inherited-members:
 
 LCMaterial
 ++++++++++

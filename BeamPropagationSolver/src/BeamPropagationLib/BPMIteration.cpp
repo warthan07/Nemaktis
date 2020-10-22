@@ -8,20 +8,20 @@
 #include "SimpleShiftOperator.h"
 
 BPMIteration::BPMIteration(
-		const VectorField<double> &lc_sol,
+		const VectorField<double> &lc_field,
 		ScreenOpticalFieldCollection &screen_optical_fields,
 		const PhysicsCoefficients &coefs,
 		const RootSettings &settings) :
 	coefs(coefs),
 	settings(settings),
-	delta_x(lc_sol.mesh.delta_x),
-	delta_y(lc_sol.mesh.delta_y),
-	delta_z(lc_sol.mesh.delta_z),
-	Nx(lc_sol.mesh.Nx),
-	Ny(lc_sol.mesh.Ny),
-	Nz(lc_sol.mesh.Nz),
+	delta_x(lc_field.mesh.delta_x),
+	delta_y(lc_field.mesh.delta_y),
+	delta_z(lc_field.mesh.delta_z),
+	Nx(lc_field.mesh.Nx),
+	Ny(lc_field.mesh.Ny),
+	Nz(lc_field.mesh.Nz),
 	Nz_substeps(settings.algorithm.bpm.Nz_substeps),
-	lc_sol(lc_sol),
+	lc_field(lc_field),
 	screen_optical_fields(screen_optical_fields),
 	bulk_output(settings.postprocessor.volume_output.activate),
 	wavelengths(coefs.wavelengths()),
@@ -45,7 +45,7 @@ BPMIteration::BPMIteration(
 
 	if(bulk_output)
 		bulk_optical_fields = std::make_shared<BulkOpticalFieldCollection>(
-			lc_sol.mesh, coefs);
+			lc_field.mesh, coefs);
 }
 
 void BPMIteration::propagate_fields() {
@@ -55,7 +55,7 @@ void BPMIteration::propagate_fields() {
 			"[ wavelength: " << wavelengths[wave_idx] << "µm ]" << std::endl <<
 			"\tInitializing evolution operators..." << std::endl;
 
-		PermittivityTensorField eps(lc_sol, coefs, wavelengths[wave_idx]);
+		PermittivityTensorField eps(lc_field, coefs, wavelengths[wave_idx]);
 		ParaxialPrimaryEvolutionOperator primary_evolution_operator(
 			eps, wavelengths[wave_idx], settings);
 		PhaseEvolutionOperator secondary_evolution_operator(

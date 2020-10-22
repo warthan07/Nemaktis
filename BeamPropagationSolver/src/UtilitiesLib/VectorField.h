@@ -29,21 +29,19 @@ public:
 	/**
 	 * Initializes a vector field from a raw pointer array (slow to fast
 	 * indices: iz -> iy -> ix -> field component). The number of components
-	 * should be field_dim.
+	 * is calculated as n_user_vals/(mesh.Nx*mesh.Ny*mesh.Nz).
 	 */
 	VectorField(
-		CartesianMesh mesh, int field_dim,
-		T* user_vals, int n_user_vals);
+		CartesianMesh mesh, T* user_vals, int n_user_vals);
 	/**
 	 * Initializes a vector field from a raw pointer array (slow to fast
 	 * indices: iz -> iy -> ix -> field component). The number of components
-	 * should either be field_dim. An additional raw pointer array specify the mask values
-	 * of this vector field. Positive mask values are equivalent to true,
-	 * strictly negative mask values are equivalent to false.
+	 * is calculated as n_user_vals/(mesh.Nx*mesh.Ny*mesh.Nz). An additional raw pointer
+	 * array specify the mask values of this vector field. Positive mask values are
+	 * equivalent to true, strictly negative mask values are equivalent to false.
 	 */
 	VectorField(
-		CartesianMesh mesh, int field_dim,
-		T* user_vals, int n_user_vals,
+		CartesianMesh mesh, T* user_vals, int n_user_vals,
 		double* mask_vals, int n_mask_vals);
 
 	void set_mask(std::string mask_formula);
@@ -77,8 +75,8 @@ public:
 	double norm();
 	double linfty_norm();
 
-	const int field_dim;
 	const int n_vertex;
+	const int field_dim;
 
 	const CartesianMesh mesh;
 

@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.3.4"
+    version: "1.4.0"
 
 source:
     - path: ../BeamPropagationSolver
@@ -25,7 +25,7 @@ requirements:
         - fftw
         - boost 1.67.*
         - openmp
-        - vtk
+        - vtk 9.*
         - eigen
         - tbb-devel
         - swig
@@ -41,7 +41,7 @@ requirements:
         - fftw
         - libboost 1.67.*
         - openmp
-        - vtk
+        - vtk 9.*
         - eigen
         - numpy
         - numba

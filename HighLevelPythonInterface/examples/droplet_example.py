@@ -34,7 +34,7 @@ else:
     # of the LC sample: LC layer + possible isotropic layers above it
     # (a glass plate for example)
     mat = nm.LCMaterial(
-        director_field=nfield,
+        lc_field=nfield,
         ne="1.6933+0.0078/lambda^2+0.0028/lambda^4",
         no="1.4990+0.0072/lambda^2+0.0003/lambda^4",
         nhost=1.55)

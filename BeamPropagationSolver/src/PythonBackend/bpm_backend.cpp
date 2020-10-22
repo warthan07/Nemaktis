@@ -4,8 +4,8 @@
 
 void run_backend_without_mask(
 		std::string json_str,
-		double* director_vals, int n_director,
-		std::complex<double>* fields_vals, int n_fields) {
+		double* lc_field_vals, int n_lc_vals,
+		std::complex<double>* E_field_vals, int n_E_vals) {
 
 	try {
 		std::cout <<
@@ -21,20 +21,23 @@ void run_backend_without_mask(
 		CartesianMesh mesh(
 			{spacings[0], spacings[1], spacings[2]},
 			{dims[0], dims[1], dims[2]});
-		auto nfield = std::make_shared<VectorField<double> >(
-			mesh, 3, director_vals, n_director);
+		auto lc_field = std::make_shared<VectorField<double> >(
+			mesh, lc_field_vals, n_lc_vals);
+		if(lc_field->field_dim!=3 && lc_field->field_dim!=6)
+			throw std::string(
+				"Unexpected dimension for the LC orientational field, should be 3 or 6.");
 
-		PhysicsCoefficients coefs(settings, nfield->mesh);
-		ScreenOpticalFieldCollection screen_optical_fields(nfield->mesh, coefs);
+		PhysicsCoefficients coefs(settings, lc_field->mesh);
+		ScreenOpticalFieldCollection screen_optical_fields(lc_field->mesh, coefs);
 
 		BPMIteration bpm_iteration(
-			*nfield, screen_optical_fields, coefs, settings);
+			*lc_field, screen_optical_fields, coefs, settings);
 		bpm_iteration.propagate_fields();
 
 		ScreenOutput micrograph_output(settings, coefs);
-		if(n_fields != coefs.wavelengths().size()*coefs.q_vals().size()*4*dims[0]*dims[1])
+		if(n_E_vals != coefs.wavelengths().size()*coefs.q_vals().size()*4*dims[0]*dims[1])
 			throw std::string("Wrong dimension for the raw fields array");
-		micrograph_output.apply_no_export(screen_optical_fields, fields_vals);
+		micrograph_output.apply_no_export(screen_optical_fields, E_field_vals);
 
 		if(settings.postprocessor.volume_output.activate) {
 			VolumeOutput volume_output(settings, coefs);
@@ -80,9 +83,9 @@ void run_backend_without_mask(
 
 void run_backend_with_mask(
 		std::string json_str,
-		double* director_vals, int n_director,
+		double* lc_field_vals, int n_lc_vals,
 		double* mask_vals, int n_mask,
-		std::complex<double>* fields_vals, int n_fields) {
+		std::complex<double>* E_field_vals, int n_E_vals) {
 
 	try {
 		std::cout <<
@@ -98,20 +101,23 @@ void run_backend_with_mask(
 		CartesianMesh mesh(
 			{spacings[0], spacings[1], spacings[2]},
 			{dims[0], dims[1], dims[2]});
-		auto nfield = std::make_shared<VectorField<double> >(
-			mesh, 3, director_vals, n_director, mask_vals, n_mask);
+		auto lc_field = std::make_shared<VectorField<double> >(
+			mesh, lc_field_vals, n_lc_vals, mask_vals, n_mask);
+		if(lc_field->field_dim!=3 && lc_field->field_dim!=6)
+			throw std::string(
+				"Unexpected dimension for the LC orientational field, should be 3 or 6.");
 
-		PhysicsCoefficients coefs(settings, nfield->mesh);
-		ScreenOpticalFieldCollection screen_optical_fields(nfield->mesh, coefs);
+		PhysicsCoefficients coefs(settings, lc_field->mesh);
+		ScreenOpticalFieldCollection screen_optical_fields(lc_field->mesh, coefs);
 
 		BPMIteration bpm_iteration(
-			*nfield, screen_optical_fields, coefs, settings);
+			*lc_field, screen_optical_fields, coefs, settings);
 		bpm_iteration.propagate_fields();
 
 		ScreenOutput micrograph_output(settings, coefs);
-		if(n_fields != coefs.wavelengths().size()*coefs.q_vals().size()*4*dims[0]*dims[1])
+		if(n_E_vals != coefs.wavelengths().size()*coefs.q_vals().size()*4*dims[0]*dims[1])
 			throw std::string("Wrong dimension for the raw fields array");
-		micrograph_output.apply_no_export(screen_optical_fields, fields_vals);
+		micrograph_output.apply_no_export(screen_optical_fields, E_field_vals);
 
 		if(settings.postprocessor.volume_output.activate) {
 			VolumeOutput volume_output(settings, coefs);

@@ -7,44 +7,41 @@
 
 template <typename T>
 VectorField<T>::VectorField(CartesianMesh mesh, int field_dim) :
-	field_dim(field_dim),
 	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
+	field_dim(field_dim),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
 	mask_exists(false) {}
 
 template <typename T>
 VectorField<T>::VectorField(CartesianMesh mesh, int field_dim, T val) :
-	field_dim(field_dim),
 	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
+	field_dim(field_dim),
 	mesh(mesh),
 	vals(n_vertex * field_dim, val),
 	mask_exists(false) {}
 
 template <typename T>
 VectorField<T>::VectorField(
-		CartesianMesh mesh, int field_dim,
-		T* user_vals, int n_user_vals) :
-	field_dim(field_dim),
+		CartesianMesh mesh, T* user_vals, int n_user_vals) :
 	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
+	field_dim(n_user_vals/n_vertex),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
 	mask_exists(false) {
 
 	if(n_user_vals!=n_vertex*field_dim)
 		throw std::string("Wrong dimension for the user pointer array");
-
 	for(int i=0; i<n_vertex*field_dim; i++)
 		vals[i] = user_vals[i];
 }
 
 template <typename T>
 VectorField<T>::VectorField(
-		CartesianMesh mesh, int field_dim,
-		T* user_vals, int n_user_vals,
+		CartesianMesh mesh, T* user_vals, int n_user_vals,
 		double* user_mask_vals, int n_mask_vals) :
-	field_dim(field_dim),
 	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
+	field_dim(n_user_vals/n_vertex),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
 	mask_exists(true) {

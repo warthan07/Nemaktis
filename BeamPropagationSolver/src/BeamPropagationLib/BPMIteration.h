@@ -59,9 +59,9 @@ private:
 	double waist;
 
 	/**
-	 * Shortcut reference to the LC solution.
+	 * Shortcut reference to the LC orientational field (n or q).
 	 */
-	const VectorField<double> &lc_sol;
+	const VectorField<double> &lc_field;
 
 	/**
 	 * Reference to the object storing the values of the optical fields for the current

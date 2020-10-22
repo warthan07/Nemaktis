@@ -1,9 +1,6 @@
 import re
 import os
 
-import sys
-sys.path.insert(0,"/home/gpoy/Nemaktis/BeamPropagationSolver/bin/")
-
 from json import JSONEncoder
 from .lc_material import LCMaterial
 import bpm_backend as bpm
@@ -130,14 +127,14 @@ class LightPropagator:
     def _bpm_propagation(self, bulk_filename):
         print("{ Running beam propagation backend }\n")
 
-        director_field = self._material.director_field
-        dims = director_field.get_mesh_dimensions()
-        spacings = director_field.get_mesh_spacings()
+        lc_field = self._material.lc_field
+        dims = lc_field.get_mesh_dimensions()
+        spacings = lc_field.get_mesh_spacings()
         wavevectors = self._wavevectors.flatten().tolist()
         json_str = JSONEncoder().encode({
             "Algorithm settings": {
                 "General": {
-                    "LC field type":               "Director",
+                    "LC field type":               "Director" if lc_field._Nv==3 else "Q-tensor",
                     "Results folder name":         "" },
                 "Beam propagation": {
                     "N Woodbury steps":            2,
@@ -168,18 +165,18 @@ class LightPropagator:
                     "Focalisation z-shift":               0,
                     "Numerical aperture":                 self._max_NA_objective }}})
 
-        director_vals = director_field.vals.ravel()
-        if director_field.mask_type is not None:
-            mask_vals = director_field.mask_vals.ravel()
+        lc_vals = lc_field.vals.ravel()
+        if lc_field.mask_type is not None:
+            mask_vals = lc_field.mask_vals.ravel()
 
-        N_fields_vals = \
+        N_E_vals = \
             self._wavevectors.shape[0]*len(self._wavelengths)*4*dims[0]*dims[1]
-        if director_field.mask_type is None:
+        if lc_field.mask_type is None:
             data_out = bpm.run_backend_without_mask(
-                json_str, director_vals, N_fields_vals)
+                json_str, lc_vals, N_E_vals)
         else:
             data_out = bpm.run_backend_with_mask(
-                json_str, director_vals, mask_vals, N_fields_vals)
+                json_str, lc_vals, mask_vals, N_E_vals)
         print("")
 
         output_fields = OpticalFields(
@@ -199,9 +196,9 @@ class LightPropagator:
     def _dtmm_propagation(self, bulk_filename, diffraction=1):
         print("{ Running diffraction transfer matrix backend }\n")
 
-        director_field = self._material.director_field
-        dims = director_field.get_mesh_dimensions()
-        spacings = director_field.get_mesh_spacings()
+        lc_field = self._material.lc_field
+        dims = lc_field.get_mesh_dimensions()
+        spacings = lc_field.get_mesh_spacings()
 
         if np.abs(spacings[0]-spacings[1])>1e-6:
             # 2D simulation with an artificial spacings along the normal
@@ -250,14 +247,32 @@ class LightPropagator:
                   "not yet supported in dtmm.")
         print("")
         
-        if director_field.mask_vals is not None:
-            mask_vals = director_field.mask_vals>=0
+        if lc_field.mask_vals is not None:
+            mask_vals = lc_field.mask_vals>=0
         else:
             mask_vals = None
-        optical_data = dtmm.director2data(
-           director_field.vals, mask = mask_vals,
-           no = no, ne = ne, nhost = nhost,
-           thickness = spacings[2]/spacings[0]*np.ones(dims[2]))
+        if lc_field._Nv==3:
+            optical_data = dtmm.director2data(
+                lc_field.vals, mask = mask_vals,
+                no = no, ne = ne, nhost = nhost,
+                thickness = spacings[2]/spacings[0]*np.ones(dims[2]))
+        elif lc_field._Nv==6:
+            ea_eff = 2*(ne**2-no**2)/3
+            e_iso = no**2+(ne**2-no**2)/3
+            if mask_vals is not None:
+                lc_vals = lc_field.vals.reshape((dims[2]*dims[1]*dims[0],6))
+                eps_vals = np.zeros((dims[2]*dims[1]*dims[0],6))
+                eps_vals[mask_vals.flatten(),0:3] = e_iso+ea_eff*lc_vals[mask_vals.flatten(),0:3]
+                eps_vals[mask_vals.flatten(),3:6] = ea_eff*lc_vals[mask_vals.flatten(),3:6]
+                eps_vals[~mask_vals.flatten(),0:3] = nhost**2
+                eps_vals = eps_vals.reshape((dims[2],dims[1],dims[0],6))
+            else:
+                eps_vals = np.zeros((dims[2],dims[1],dims[0],6))
+                eps_vals[:,:,:,0:3] = e_iso+ea_eff*lc_field.vals[:,:,:,0:3]
+                eps_vals[:,:,:,3:6] = ea_eff*lc_field.vals[:,:,:,3:6]
+
+            epsv,epsa = dtmm.data.eps2epsva(eps_vals)
+            optical_data = (spacings[2]/spacings[0]*np.ones(dims[2]),epsv,epsa)
 
         wavelengths = 1000*np.array(self._wavelengths)
         beta = np.zeros((len(self._wavevectors),))
@@ -279,7 +294,7 @@ class LightPropagator:
 
         if bulk_filename is not None:
             print("{ Saving optical fields to "+bulk_filename+".vti }")
-            lengths = director_field.get_mesh_lengths()
+            lengths = lc_field.get_mesh_lengths()
 
             vti_data = vtkImageData()
             vti_data.SetDimensions(dims[0], dims[1], dims[2]+1)

@@ -51,7 +51,7 @@ else:
     
 # We propagate fields through the lc layer
 mat = nm.LCMaterial(
-    director_field=nfield,
+    lc_field=nfield,
     ne=1.50,
     no=1.65,
     nhost=1.55)
