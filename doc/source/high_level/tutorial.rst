@@ -4,7 +4,7 @@ Tutorial
 ========
 
 This tutorial provides a hands-on introduction to the python package ``nemaktis``.
-You will learn the different ways of creating director field data,
+You will learn the different ways of creating permittivity field data,
 how to define the sample geometry and material constants, and how to propagate and
 visualise optical fields.
 
@@ -22,7 +22,7 @@ which the conda environment for ``nemaktis`` is activated).
 
 .. _nfield:
 
-Defining a DirectorField
+Defining the optical axes
 -------------------------
 
 Before starting using ``nemaktis``, we of course need to import the associated python package.
@@ -33,27 +33,61 @@ We will also import numpy, which will be needed to define arrays:
     import nemaktis as nm
     import numpy as np
 
-Next, we need to define the permittivity tensor of the LC structure.
-Currently, only uniaxial media is supported in the high-level interface
-(which means we only need to specify the director field associated with
-the privileged axis of the birefringence medium), but support for
-arbitrary permittivity tensor should be added soon (the low-level
-backends ``dtmm`` and ``bpm-solver`` are already fully compatible with
-biaxial media). In ``nemaktis``, any vector field is represented
-internally on a cartesian regular mesh as a numpy array of shape
-``(Nz,Ny,Nx,Nv)``, where ``Nv`` is the dimension of the vector data (3
-for a director field, 6 for a symmetric tensor) and ``Nx``, ``Ny`` and
-``Nz`` are the number of mesh points in each spatial direction. In
-addition to these variables, one needs to specify the total lengths of
-the mesh in each spatial direction, which we will call ``Lx``, ``Ly``
-and ``Lz`` in the following. All lengths are in micrometer in
-``nemaktis``, and the mesh for the director field is always centerered
-on the origin (which means that the spatial coordinate ``u=x,y,z`` is
-always running from ``-Lu/2`` to ``Lu/2``).
+Next, we need to define the permittivity tensor inside the sample, which is always defined
+on a regular cartesian mesh. As a general rule, the permittivity tensor in a non-absorbing
+medium can always be represented in terms of two (resp. one) optical axes and three (resp.
+two) refractive indices if the the medium is biaxial (resp. uniaxial). Currently, we only
+support initialization of the optical axes from a director or Q-tensor field defining a
+liquid crystal phase. 
 
-Here, we will start by defining an empty
-:class:`~nemaktis.lc_material.DirectorField` object on a mesh of
-dimensions ``80x80x80`` and lengths ``10x10x10``:
+In the first case, the phase is unixial and the optical axis simply corresponds to the
+director field :math:`\vec{n}`. The relation between permttivity field and unixial optical
+axis is as follows (with :math:`n_e` and :math:`n_o` the extraordinay and ordinary indices):
+
+.. math::
+
+    \epsilon_{ij} = n_o^2\delta_{ij}+(n_e^2-n_o^2)n_in_j
+
+In the second case, the Q-tensor fully defines the orientational order of the LC phase and
+therefore encompasses both biaxial and unixial media. The general definition of the Q-tensor
+is as follows:
+
+.. math::
+
+    Q_{ij} = \frac{\tilde{S}}{2}\left(n^{(1)}_in^{(1)}_j-\delta_{ij}\right)
+        + \frac{\tilde{P}}{2}\left(n^{(2)}_in^{(2)}_j-n^{(3)}_in^{(3)}_j\right)
+
+with :math:`\tilde{S}` and :math:`\tilde{P}` the renormalized scalar order parameter and
+biaxiality parameter, :math:`\vec{n}^{(1)}` and :math:`\vec{n}^{(2)}` the two optical axes,
+and :math:`\vec{n}^{(3)}=\vec{n}^{(1)}\times\vec{n}^{(2)}`. When :math:`\tilde{S}\neq0` and
+:math:`\tilde{P}=0` (resp. :math:`\tilde{P}\neq0`), the phase is unixial (resp. biaxial). An
+equilibrium (uniform) nematic liquid crystal phase is associated with :math:`\tilde{S}=1`
+and :math:`\tilde{P}=0`, but both these parameters can have different values inside
+topological defects. Finally, the relation between the Q-tensor and permittivity tensor is
+as follows (with :math:`n_e` and :math:`n_o` the extraordinay and ordinary indices of the
+uniform nematic liquid crystal phase):
+
+.. math::
+
+    \epsilon_ij = \frac{2n_o^2+n_e^2}{3}\delta_{ij}+\frac{2(n_e^2-n_o^2)}{3}Q_{ij}
+
+Note that despite the use of two refractive indices, optical biaxiality near the core of
+defects is still taken into account through the associated biaxiality of the Q-tensor.
+
+In ``nemaktis``, any tensor field (director or Q-tensor) is represented internally on a
+cartesian regular mesh as a numpy array of shape ``(Nz,Ny,Nx,Nv)``, where ``Nv`` is the
+dimension of the tensor data (3 for a director field, 6 for a symmetric tensor) and ``Nx``,
+``Ny`` and ``Nz`` are the number of mesh points in each spatial direction. In addition to
+these variables, one needs to specify the total lengths of the mesh in each spatial
+direction, which we will call ``Lx``, ``Ly`` and ``Lz`` in the following. All lengths are in
+micrometer in ``nemaktis``, and the mesh for the director field is always centerered on the
+origin (which means that the spatial coordinate ``u=x,y,z`` is always running from ``-Lu/2``
+to ``Lu/2``).
+
+Here, we will focus on a simple director field structure and start by defining an empty
+:class:`~nemaktis.lc_material.DirectorField` object on a mesh of dimensions ``80x80x80`` and
+lengths ``10x10x10`` (for q-tensor field, use instead
+:class:`~nemaktis.lc_material.QTensorField`):
 
 .. code-block:: python
 
@@ -97,18 +131,22 @@ you can still normalize manually the director values after importing them:
 
     nfield.normalize()
 
-Finally, you can apply geometric transformation to the director field with the methods
-:meth:`~nemaktis.lc_material.DirectorField.rotate`,
-:meth:`~nemaktis.lc_material.DirectorField.rotate_90deg`,
-:meth:`~nemaktis.lc_material.DirectorField.rotate_180deg`,
-:meth:`~nemaktis.lc_material.DirectorField.rescale_mesh`,
-:meth:`~nemaktis.lc_material.DirectorField.extend`,
-as well as specify a non-trivial domain for the LC phase with the method
-:meth:`~nemaktis.lc_material.DirectorField.set_mask`,
-All these methods are documented in the API section of this wiki. Here, we will simply
-demonstrate the capabilities of the director field object by applying a 90° rotation around
-the axis ``x``, extending the mesh in the ``xy`` plane with a scale factor of 2, and defining a
-droplet mask centered on the mesh with a diameter equal to the mesh height:
+Finally, we point out that both the :class:`~nemaktis.lc_material.DirectorField` class used
+here and the more general :class:`~nemaktis.lc_material.QTensorField` class derive from a
+common class :class:`~nemaktis.lc_material.TensorField` which includes useful geometric
+transformation routines (:meth:`~nemaktis.lc_material.TensorField.rotate`,
+:meth:`~nemaktis.lc_material.TensorField.rotate_90deg`,
+:meth:`~nemaktis.lc_material.TensorField.rotate_180deg`,
+:meth:`~nemaktis.lc_material.TensorField.rescale_mesh`,
+:meth:`~nemaktis.lc_material.TensorField.extend`)
+and a routine :meth:`~nemaktis.lc_material.TensorField.set_mask` allowing the specification
+of non-trivial definition domain for the LC phase. 
+All these methods are documented in the API section of this wiki and are inherited by the
+:class:`~nemaktis.lc_material.DirectorField` and :class:`~nemaktis.lc_material.QTensorField`
+classes. Here, we will simply demonstrate the capabilities of the tensor field class by
+applying a 90° rotation around the axis ``x``, extending the mesh in the ``xy`` plane with a
+scale factor of 2, and defining a droplet mask centered on the mesh with a diameter equal to
+the mesh height:
 
 .. code-block:: python
 
@@ -139,9 +177,9 @@ object with the path to this file:
 
     nfield = nm.DirectorField(vti_file="double_twist_droplet.vti")
 
-This functionality is especially useful if generating the director field values takes a lot of
-time.
-
+This functionality is especially useful if generating the director field values takes a lot
+of time. Of course, the same type of functionality can also be found in the
+:class:`~nemaktis.lc_material.QTensorField` class.
 
 
 .. _lcmat:
@@ -159,7 +197,7 @@ refractive index of the host fluid. All these informations are stored in the cla
 .. code-block:: python
 
     mat = nm.LCMaterial(
-        director_field=nfield, ne=1.5, no=1.7, nhost=1.55)
+        lc_field=nfield, ne=1.5, no=1.7, nhost=1.55)
 
 Note that you can also specify refractive indices with a string expression depending on the
 wavelength variable "lambda" (in µm), in case you want to take into account the dispersivity

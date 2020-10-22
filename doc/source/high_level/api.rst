@@ -1,6 +1,14 @@
 API Reference
 =============
 
+TensorField
++++++++++++++
+
+.. _TensorField:
+
+.. autoclass:: nemaktis.lc_material.TensorField
+    :members:
+
 DirectorField
 +++++++++++++
 
@@ -8,7 +16,6 @@ DirectorField
 
 .. autoclass:: nemaktis.lc_material.DirectorField
     :members:
-    :inherited-members:
 
 QTensorField
 +++++++++++++
@@ -17,7 +24,6 @@ QTensorField
 
 .. autoclass:: nemaktis.lc_material.QTensorField
     :members:
-    :inherited-members:
 
 LCMaterial
 ++++++++++

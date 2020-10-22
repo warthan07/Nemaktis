@@ -71,19 +71,23 @@ class TensorField:
     mesh or a path to a vti file containing the tensor field and mesh details.
 
     In the first version of this constructor:
+
     .. code-block:: python
     
         nfield = TensorField(
             mesh_lengths=(Lx,Ly,Lz), mesh_dimensions=(Nx,Ny,Nz), tensor_order=m)
+
     the actual values of the director field needs to be provided later using the
     "init_from_funcs" method or via the setter method "vals", which should be a numpy array
     of shape (Nz,Ny,Nx,Nv), where Nv=3 (Nv=6) if m=1 (m=2). The mesh lengths needs to be
     specified in micrometer.
 
     In the second version of this constructor:
+
     .. code-block:: python
     
         nfield = TensorField(vti_file="path to vti file", vti_array="name of tensor array")
+
     the values of the tensor field and the details of the mesh are automatically assigned
     from the given vti file and array name. 
     """
@@ -170,15 +174,19 @@ class TensorField:
         LC domain). Three possible ways of initializing the mask are possible. If you simply
         want to specify a spherical domain for a droplet centered on the mesh and of
         diameter equal to the mesh length along z, call:
+
         .. code-block:: python
             
             tensor_field.set_mask(mask_type="droplet")
+
         You can also use a string formula depending on the space variables ``x``, ``y`` and
         ``z`` and which must evaluates to a value >=0 if the associated point is inside the
         definition domain of the tensor field, else to a value <=0:
+
         .. code-block:: python
             
             tensor_field.set_mask(mask_type="formula", mask_formula="your formula")
+
         Finally, you can directly gives a numpy array of shape (Nz,Ny,Nx), where each value
         in this array must be >=0 if the associated mesh point is inside the definition
         domain, else <=0:
@@ -186,6 +194,7 @@ class TensorField:
         .. code-block:: python
             
             tensor_field.set_mask(mask_type="raw", mask_ndarray=your_mask_array)
+
         """
         if mask_type=="droplet":
             self._mask_type = mask_type
@@ -242,6 +251,7 @@ class TensorField:
         Extend the computational mesh in the ``xy`` plane by padding new points near the ``x``
         and ``y`` boundaries. The associated new data points are initialized with the edge
         value of the tensor field on the ``x`` and ``y`` boundaries.
+
         Parameters
         ----------
         scale_x : float
@@ -544,6 +554,7 @@ class DirectorField(TensorField):
     The two versions of the constructor of the parent class TensorField are simplified since
     we do not need the parameters 'tensor_order' (always 1 for a director field) or
     'vti_array' (assumed to be "n"):
+
     .. code-block:: python
     
         # First version of the constructor
@@ -571,11 +582,11 @@ class DirectorField(TensorField):
 
     def init_from_funcs(self, nx_func, ny_func, nz_func):
         """Initialize the director field from three functions for each of its component. The
-        functions must depends on the space variables ``x``, ``y`` and ``z``. We recall that
+        functions must depend on the space variables ``x``, ``y`` and ``z``. We recall that
         the mesh is centered on the origin.
 
-        If the given function are numpy-vectorizable, this function should be pretty fast. If
-        not, a warning will be printed and the given function will be vectorized with the
+        If the given functions are numpy-vectorizable, this function should be pretty fast. If
+        not, a warning will be printed and the faulty function(s) will be vectorized with the
         numpy method ``vectorize`` (in which case you should expect a much slower execution
         time).
         """
@@ -669,6 +680,7 @@ class QTensorField(TensorField):
     The two versions of the constructor of the parent class TensorField are simplified since
     we do not need the parameters 'tensor_order' (always 2 for Q-tensor) or 'vti_array'
     (assumed to be "Q"):
+
     .. code-block:: python
     
         # First version of the constructor
@@ -696,11 +708,11 @@ class QTensorField(TensorField):
 
     def init_from_funcs(self, Qxx_func, Qyy_func, Qzz_func, Qxy_func, Qxz_func, Qyz_func):
         """Initialize the Q-tensor field from six functions for each of its component (xx,
-        yy, zz, xy, xz, yz). The functions must depends on the space variables ``x``, ``y``
+        yy, zz, xy, xz, yz). The functions must depend on the space variables ``x``, ``y``
         and ``z``. We recall that the mesh is centered on the origin.
 
-        If the given function are numpy-vectorizable, this function should be pretty fast.
-        If not, a warning will be printed and the given function will be vectorized with the
+        If the given functions are numpy-vectorizable, this function should be pretty fast.
+        If not, a warning will be printed and the faulty function(s) will be vectorized with the
         numpy method ``vectorize`` (in which case you should expect a much slower execution
         time).
         """
