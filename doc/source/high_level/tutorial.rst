@@ -69,20 +69,20 @@ uniform nematic liquid crystal phase):
 
 .. math::
 
-    \epsilon_ij = \frac{2n_o^2+n_e^2}{3}\delta_{ij}+\frac{2(n_e^2-n_o^2)}{3}Q_{ij}
+    \epsilon_{ij} = \frac{2n_o^2+n_e^2}{3}\delta_{ij}+\frac{2(n_e^2-n_o^2)}{3}Q_{ij}
 
 Note that despite the use of two refractive indices, optical biaxiality near the core of
 defects is still taken into account through the associated biaxiality of the Q-tensor.
 
 In ``nemaktis``, any tensor field (director or Q-tensor) is represented internally on a
 cartesian regular mesh as a numpy array of shape ``(Nz,Ny,Nx,Nv)``, where ``Nv`` is the
-dimension of the tensor data (3 for a director field, 6 for a symmetric tensor) and ``Nx``,
-``Ny`` and ``Nz`` are the number of mesh points in each spatial direction. In addition to
-these variables, one needs to specify the total lengths of the mesh in each spatial
-direction, which we will call ``Lx``, ``Ly`` and ``Lz`` in the following. All lengths are in
-micrometer in ``nemaktis``, and the mesh for the director field is always centerered on the
-origin (which means that the spatial coordinate ``u=x,y,z`` is always running from ``-Lu/2``
-to ``Lu/2``).
+dimension of the tensor data (3 for vector fields such as the director, 6 for symmetric
+tensors such as the Q-tensor) and ``Nx``, ``Ny`` and ``Nz`` are the number of mesh points in
+each spatial direction. In addition to these variables, one needs to specify the total
+lengths of the mesh in each spatial direction, which we will call ``Lx``, ``Ly`` and ``Lz``
+in the following. All lengths are in micrometer in ``nemaktis``, and the mesh for the
+director field is always centerered on the origin (which means that the spatial coordinate
+``u=x,y,z`` is always running from ``-Lu/2`` to ``Lu/2``).
 
 Here, we will focus on a simple director field structure and start by defining an empty
 :class:`~nemaktis.lc_material.DirectorField` object on a mesh of dimensions ``80x80x80`` and
