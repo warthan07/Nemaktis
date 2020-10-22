@@ -35,7 +35,7 @@ b1. (Windows) Install Nemaktis automatically
 If you are a Windows 10 user and do not want to copy-paste commands in a terminal, the next
 step is as simple as running the following installation script 
 
-https://github.com/warthan07/Nemaktis/releases/download/v1.3/Install.Nemaktis.cmd
+https://github.com/warthan07/Nemaktis/releases/download/v1.4/Install.Nemaktis.cmd
 
 This script will create a special environment for ``Nemaktis`` named *nm* and will install
 everything needed in it. It will also install the python editor ``Spyder`` and create a
@@ -50,7 +50,7 @@ Alternatively, if you are a Linux user or want to type the installation commands
 (they are not very complicated after all!), open a terminal (Windows: application "Conda
 terminal" installed with miniconda, Linux: any terminal) and type the following command: ::
 
-  conda create -n nm -c conda-forge -c warthan07 -y nemaktis=1.3.4
+  conda create -n nm -c conda-forge -c warthan07 -y nemaktis=1.4.0
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
 to install and run it from the same conda environment. You can search https://anaconda.org/
