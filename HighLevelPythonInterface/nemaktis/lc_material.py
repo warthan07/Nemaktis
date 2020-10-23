@@ -77,10 +77,9 @@ class TensorField:
         nfield = TensorField(
             mesh_lengths=(Lx,Ly,Lz), mesh_dimensions=(Nx,Ny,Nz), tensor_order=m)
 
-    the actual values of the director field needs to be provided later using the
-    "init_from_funcs" method or via the setter method "vals", which should be a numpy array
-    of shape (Nz,Ny,Nx,Nv), where Nv=3 (Nv=6) if m=1 (m=2). The mesh lengths needs to be
-    specified in micrometer.
+    the actual values of the tensor field needs to be provided later via the setter method
+    "vals", which should be given a numpy array of shape (Nz,Ny,Nx,Nv), where Nv=3 (Nv=6) if
+    m=1 (m=2). The mesh lengths needs to be specified in micrometer.
 
     In the second version of this constructor:
 
