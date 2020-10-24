@@ -74,7 +74,7 @@ class TensorField:
 
     .. code-block:: python
     
-        nfield = TensorField(
+        field = TensorField(
             mesh_lengths=(Lx,Ly,Lz), mesh_dimensions=(Nx,Ny,Nz), tensor_order=m)
 
     the actual values of the tensor field needs to be provided later via the setter method
@@ -85,7 +85,7 @@ class TensorField:
 
     .. code-block:: python
     
-        nfield = TensorField(vti_file="path to vti file", vti_array="name of tensor array")
+        field = TensorField(vti_file="path to vti file", vti_array="name of tensor array")
 
     the values of the tensor field and the details of the mesh are automatically assigned
     from the given vti file and array name. 
@@ -557,10 +557,10 @@ class DirectorField(TensorField):
     .. code-block:: python
     
         # First version of the constructor
-        nfield = TensorField(
+        nfield = DirectorField(
             mesh_lengths=(Lx,Ly,Lz), mesh_dimensions=(Nx,Ny,Nz))
         # Second version of the constructor
-        nfield = TensorField(
+        nfield = DirectorField(
             vti_file="path to vti file", vti_array="name of tensor array")
 
     In addition to all the methods of the parent class for initializing and manipulating 
@@ -683,10 +683,10 @@ class QTensorField(TensorField):
     .. code-block:: python
     
         # First version of the constructor
-        nfield = TensorField(
+        qfield = QTensorField(
             mesh_lengths=(Lx,Ly,Lz), mesh_dimensions=(Nx,Ny,Nz))
         # Second version of the constructor
-        nfield = TensorField(
+        qfield = QTensorField(
             vti_file="path to vti file", vti_array="name of tensor array")
 
     In addition to all the methods of the parent class for initializing and manipulating 
