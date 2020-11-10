@@ -35,7 +35,7 @@ b1. (Windows) Install Nemaktis automatically
 If you are a Windows 10 user and do not want to copy-paste commands in a terminal, the next
 step is as simple as running the following installation script 
 
-https://github.com/warthan07/Nemaktis/releases/download/v1.4/Install.Nemaktis.cmd
+https://github.com/warthan07/Nemaktis/releases/download/v1.4/Install_Nemaktis-1.4.cmd
 
 This script will create a special environment for ``Nemaktis`` named *nm* and will install
 everything needed in it. It will also install the python editor ``Spyder`` and create a
