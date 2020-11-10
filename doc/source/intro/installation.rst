@@ -60,6 +60,17 @@ you just need to type: ::
   conda activate nm
   conda install spyder
 
+Note that when you want to run python scripts using nemaktis, the installed python editor
+should always be run from inside the *nm* environment. For example, to run ``Spyder``, you
+should type in the terminal: ::
+
+  conda activate nm
+  spyder
+
+The advantage of step b1 is that it creates a shortcut for Spyder which automatically does
+this activation step for you. 
+
+
 c. (Windows/Linux) How to update
 ................................
 
