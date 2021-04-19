@@ -5,59 +5,70 @@
 PhysicsCoefficients::PhysicsCoefficients(
 		const RootSettings &settings,
 		const CartesianMesh &mesh) :
-	physics_settings(settings.physics),
-    _wavelengths(settings.physics.coefs.wavelengths()),
-	_q_vals(settings.physics.coefs.q_vals()) {
+	coefs_settings(settings.physics.coefs) {}
 
-	ne_expression = physics_settings.coefs.ne_expression;
-	no_expression = physics_settings.coefs.no_expression;
-	nhost_expression = physics_settings.coefs.nhost_expression;
-	nin_expression = physics_settings.coefs.nin_expression;
-
-	_mesh_volume = 
-		mesh.delta_x*(mesh.Nx-1)*
-		mesh.delta_y*(mesh.Ny-1)*
-		mesh.delta_z*(mesh.Nz-1);
-	_mesh_thickness = mesh.delta_x*(mesh.Nx-1);
-	_z_origin = -mesh.delta_z*(mesh.Nz-1)/2.;
-}
-
-double PhysicsCoefficients::get_ne(double wavelength) const {
+double PhysicsCoefficients::get_n1(unsigned int domain_id,double wavelength) const {
 
 	try {
 		mu::Parser p;
 		p.DefineConst("lambda", wavelength);
-		p.SetExpr(ne_expression);
+		p.SetExpr(coefs_settings.nsample_expressions().at(3*domain_id));
 		return p.Eval();
 	}
 	catch(mu::Parser::exception_type &e) {
-		throw std::string("Wrong expression for ne");
+		throw std::string("Wrong expression for n1");
 	}
 }
 
-double PhysicsCoefficients::get_no(double wavelength) const {
+double PhysicsCoefficients::get_n2(unsigned int domain_id,double wavelength) const {
 
 	try {
 		mu::Parser p;
 		p.DefineConst("lambda", wavelength);
-		p.SetExpr(no_expression);
+		p.SetExpr(coefs_settings.nsample_expressions().at(3*domain_id+1));
 		return p.Eval();
 	}
 	catch(mu::Parser::exception_type &e) {
-		throw std::string("Wrong expression for no");
+		throw std::string("Wrong expression for n2");
 	}
 }
 
-double PhysicsCoefficients::get_nhost(double wavelength) const {
+double PhysicsCoefficients::get_n3(unsigned int domain_id,double wavelength) const {
 
 	try {
 		mu::Parser p;
 		p.DefineConst("lambda", wavelength);
-		p.SetExpr(nhost_expression);
+		p.SetExpr(coefs_settings.nsample_expressions().at(3*domain_id+2));
 		return p.Eval();
 	}
 	catch(mu::Parser::exception_type &e) {
-		throw std::string("Wrong expression for nhost");
+		throw std::string("Wrong expression for n3");
+	}
+}
+
+double PhysicsCoefficients::get_niso_up(unsigned int layer_id, double wavelength) const {
+
+	try {
+		mu::Parser p;
+		p.DefineConst("lambda", wavelength);
+		p.SetExpr(coefs_settings.niso_up_expressions().at(layer_id));
+		return p.Eval();
+	}
+	catch(mu::Parser::exception_type &e) {
+		throw std::string("Wrong expression for niso_up");
+	}
+}
+
+double PhysicsCoefficients::get_niso_lo(unsigned int layer_id, double wavelength) const {
+
+	try {
+		mu::Parser p;
+		p.DefineConst("lambda", wavelength);
+		p.SetExpr(coefs_settings.niso_lo_expressions().at(layer_id));
+		return p.Eval();
+	}
+	catch(mu::Parser::exception_type &e) {
+		throw std::string("Wrong expression for niso_lo");
 	}
 }
 
@@ -66,10 +77,23 @@ double PhysicsCoefficients::get_nin(double wavelength) const {
 	try {
 		mu::Parser p;
 		p.DefineConst("lambda", wavelength);
-		p.SetExpr(nin_expression);
+		p.SetExpr(coefs_settings.nin_expression);
 		return p.Eval();
 	}
 	catch(mu::Parser::exception_type &e) {
 		throw std::string("Wrong expression for nin");
+	}
+}
+
+double PhysicsCoefficients::get_nout(double wavelength) const {
+
+	try {
+		mu::Parser p;
+		p.DefineConst("lambda", wavelength);
+		p.SetExpr(coefs_settings.nout_expression);
+		return p.Eval();
+	}
+	catch(mu::Parser::exception_type &e) {
+		throw std::string("Wrong expression for nout");
 	}
 }

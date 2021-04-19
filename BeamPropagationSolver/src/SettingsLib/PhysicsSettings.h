@@ -7,12 +7,22 @@ enum class BasisConvention {
 	XYZ, YZX, ZXY
 };
 
-class InitialConditionsSettings : public BaseSettings {
+class FieldSetupSettings : public BaseSettings {
 public:
-	InitialConditionsSettings(const nlohmann::json &j);
+	FieldSetupSettings(const nlohmann::json &j);
 	
+	/**
+	 * Type of input beam profile
+	 */
 	const std::string beam_profile_type;
-	const std::string initial_solution_file;
+	/**
+	 * Path to the microscope sample input vti file
+	 */
+	const std::string sample_file;
+
+	/**
+	 * Orientation convention for the microscope sample file
+	 */
 	BasisConvention basis_convention() const {
 		return _basis_convention;
 	}
@@ -23,21 +33,67 @@ private:
 
 class CoefficientsSettings : public BaseSettings {
 public:
-	CoefficientsSettings(const nlohmann::json &j);
+	CoefficientsSettings(
+		const nlohmann::json &j,
+		const std::string &sample_file);
 
-	const std::string ne_expression;
-	const std::string no_expression;
-	const std::string nhost_expression;
-	const std::string nin_expression;
-	const std::string nout_expression;
-	std::vector<double> wavelengths() const {
+	/**
+	 * Wavelengths of incoming plane waves
+	 */
+	const std::vector<double> &wavelengths() const {
 		return _wavelengths;
 	}
-	std::vector<std::pair<double,double> > q_vals() const {
+	/**
+	 * Transverse wavevectors of incoming plane waves renormalized by k0=2pi/wavelength
+	 */
+	const std::vector<std::pair<double,double> > &q_vals() const {
 		return _q_vals;
 	}
+	/**
+	 * Expressions of the principal refractive indices of all domains inside the sample
+	 */
+	const std::vector<std::string> &nsample_expressions() const {
+		return _nsample_expressions;
+	}
+	/**
+	 * Expressions of the refractive indices of the upper isotropic layer
+	 */
+	const std::vector<std::string> &niso_up_expressions() const {
+		return _niso_up_expressions;
+	}
+	/**
+	 * Expressions of the refractive indices of the lower isotropic layer
+	 */
+	const std::vector<std::string> &niso_lo_expressions() const {
+		return _niso_lo_expressions;
+	}
+	/**
+	 * Thicknesses of the upper isotropic layer
+	 */
+	const std::vector<double> &hiso_up() const {
+		return _hiso_up;
+	}
+	/**
+	 * Thicknesses of the lower isotropic layer
+	 */
+	const std::vector<double> &hiso_lo() const {
+		return _hiso_lo;
+	}
+	/**
+	 * Expression of the refractive index of the input medium
+	 */
+	const std::string nin_expression;
+	/**
+	 * Expression of the refractive index of the output medium
+	 */
+	const std::string nout_expression;
 
 private:
+	std::vector<std::string> _nsample_expressions;
+	std::vector<std::string> _niso_up_expressions;
+	std::vector<std::string> _niso_lo_expressions;
+	std::vector<double> _hiso_up;
+	std::vector<double> _hiso_lo;
 	std::vector<double> _wavelengths;
 	std::vector<std::pair<double,double> > _q_vals;
 };
@@ -46,7 +102,7 @@ class PhysicsSettings : public BaseSettings {
 public:
 	PhysicsSettings(const nlohmann::json &j);
 
-	InitialConditionsSettings initial_conditions;
+	FieldSetupSettings field_setup;
 	CoefficientsSettings coefs;
 };
 

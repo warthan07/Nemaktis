@@ -19,56 +19,70 @@ public:
 		const RootSettings &settings,
 		const CartesianMesh &mesh);
 
-	double get_ne(double wavelength) const;
-	double get_no(double wavelength) const;
-	double get_nhost(double wavelength) const;
-	double get_nin(double wavelength) const;
+	/**
+	 * Principal refractive index of selected sample domain at the specified wavelength.
+	 *
+	 * Relevant for isotropic, uniaxial and biaxial domains.
+	 */
+	double get_n1(unsigned int domain_id, double wavelength) const;
+	/**
+	 * Secondary refractive index of selected sample domain at the specified wavelength.
+	 *
+	 * Relevant for uniaxial and biaxial domains.
+	 */
+	double get_n2(unsigned int domain_id, double wavelength) const;
+	/**
+	 * Tertiary refractive index of selected sample domain at the specified wavelength.
+	 *
+	 * Relevant for biaxial domains.
+	 */
+	double get_n3(unsigned int domain_id, double wavelength) const;
 
-	double mesh_volume() const {
-		return _mesh_volume;
+	/**
+	 * Refractive index of selected upper isotropic layer at the specified wavelength.
+	 */
+	double get_niso_up(unsigned int layer_id, double wavelength) const;
+	/**
+	 * Refractive index of selected lower isotropic layer at the specified wavelength.
+	 */
+	double get_niso_lo(unsigned int layer_id, double wavelength) const;
+
+	/**
+	 * Refractive index of input medium at the specified wavelength
+	 */
+	double get_nin(double wavelength) const;
+	/**
+	 * Refractive index of input medium at the specified wavelength
+	 */
+	double get_nout(double wavelength) const;
+
+	/**
+	 * Wavelengths of input plane waves
+	 */
+	const std::vector<double> &wavelengths() const {
+		return coefs_settings.wavelengths();
 	}
-	double mesh_thickness() const {
-		return _mesh_thickness;
+	/**
+	 * Transverse wavevevectors of input plane waves renormalized by k0=2pi/wavelength
+	 */
+	const std::vector<std::pair<double,double> > &q_vals() const {
+		return coefs_settings.q_vals();
 	}
-	double z_origin() const {
-		return _z_origin;
+	/**
+	 * Thicknesses of the upper isotropic layer
+	 */
+	const std::vector<double> &hiso_up() const {
+		return coefs_settings.hiso_up();
 	}
-	std::vector<double> wavelengths() const {
-		return _wavelengths;
-	}
-	std::vector<std::pair<double,double> > q_vals() const {
-		return _q_vals;
+	/**
+	 * Thicknesses of the lower isotropic layer
+	 */
+	const std::vector<double> &hiso_lo() const {
+		return coefs_settings.hiso_lo();
 	}
 
 private:
-	std::string ne_expression;
-	std::string no_expression;
-	std::string nhost_expression;
-	std::string nin_expression;
-
-	const PhysicsSettings &physics_settings;
-
-	/**
-	 * Volume of the LC layer.
-	 */
-	double _mesh_volume;
-	/**
-	 * Thickness of the LC layer.
-	 */
-	double _mesh_thickness;
-	/**
-	 * Z-origin for the mesh
-	 */
-	double _z_origin;
-
-	/**
-	 * Array containing all the wavelengths in the light spectrum.
-	 */
-	std::vector<double> _wavelengths;
-	/**
-	 * Array containing x and y components of the incoming wavectors.
-	 */
-	std::vector<std::pair<double,double> > _q_vals;
+	const CoefficientsSettings &coefs_settings;
 };
 
 #endif

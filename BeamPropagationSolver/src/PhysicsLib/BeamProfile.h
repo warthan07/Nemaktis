@@ -19,25 +19,9 @@ public:
 
 protected:
 	/**
-	 * Extraordinary refractive index
-	 */
-	double ne;
-	/**
-	 * Ordinary refractive index
-	 */
-	double no;
-	/**
-	 * Wavevector in empty space
-	 */
-	double k;
-	/**
 	 * Input polarisation 
 	 */
 	double theta;
-	/**
-	 * Sample thickness
-	 */
-	double h;
 };
 
 class GaussianBeam : public BeamProfile {

@@ -2,7 +2,7 @@ import re
 import os
 
 from json import JSONEncoder
-from .lc_material import LCMaterial
+from .lc_material import MicroscopeSample 
 import bpm_backend as bpm
 
 import dtmm
@@ -21,11 +21,11 @@ simplefilter(action='ignore', category=FutureWarning)
 
 
 class LightPropagator:
-    """The LightPropagator class allows to propagate optical fields through a LC sample as
-    in a real microscope: a set of plane waves with different wavevectors and wavelengths
-    are sent on the LC sample, and the associated transmitted optical fields (which can now
-    longer be represented as plane waves due to diffraction) are calculated using one of the
-    backend. 
+    """The LightPropagator class allows to propagate optical fields through a
+    MicroscopeSample object as in a real microscope: a set of plane waves with different
+    wavevectors and wavelengths are sent on the sample, and the associated transmitted
+    optical fields (which can now longer be represented as plane waves due to diffraction)
+    are calculated using one of the backend. 
 
     The actual set of wavelengths for the plane waves (choosen at construction) approximate
     the relevant part of the spectrum of the illumination light, whereas the set of
@@ -52,7 +52,7 @@ class LightPropagator:
 
     Parameters
     ----------
-    material : :class:`~nemaktis.lc_material.LCMaterial` object
+    sample : :class:`~nemaktis.lc_material.MicroscopeSample` object
     wavelengths : array-like object
         An array containing all the wavelengths of the spectrum for the light source.
     max_NA_objective : float
@@ -66,11 +66,12 @@ class LightPropagator:
         waves. The total number of plane waves for each wavelength is 1+3*Nr*(Nr-1), where
         Nr correspond to the value of this parameter.
     """
-    def __init__(self, *, material, wavelengths, max_NA_objective,
+    def __init__(self, *, sample, wavelengths, max_NA_objective,
             max_NA_condenser = 0, N_radial_wavevectors = 1):
-        if not isinstance(material, LCMaterial):
-            raise TypeError("material should be a LCMaterial object")
-        self._material = material
+
+        if not isinstance(sample, MicroscopeSample):
+            raise TypeError("sample should be a MicroscopeSample object")
+        self._sample = sample 
         self._wavelengths = list(wavelengths)
         self._max_NA_objective = max_NA_objective
         self._max_NA_condenser = max_NA_condenser
@@ -86,12 +87,12 @@ class LightPropagator:
                 self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
 
     @property
-    def material(self):
-        """Returns the current LC material"""
-        return self._material
+    def sample(self):
+        """Returns the current MicroscopeSample object loaded in this class"""
+        return self._sample
 
     def propagate_fields(self, *, method, bulk_filename=None):
-        """Propagate optical fields through the LC sample using the specified backend.
+        """Propagate optical fields through the MicroscopeSample using the specified backend.
 
         Parameters
         ----------
@@ -127,32 +128,35 @@ class LightPropagator:
     def _bpm_propagation(self, bulk_filename):
         print("{ Running beam propagation backend }\n")
 
-        lc_field = self._material.lc_field
-        dims = lc_field.get_mesh_dimensions()
-        spacings = lc_field.get_mesh_spacings()
+        sample = self._sample
+        dims = sample.get_mesh_dimensions()
+        spacings = sample.get_mesh_spacings()
         wavevectors = self._wavevectors.flatten().tolist()
         json_str = JSONEncoder().encode({
             "Algorithm settings": {
                 "General": {
-                    "LC field type":               "Director" if lc_field._Nv==3 else "Q-tensor",
-                    "Results folder name":         "" },
+                    "Optical axis field type": sample._optical_axis_field_type,
+                    "Results folder name":     "" },
                 "Beam propagation": {
                     "N Woodbury steps":            2,
                     "Number of substeps per slab": 1 }},
             "Physics settings": {
-                "Initial conditions": {
-                    "Beam profile":     "UniformBeam",
-                    "LC field file":    "",
-                    "Mesh dimensions":  dims,
-                    "Mesh spacings":    spacings,
-                    "Basis convention": "XYZ" },
+                "Field setup": {
+                    "Beam profile":           "UniformBeam",
+                    "Microscope sample file": "",
+                    "Mesh dimensions":        dims,
+                    "Mesh spacings":          spacings,
+                    "Basis convention":       "XYZ" },
                 "Coefficients": {
-                    "no":               str(self._material.no),
-                    "ne":               str(self._material.ne),
-                    "nhost":            str(self._material.nhost),
-                    "nin":              str(self._material.nin),
-                    "Wavelengths":      self._wavelengths,
-                    "Wavevectors":      wavevectors}},
+                    "nsample":     sample._refractive_indices.flatten(),
+                    "nin":         self._nin,
+                    "nout":        self._nout,
+                    "niso_up":     sample._up_iso_layer_indices,
+                    "niso_lo":     sample._lo_iso_layer_indices,
+                    "hiso_up":     sample._up_iso_layer_thicknesses,
+                    "hiso_lo":     sample._lo_iso_layer_thicknesses,
+                    "Wavelengths": self._wavelengths,
+                    "Wavevectors": wavevectors}},
             "Postprocessor settings": {
                 "Bulk output": {
                     "Activate":	        bulk_filename is not None,
@@ -160,11 +164,10 @@ class LightPropagator:
                 "Screen output": {
                     "Activate":	                          True,
                     "Base name":                          "",
-                    "Isotropic layer thicknesses":        self._material.iso_layer_thicknesses,
-                    "Isotropic layer refractive indices": self._material.iso_layer_indices,
                     "Focalisation z-shift":               0,
                     "Numerical aperture":                 self._max_NA_objective }}})
 
+        """
         lc_vals = lc_field.vals.ravel()
         if lc_field.mask_type is not None:
             mask_vals = lc_field.mask_vals.ravel()
@@ -186,6 +189,7 @@ class LightPropagator:
             N_radial_wavevectors = self._N_radial_wavevectors,
             mesh_lengths = (spacings[0]*(dims[0]-1), spacings[1]*(dims[1]-1)),
             mesh_dimensions = (dims[0], dims[1]))
+        """
 
         Nl = len(self._wavelengths)
         Nq = len(self._wavevectors)
@@ -196,9 +200,9 @@ class LightPropagator:
     def _dtmm_propagation(self, bulk_filename, diffraction=1):
         print("{ Running diffraction transfer matrix backend }\n")
 
-        lc_field = self._material.lc_field
-        dims = lc_field.get_mesh_dimensions()
-        spacings = lc_field.get_mesh_spacings()
+        sample = self._sample
+        dims = sample.get_mesh_dimensions()
+        spacings = sample.get_mesh_spacings()
 
         if np.abs(spacings[0]-spacings[1])>1e-6:
             # 2D simulation with an artificial spacings along the normal
@@ -209,6 +213,7 @@ class LightPropagator:
             else:
                 raise Exception("dtmm supports only uniform spacings in the XY plane.")
 
+        """
         if isinstance(self._material.ne, str):
             if "lambda" in self._material.ne:
                 print("Warning: dtmm does not support dispersive index; " +
@@ -291,6 +296,7 @@ class LightPropagator:
             betamax=self._max_NA_objective, diffraction=diffraction,
             ret_bulk=bulk_filename is not None)[0]
         print("")
+        """
 
         if bulk_filename is not None:
             print("{ Saving optical fields to "+bulk_filename+".vti }")
