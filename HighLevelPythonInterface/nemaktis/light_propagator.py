@@ -168,6 +168,8 @@ class LightPropagator:
         lc_vals = lc_field.vals.ravel()
         if lc_field.mask_type is not None:
             mask_vals = lc_field.mask_vals.ravel()
+            mask_formula = lc_field.mask_formula if lc_field.mask_formula is not None else ""
+            mask_formula = mask_formula.replace("np.","").replace("**","^")
 
         N_E_vals = \
             self._wavevectors.shape[0]*len(self._wavelengths)*4*dims[0]*dims[1]
@@ -176,7 +178,7 @@ class LightPropagator:
                 json_str, lc_vals, N_E_vals)
         else:
             data_out = bpm.run_backend_with_mask(
-                json_str, lc_vals, mask_vals, N_E_vals)
+                json_str, mask_formula, lc_vals, mask_vals, N_E_vals)
         print("")
 
         output_fields = OpticalFields(

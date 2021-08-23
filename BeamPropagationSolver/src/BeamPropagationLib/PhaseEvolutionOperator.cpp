@@ -40,10 +40,13 @@ void PhaseEvolutionOperator::update() {
 			Index3D p{ix,iy,iz};
 			Index3D p_pz{ix,iy,iz+1};
 
+			double w = eps.get_interp_weight(p, 0);
+			double w_pz = eps.get_interp_weight(p, 1);
+
 			// Components of tensor d = (sqrt(eps_tr)-nref)*delta_Z/2
-			double dxx = 0.25*delta_Z*(eps.xx_sqrt(p)+eps.xx_sqrt(p_pz)-2*nref);
-			double dyy = 0.25*delta_Z*(eps.yy_sqrt(p)+eps.yy_sqrt(p_pz)-2*nref);
-			double dxy = 0.25*delta_Z*(eps.xy_sqrt(p)+eps.xy_sqrt(p_pz));
+			double dxx = 0.5*delta_Z*(w*eps.xx_sqrt(p)+w_pz*eps.xx_sqrt(p_pz)-nref);
+			double dyy = 0.5*delta_Z*(w*eps.yy_sqrt(p)+w_pz*eps.yy_sqrt(p_pz)-nref);
+			double dxy = 0.5*delta_Z*(w*eps.xy_sqrt(p)+w_pz*eps.xy_sqrt(p_pz));
 
 			// Efficient calculation of exp(I*d) based on the
 			// Cayleigh-Hamilton theorem and Sylvester formula (see

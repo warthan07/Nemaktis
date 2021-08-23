@@ -82,7 +82,7 @@ void run_backend_without_mask(
 }
 
 void run_backend_with_mask(
-		std::string json_str,
+		std::string json_str, std::string mask_formula,
 		double* lc_field_vals, int n_lc_vals,
 		double* mask_vals, int n_mask,
 		std::complex<double>* E_field_vals, int n_E_vals) {
@@ -102,7 +102,7 @@ void run_backend_with_mask(
 			{spacings[0], spacings[1], spacings[2]},
 			{dims[0], dims[1], dims[2]});
 		auto lc_field = std::make_shared<VectorField<double> >(
-			mesh, lc_field_vals, n_lc_vals, mask_vals, n_mask);
+			mesh, lc_field_vals, n_lc_vals, mask_vals, n_mask, mask_formula);
 		if(lc_field->field_dim!=3 && lc_field->field_dim!=6)
 			throw std::string(
 				"Unexpected dimension for the LC orientational field, should be 3 or 6.");

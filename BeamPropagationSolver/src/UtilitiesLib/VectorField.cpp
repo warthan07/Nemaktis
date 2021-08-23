@@ -11,6 +11,7 @@ VectorField<T>::VectorField(CartesianMesh mesh, int field_dim) :
 	field_dim(field_dim),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
+	interp_weigths(2*mesh.Nx*mesh.Ny*(mesh.Nz-1), 0.5),
 	mask_exists(false) {}
 
 template <typename T>
@@ -19,6 +20,7 @@ VectorField<T>::VectorField(CartesianMesh mesh, int field_dim, T val) :
 	field_dim(field_dim),
 	mesh(mesh),
 	vals(n_vertex * field_dim, val),
+	interp_weigths(2*mesh.Nx*mesh.Ny*(mesh.Nz-1), 0.5),
 	mask_exists(false) {}
 
 template <typename T>
@@ -28,6 +30,7 @@ VectorField<T>::VectorField(
 	field_dim(n_user_vals/n_vertex),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
+	interp_weigths(2*mesh.Nx*mesh.Ny*(mesh.Nz-1), 0.5),
 	mask_exists(false) {
 
 	if(n_user_vals!=n_vertex*field_dim)
@@ -39,11 +42,12 @@ VectorField<T>::VectorField(
 template <typename T>
 VectorField<T>::VectorField(
 		CartesianMesh mesh, T* user_vals, int n_user_vals,
-		double* user_mask_vals, int n_mask_vals) :
+		double* user_mask_vals, int n_mask_vals, std::string mask_formula) :
 	n_vertex(mesh.Nx*mesh.Ny*mesh.Nz),
 	field_dim(n_user_vals/n_vertex),
 	mesh(mesh),
 	vals(n_vertex * field_dim),
+	interp_weigths(2*mesh.Nx*mesh.Ny*(mesh.Nz-1), 0.5),
 	mask_exists(true) {
 
 	if(n_user_vals!=n_vertex*field_dim)
@@ -56,6 +60,57 @@ VectorField<T>::VectorField(
 	mask_vals.resize(n_vertex);
 	for(int i=0; i<n_vertex; i++)
 		mask_vals[i] = (user_mask_vals[i]>=0);
+
+	if(mask_formula!="") {
+		bool failed = false;
+		#pragma omp parallel for reduction(||:failed)
+		for(int iperp=0; iperp<mesh.Nx*mesh.Ny; iperp++) {
+			int ix = iperp%mesh.Nx;
+			int iy = iperp/mesh.Nx;
+			double z, zi, zp, zm, f, fp, fm;
+
+			mu::Parser p;
+			p.DefineConst("x", (ix-0.5*(mesh.Nx-1))*mesh.delta_x);
+			p.DefineConst("y", (iy-0.5*(mesh.Ny-1))*mesh.delta_y);
+			p.DefineVar("z", &z);
+			p.SetExpr(mask_formula);
+
+			for(int iz=0; iz<mesh.Nz-1; iz++) {
+				int i = iperp+mesh.Nx*mesh.Ny*iz;
+
+				zi = (iz-0.5*(mesh.Nz-1))*mesh.delta_z;
+				zm = zi;
+				zp = (iz+1-0.5*(mesh.Nz-1))*mesh.delta_z;
+
+				z = zm; 	fm = p.Eval();
+				z = zp; 	fp = p.Eval();
+				if(fm*fp<=0) {
+					if(get_mask_val({ix,iy,iz})==get_mask_val({ix,iy,iz+1}))
+						failed = true;
+
+					while(std::abs(zp-zm)>=1e-3*mesh.delta_z) {
+						z = zm; 			fm = p.Eval();
+						z = 0.5*(zp+zm);	f = p.Eval();
+						if(f==0)
+							break;
+						else if(f*fm<0)
+							zp = z;
+						else
+							zm = z;
+					}
+
+					interp_weigths[2*i] = (z-zi)/mesh.delta_z;
+					interp_weigths[2*i+1] = 1-interp_weigths[2*i];
+				}
+			}
+		}
+		if(failed) {
+			std::cout <<
+				"Mask values do not corresponds to the given formula, will ignore interpolation correction" <<
+				std::endl;
+			interp_weigths.assign(mesh.Nx*mesh.Ny*(mesh.Nz-1),0.5);
+		}
+	}
 }
 
 template <typename T>
@@ -83,6 +138,45 @@ void VectorField<T>::set_mask(std::string mask_formula) {
 			}
 		}
 	}
+
+	#pragma omp parallel for
+	for(int iperp=0; iperp<mesh.Nx*mesh.Ny; iperp++) {
+		int ix = iperp%mesh.Nx;
+		int iy = iperp/mesh.Nx;
+		double z, zi, zp, zm, f, fp, fm;
+
+		mu::Parser p;
+		p.DefineConst("x", (ix-0.5*(mesh.Nx-1))*mesh.delta_x);
+		p.DefineConst("y", (iy-0.5*(mesh.Ny-1))*mesh.delta_y);
+		p.DefineVar("z", &z);
+		p.SetExpr(mask_formula);
+
+		for(int iz=0; iz<mesh.Nz-1; iz++) {
+			int i = iperp+mesh.Nx*mesh.Ny*iz;
+
+			zi = (iz-0.5*(mesh.Nz-1))*mesh.delta_z;
+			zm = zi;
+			zp = (iz+1-0.5*(mesh.Nz-1))*mesh.delta_z;
+
+			z = zm; 	fm = p.Eval();
+			z = zp; 	fp = p.Eval();
+			if(fm*fp<=0) {
+				while(std::abs(zp-zm)>=1e-3*mesh.delta_z) {
+					z = zm; 			fm = p.Eval();
+					z = 0.5*(zp+zm);	f = p.Eval();
+					if(f==0)
+						break;
+					else if(f*fm<0)
+						zp = z;
+					else
+						zm = z;
+				}
+
+				interp_weigths[2*i] = (z-zi)/mesh.delta_z;
+				interp_weigths[2*i+1] = 1-interp_weigths[2*i];
+			}
+		}
+	}
 }
 
 template <typename T>
@@ -101,7 +195,7 @@ void VectorField<T>::set_mask_from_nonzeros() {
 }
 
 template <typename T>
-bool VectorField<T>::get_mask_val(const int vertex_idx) const {
+bool VectorField<T>::get_mask_val(int vertex_idx) const {
 
 	if(!mask_exists)
 		return true;
@@ -116,6 +210,18 @@ bool VectorField<T>::get_mask_val(const Index3D &p) const {
 		return true;
 	else
 		return mask_vals[p.x + mesh.Nx*( p.y + mesh.Ny*p.z)];
+}
+
+template <typename T>
+double VectorField<T>::get_interp_weight(int vertex_idx, int comp) const {
+
+	return interp_weigths[2*vertex_idx+comp];
+}
+
+template <typename T>
+double VectorField<T>::get_interp_weight(const Index3D &p, int comp) const {
+
+	return interp_weigths[2*(p.x + mesh.Nx*( p.y + mesh.Ny*p.z))+comp];
 }
 
 template <typename T>
@@ -199,7 +305,7 @@ T& VectorField<T>::operator[](int idx) {
 }
 
 template <typename T>
-T VectorField<T>::operator()(const int vertex_idx, int comp) const {
+T VectorField<T>::operator()(int vertex_idx, int comp) const {
 
 	Assert(
 		vertex_idx<n_vertex && comp<field_dim,
@@ -209,7 +315,7 @@ T VectorField<T>::operator()(const int vertex_idx, int comp) const {
 }
 
 template <typename T>
-T& VectorField<T>::operator()(const int vertex_idx, int comp) {
+T& VectorField<T>::operator()(int vertex_idx, int comp) {
 
 	Assert(
 		vertex_idx<n_vertex && comp<field_dim,

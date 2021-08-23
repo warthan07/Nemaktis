@@ -50,7 +50,7 @@ find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
 set(Python3_FIND_REGISTRY LAST)
-find_package(Python3 REQUIRED COMPONENTS Development NumPy)
+find_package(Python3 3.7.10 EXACT REQUIRED COMPONENTS Development NumPy)
 
 
 ###########################################################################

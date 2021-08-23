@@ -11,6 +11,7 @@ PermittivityTensorField::PermittivityTensorField(
 	eps_a(std::pow(ne,2.)-eps_perp),
 	eps_host(std::pow(coefs.get_nhost(wavelength),2.)) {
 
+	this->interp_weigths = lc_sol.get_interp_weight();
 	bool mask_val;
 
 	if(lc_sol.field_dim == 3) {

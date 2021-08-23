@@ -9,7 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from traits.api import HasTraits, Enum, Float, Bool, Int, Str, Directory, Instance, Button
 from traitsui.api import View, Item, Spring, Group, RangeEditor, EnumEditor
 from traitsui.qt4.editor import Editor
-from traitsui.qt4.basic_editor_factory import BasicEditorFactory
+from traitsui.basic_editor_factory import BasicEditorFactory
 
 from pyface.qt import QtGui, QtCore
 from pyface.util.guisupport import start_event_loop_qt4

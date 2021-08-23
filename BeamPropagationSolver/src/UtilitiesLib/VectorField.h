@@ -38,16 +38,27 @@ public:
 	 * indices: iz -> iy -> ix -> field component). The number of components
 	 * is calculated as n_user_vals/(mesh.Nx*mesh.Ny*mesh.Nz). An additional raw pointer
 	 * array specify the mask values of this vector field. Positive mask values are
-	 * equivalent to true, strictly negative mask values are equivalent to false.
+	 * equivalent to true, strictly negative mask values are equivalent to false. The final
+	 * (optional) string argument can describe, if available, the analytical expression that
+	 * was used to compute the mask values and should depends on the variables "x", "y", and
+	 * "z". This formula will then be used to estimate accurate interpolation weights for
+	 * cells crossing any interface between true/false mask regions.
 	 */
 	VectorField(
 		CartesianMesh mesh, T* user_vals, int n_user_vals,
-		double* mask_vals, int n_mask_vals);
+		double* mask_vals, int n_mask_vals, std::string mask_formula = "");
 
 	void set_mask(std::string mask_formula);
 	void set_mask_from_nonzeros();
-	bool get_mask_val(const int vertex_idx) const;
+
+	bool get_mask_val(int vertex_idx) const;
 	bool get_mask_val(const Index3D &p) const;
+
+	double get_interp_weight(int vertex_idx, int comp) const;
+	double get_interp_weight(const Index3D &p, int comp) const;
+	const std::vector<double>& get_interp_weight() const {
+		return interp_weigths;
+	}
 
 	void operator=(T val);
 	void operator=(const VectorField<T> &src);
@@ -61,8 +72,8 @@ public:
 	T operator[](int idx) const;
 	T& operator[](int idx);
 
-	T operator()(const int vertex_idx, int comp) const;
-	T& operator()(const int vertex_idx, int comp);
+	T operator()(int vertex_idx, int comp) const;
+	T& operator()(int vertex_idx, int comp);
 
 	T operator()(const Index3D &p, int comp) const;
 	T& operator()(const Index3D &p, int comp);
@@ -83,6 +94,7 @@ public:
 protected:
 	std::vector<T> vals;
 	std::vector<bool> mask_vals;
+	std::vector<double> interp_weigths;
 
 	bool mask_exists;
 };
