@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.4.2"
+    version: "1.4.3"
 
 source:
     - path: ../BeamPropagationSolver
@@ -30,9 +30,9 @@ requirements:
         - tbb-devel
         - swig
         - numpy-devel
-        - numpy 1.18.*
+        - numpy 1.20.*
         - numba
-        - scipy 1.4.*
+        - scipy
         - matplotlib
         - setuptools
         - python
@@ -44,9 +44,9 @@ requirements:
         - openmp
         - vtk 9.*
         - eigen
-        - numpy 1.18.*
+        - numpy 1.20.*
         - numba
-        - scipy 1.4.*
+        - scipy
         - matplotlib
         - python
         - ipython

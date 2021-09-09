@@ -122,7 +122,13 @@ class LightPropagator:
                 return self._dtmm_propagation(
                     bulk_filename, diffraction=int(match.group(1)))
             else:
-                raise Exception("Unrecognised method, should be 'bpm' or 'dtmm'")
+                match = re.compile("dtmm\((\d+),(\d+)\)").match(method)
+                if match:
+                    return self._dtmm_propagation(
+                        bulk_filename, diffraction=int(match.group(1)),
+                        reflection_passes=int(match.group(2)))
+                else:
+                    raise Exception("Unrecognised method, should be 'bpm' or 'dtmm'")
 
     def _bpm_propagation(self, bulk_filename):
         print("{ Running beam propagation backend }\n")
@@ -195,7 +201,7 @@ class LightPropagator:
         return output_fields
 
 
-    def _dtmm_propagation(self, bulk_filename, diffraction=1):
+    def _dtmm_propagation(self, bulk_filename, diffraction=1, reflection_passes=1):
         print("{ Running diffraction transfer matrix backend }\n")
 
         lc_field = self._material.lc_field
@@ -291,7 +297,12 @@ class LightPropagator:
         field_data_out = dtmm.transfer_field(
             field_data_in, optical_data, nin=nin,
             betamax=self._max_NA_objective, diffraction=diffraction,
+            method="4x4", npass=reflection_passes,
+            #  method="2x2", reflection=2,
             ret_bulk=bulk_filename is not None)[0]
+        jones_data_out = dtmm.field.field2jones(
+            field_data_out, beta=beta, phi=phi, mode=1,
+            betamax=self._max_NA_objective)
         print("")
 
         if bulk_filename is not None:
@@ -318,9 +329,9 @@ class LightPropagator:
             Np = dims[0]*dims[1]*(dims[2]+1)
             for wave_idx in range(0,len(self._wavelengths)):
                 for q_idx in range(0,len(self._wavevectors)):
-                    E_inputX = field_data_out[:-1,q_idx,0,wave_idx,[0,2],:,:].transpose(
+                    E_inputX = jones_data_out[:-1,q_idx,0,wave_idx,:,:,:].transpose(
                         (1,0,2,3)).reshape((2,Np)).transpose()
-                    E_inputY = field_data_out[:-1,q_idx,1,wave_idx,[0,2],:,:].transpose(
+                    E_inputY = jones_data_out[:-1,q_idx,1,wave_idx,:,:,:].transpose(
                         (1,0,2,3)).reshape((2,Np)).transpose()
 
                     E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
