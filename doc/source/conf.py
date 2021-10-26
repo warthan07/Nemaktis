@@ -25,7 +25,7 @@ MOCK_MODULES = [
     "traitsui.api",
     "traitsui.qt4",
     "traitsui.qt4.editor",
-    "traitsui.qt4.basic_editor_factory",
+    "traitsui.basic_editor_factory",
     "traitsui.delegating_handler",
 ]
 
@@ -134,7 +134,7 @@ copyright = '2019, Guilhem Poy, Andrej Petelin'
 author = 'Guilhem Poy, Andrej Petelin'
 
 # The full version, including alpha/beta/rc tags
-release = '1.4.0'
+release = '1.4.2'
 
 
 # -- General configuration ---------------------------------------------------
