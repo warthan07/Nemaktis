@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.4.2"
+    version: "1.4.3"
 
 source:
     - path: ../BeamPropagationSolver
@@ -23,32 +23,31 @@ requirements:
         - muparser
         - pyfftw
         - fftw
-        - boost 1.67.*
+        - boost 1.73.*
         - openmp
         - vtk 9.*
         - eigen
         - tbb-devel
         - swig
-        - numpy-devel
-        - numpy 1.18.*
+        - numpy >=1.20
         - numba
-        - scipy 1.4.*
+        - scipy
         - matplotlib
         - setuptools
-        - python
+        - python 3.8.*
     run:
         - muparser
         - pyfftw
         - fftw
-        - libboost 1.67.*
+        - libboost 1.73.*
         - openmp
         - vtk 9.*
         - eigen
-        - numpy 1.18.*
+        - {{ pin_compatible('numpy') }}
         - numba
-        - scipy 1.4.*
+        - scipy
         - matplotlib
-        - python
+        - python  3.8.*
         - ipython
         - traits
         - traitsui
