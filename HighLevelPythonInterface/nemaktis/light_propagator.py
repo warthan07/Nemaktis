@@ -539,14 +539,16 @@ class OpticalFields:
 
 
         IY, IX = np.meshgrid(range(0,self._Ny), range(0,self._Nx), indexing="ij")
-        kx = -np.abs(2*np.pi/self._Lx*(IX-0.5*self._Nx)) + np.pi*self._Nx/self._Lx
-        ky = -np.abs(2*np.pi/self._Ly*(IY-0.5*self._Ny)) + np.pi*self._Ny/self._Ly
+        kx = ((IX+0.5*self._Nx)%self._Nx - 0.5*self._Nx)*2*np.pi/(self._Nx*self._dx)
+        ky = ((IY+0.5*self._Ny)%self._Ny - 0.5*self._Ny)*2*np.pi/(self._Ny*self._dy)
 
         k0 = np.tile(2*np.pi/self._wavelengths, (self._Nx,self._Ny,1,Nq,1)).transpose()
         px = k0*self._wavevectors[:,0][np.newaxis,:,np.newaxis,np.newaxis,np.newaxis]
         py = k0*self._wavevectors[:,1][np.newaxis,:,np.newaxis,np.newaxis,np.newaxis]
 
-        kSqr = (kx[np.newaxis,np.newaxis,:,:]+px)**2+(ky[np.newaxis,np.newaxis,:,:]+py)**2
+        kx = kx[np.newaxis,np.newaxis,np.newaxis,:,:]
+        ky = ky[np.newaxis,np.newaxis,np.newaxis,:,:]
+        kSqr = (kx+px)**2+(ky+py)**2
         mask = kSqr.flatten()<k0.flatten()**2
 
         filt = 1j*np.zeros(Nl*Nq*self._Nx*self._Ny)
