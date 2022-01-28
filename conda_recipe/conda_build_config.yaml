@@ -1,5 +1,5 @@
 win_cxx_compiler: # [win]
-  - vs2015        # [win]
+  - vs2017        # [win]
 target_platform:  # [win]
   - win-64        # [win]
 cxx_compiler_version: # [linux]

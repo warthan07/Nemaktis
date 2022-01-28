@@ -31,7 +31,7 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.67 EXACT REQUIRED COMPONENTS filesystem regex system)
+find_package(Boost 1.73 EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
@@ -50,7 +50,7 @@ find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
 set(Python3_FIND_REGISTRY LAST)
-find_package(Python3 3.7.10 EXACT REQUIRED COMPONENTS Development NumPy)
+find_package(Python3 3.8 EXACT REQUIRED COMPONENTS Development NumPy)
 
 
 ###########################################################################
