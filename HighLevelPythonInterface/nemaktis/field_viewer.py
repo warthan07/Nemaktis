@@ -148,10 +148,10 @@ class FieldViewer:
 
         def update_NA_condenser(new_NA):
             if new_NA>self.NA_condenser:
-                self.NA_condenser = new_NA
+                self.NA_condenser = max(0,min(self._optical_fields._max_NA_condenser,new_NA))
                 self._update_specter()
             else:
-                self.NA_condenser = new_NA
+                self.NA_condenser = max(0,min(self._optical_fields._max_NA_condenser,new_NA))
             self._update_averaged_specter()
             self._update_POM_image()
             self._update_plot()

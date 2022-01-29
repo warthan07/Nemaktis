@@ -21,7 +21,7 @@ requirements:
     host:
         - pkgconfig
         - muparser
-        - pyfftw
+        - pyfftw 0.12.*
         - fftw
         - boost 1.73.*
         - openmp
@@ -29,7 +29,7 @@ requirements:
         - eigen
         - tbb-devel
         - swig
-        - numpy >=1.20
+        - numpy 1.21.*
         - numba
         - scipy
         - matplotlib
@@ -37,13 +37,13 @@ requirements:
         - python 3.8.*
     run:
         - muparser
-        - pyfftw
+        - pyfftw 0.12.*
         - fftw
         - libboost 1.73.*
         - openmp
         - vtk 9.*
         - eigen
-        - {{ pin_compatible('numpy') }}
+        - {{ pin_compatible('numpy',max_pin="1.22") }}
         - numba
         - scipy
         - matplotlib
