@@ -49,8 +49,15 @@ b2. (Windows/Linux) Install Nemaktis on the command line
 Alternatively, if you are a Linux user or want to type the installation commands yourself
 (they are not very complicated after all!), open a terminal (Windows: application "Conda
 terminal" installed with miniconda, Linux: any terminal) and type the following command: ::
+  
+  conda install -c conda-forge -y mamba
+  mamba create -n nm -c conda-forge -c warthan07 -y nemaktis=1.4.4
 
-  conda create -n nm -c conda-forge -c warthan07 -y nemaktis=1.4.3
+I highly recommend the use of ``mamba'' instead of ``conda'' to install conda packages from 
+the conda-forge repository. There is now so many different packages in conda-forge that the
+python scripts behind ``conda'' struggle with the complex graph algorithms behind dependency
+solving. ``mamba'' solves this problem by using very efficient C/C++ algorithm behind the 
+scene. 
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
 to install and run it from the same conda environment. You can search https://anaconda.org/
