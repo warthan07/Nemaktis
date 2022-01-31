@@ -53,10 +53,10 @@ terminal" installed with miniconda, Linux: any terminal) and type the following 
   conda install -c conda-forge -y mamba
   mamba create -n nm -c conda-forge -c warthan07 -y nemaktis=1.4.4
 
-I highly recommend the use of ``mamba'' instead of ``conda'' to install conda packages from 
+I highly recommend the use of ``mamba`` instead of ``conda`` to install conda packages from 
 the conda-forge repository. There is now so many different packages in conda-forge that the
-python scripts behind ``conda'' struggle with the complex graph algorithms behind dependency
-solving. ``mamba'' solves this problem by using very efficient C/C++ algorithm behind the 
+python scripts behind ``conda`` struggle with the complex graph algorithms behind dependency
+solving. ``mamba`` solves this problem by using very efficient C/C++ algorithm behind the 
 scene. 
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
