@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.4.4"
+    version: "1.4.5"
 
 source:
     - path: ../BeamPropagationSolver
@@ -43,7 +43,7 @@ requirements:
         - openmp
         - vtk 9.*
         - eigen
-        - {{ pin_compatible('numpy',max_pin="1.22") }}
+        - {{ pin_compatible('numpy',min_pin="1.20",max_pin="1.22") }}
         - numba
         - scipy
         - matplotlib
