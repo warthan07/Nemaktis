@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0,"/home/gpoy/Nemaktis/HighLevelPythonInterface")
 import nemaktis as nm
 import numpy as np
 import os.path
@@ -38,7 +40,7 @@ else:
         ne="1.6933+0.0078/lambda^2+0.0028/lambda^4",
         no="1.4990+0.0072/lambda^2+0.0003/lambda^4",
         nhost=1.55)
-    #  mat.add_isotropic_layer(nlayer=1.51, thickness=1000)
+    mat.add_isotropic_layer(nlayer=1.51, thickness=1000)
 
     wavelengths = np.linspace(0.4, 0.8, 11)
     sim = nm.LightPropagator(
@@ -49,5 +51,6 @@ else:
     output_fields.save_to_vti("optical_fields")
 
 # Finally, the optical fields are visualized as in a real microscope
+print(output_fields._zfoc_NA_corr)
 viewer = nm.FieldViewer(output_fields)
 viewer.plot()

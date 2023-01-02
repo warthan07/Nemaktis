@@ -31,7 +31,7 @@ ScreenOutput::ScreenOutput(
 
 	// new entry for the refractive index of the medium between the last iso layer and the
 	// objective, will be overwritten later on for each wavelength
-	double n_out = coefs.get_n_out(0.6);
+	double n_out = coefs.get_nout(0.6);
 	iso_layer_index.push_back(n_out);
 
 	for(int i=0; i<iso_layer_thickness.size(); i++)
@@ -83,7 +83,7 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 		// We override the last value of refractive index based on n_out, since it can
 		// depends on the wavelength
 		double wavelength = wavelengths[wave_idx];
-		iso_layer_index.back() = coefs.get_n_out(wavelength);
+		iso_layer_index.back() = coefs.get_nout(wavelength);
 
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			// Propagation filter for this wavelength and incoming wavevector
@@ -251,7 +251,7 @@ void ScreenOutput::apply_no_export(
 		// We override the last value of refractive index based on n_out, since it can
 		// depends on the wavelength
 		double wavelength = wavelengths[wave_idx];
-		iso_layer_index.back() = coefs.get_n_out(wavelength);
+		iso_layer_index.back() = coefs.get_nout(wavelength);
 
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			// Propagation filter for this wavelength and incoming wavevector
@@ -334,6 +334,7 @@ std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_f
 				-2*PI*(Ny-iy)/(delta_y*Ny);
 			Eigen::Vector2d q_vec = {kx/k0+q_val.first, ky/k0+q_val.second};
 			double q_norm_sqr = std::pow(q_vec.norm(),2);
+			double q0_sqr = std::sqrt(std::pow(q_val.first,2)+std::pow(q_val.second,2));
 
 			if(q_vec.norm()<numerical_aperture) {
 				tmat.setIdentity();
@@ -359,7 +360,7 @@ std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_f
 					tm = identity-tp;
 
 					auto g = std::exp(std::complex<double>(0,
-						(neff-np)*k0*iso_layer_thickness[p]));
+						(neff-std::sqrt(np*np-q0_sqr))*k0*iso_layer_thickness[p]));
 					layer_tmat.topLeftCorner<2,2>() = tp*g;
 					layer_tmat.topRightCorner<2,2>() = tm*std::conj(g);
 					layer_tmat.bottomLeftCorner<2,2>() = tm*g;
@@ -376,7 +377,7 @@ std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_f
 					tmat.topLeftCorner<2,2>() -
 					tmat.topRightCorner<2,2>()*tmp*tmat.bottomLeftCorner<2,2>();
 				fourier_filter->at(ix+Nx*iy) *= std::exp(std::complex<double>(0,
-					k0*(std::sqrt(n_out*n_out-q_norm_sqr)-n_out)*k0*z_foc));
+					(std::sqrt(n_out*n_out-q_norm_sqr)-std::sqrt(n_out*n_out-q0_sqr))*k0*z_foc));
 			}
 			else 
 				fourier_filter->at(ix+Nx*iy).setZero();

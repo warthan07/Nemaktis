@@ -182,7 +182,18 @@ class LightPropagator:
                 json_str, mask_formula, lc_vals, mask_vals, N_E_vals)
         print("")
 
+        if isinstance(self._material.nout, str):
+            l = 0.6
+            nout = eval(self._material.nout.replace("lambda","l").replace("^","**"))
+        else:
+            nout = self._material.nout
+
+        zfoc_NA_corr = 0
+        for (nk,ek) in zip(self._material.iso_layer_indices,self._material.iso_layer_thicknesses):
+            zfoc_NA_corr += 3*nout*ek/(14*nk) * (1/nout**2-1/nk**2)
+
         output_fields = OpticalFields(
+            zfoc_NA_corr = zfoc_NA_corr,
             wavelengths = self._wavelengths,
             max_NA_objective = self._max_NA_objective,
             max_NA_condenser = self._max_NA_condenser,
@@ -347,6 +358,7 @@ class LightPropagator:
             field_data_out = field_data_out[-1,:,:,:,:,:,:]
 
         output_fields = OpticalFields(
+            zfoc_NA_corr = 0,
             wavelengths = self._wavelengths,
             max_NA_objective = self._max_NA_objective,
             max_NA_condenser = self._max_NA_condenser,
@@ -414,6 +426,11 @@ class OpticalFields:
             if dims[2]!=1:
                 raise Exception("The specified vti file should include 2D data")
 
+            if not field_data.HasArray("zfoc_NA_corr"):
+                self._zfoc_NA_corr = 0
+            else:
+                self._zfoc_NA_corr = vn.vtk_to_numpy(field_data.GetArray("zfoc_NA_corr"))[0]
+
             if not field_data.HasArray("lambda"):
                 raise Exception(
                     "VTI file is missing the field array \"lambda\" for the wavelengths")
@@ -440,7 +457,7 @@ class OpticalFields:
                 q_idx_start = 1+3*qr_idx*(qr_idx-1) if qr_idx>0 else 0
                 q_idx_end = 1+3*qr_idx*(qr_idx+1)
                 q_norms = np.sqrt(np.sum(self._wavevectors[q_idx_start:q_idx_end,:]**2,axis=1))
-                if np.max(np.abs(q_norms-qr_idx*self._max_NA_condenser/(Nr-1)))>1e-8:
+                if qr_idx>0 and np.max(np.abs(q_norms-qr_idx*self._max_NA_condenser/(Nr-1)))>1e-8:
                     raise Exception(
                         "Incompatible wavevector mesh inside the VTI file")
 
@@ -449,6 +466,7 @@ class OpticalFields:
                     "VTI file is missing the field scalar \"max_NA_objective\"")
             self._max_NA_objective = \
                 vn.vtk_to_numpy(field_data.GetArray("max_NA_objective"))[0]
+            self._NA = self._max_NA_objective
 
             Nl = len(self._wavelengths)
             self._vals = pyfftw.empty_aligned(
@@ -497,10 +515,12 @@ class OpticalFields:
             if len(kwargs["mesh_lengths"])!=2:
                 raise Exception("mesh_lengths should be an array-like object of size 2")
 
+            self._zfoc_NA_corr = kwargs["zfoc_NA_corr"]
             self._wavelengths = np.array(kwargs["wavelengths"])
             self._max_NA_objective = kwargs["max_NA_objective"]
             self._max_NA_condenser = kwargs["max_NA_condenser"]
             self._N_radial_wavevectors = kwargs["N_radial_wavevectors"]
+            self._NA = self._max_NA_objective
 
             Nr = self._N_radial_wavevectors
             self._wavevectors = np.zeros((1+3*Nr*(Nr-1),2))
@@ -612,8 +632,8 @@ class OpticalFields:
 
 
     def update_NA_objective(self, new_NA):
-        NA = max(0,min(self._max_NA_objective,new_NA))
-        self._objective_mask = (self._kSqr<(self._k0*NA)**2).astype(float)
+        self._NA = max(0,min(self._max_NA_objective,new_NA))
+        self._objective_mask = (self._kSqr<(self._k0*self._NA)**2).astype(float)
 
 
     def focus_fields(self, z_focus=None):
@@ -621,14 +641,14 @@ class OpticalFields:
         to the focusing plane (whose altitude inside the sample is set with the parameter
         z_focus)."""
         if z_focus is not None:
-            filt = self._objective_mask*self._objective_filter**np.abs(z_focus)
+            zf = z_focus + self._NA**2*self._zfoc_NA_corr
             self._z = z_focus
         else:
-            z_focus = self._z
-            filt = self._objective_mask*self._objective_filter**np.abs(z_focus)
+            zf = self._z + self._NA**2*self._zfoc_NA_corr
+        filt = self._objective_mask*self._objective_filter**np.abs(zf)
 
         self._fft_plan()
-        self._fft_vals *= np.conj(filt) if z_focus<0 else filt
+        self._fft_vals *= np.conj(filt) if zf<0 else filt
         self._ifft_plan()
 
 
@@ -672,6 +692,10 @@ class OpticalFields:
         wavelengths_data = vn.numpy_to_vtk(self._wavelengths)
         wavelengths_data.SetName("lambda")
         vti_data.GetFieldData().AddArray(wavelengths_data)
+
+        zfoc_data = vn.numpy_to_vtk(np.array([self._zfoc_NA_corr]))
+        zfoc_data.SetName("zfoc_NA_corr")
+        vti_data.GetFieldData().AddArray(zfoc_data)
 
         qx_data = vn.numpy_to_vtk(self._wavevectors[:,0])
         qx_data.SetName("qx")
