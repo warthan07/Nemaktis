@@ -151,6 +151,7 @@ class LightPropagator:
                     "ne":               str(self._material.ne),
                     "nhost":            str(self._material.nhost),
                     "nin":              str(self._material.nin),
+                    "nout":             str(self._material.nout),
                     "Wavelengths":      self._wavelengths,
                     "Wavevectors":      wavevectors}},
             "Postprocessor settings": {

@@ -13,6 +13,7 @@ PhysicsCoefficients::PhysicsCoefficients(
 	no_expression = physics_settings.coefs.no_expression;
 	nhost_expression = physics_settings.coefs.nhost_expression;
 	nin_expression = physics_settings.coefs.nin_expression;
+	nout_expression = physics_settings.coefs.nout_expression;
 
 	_mesh_volume = 
 		mesh.delta_x*(mesh.Nx-1)*
@@ -67,6 +68,19 @@ double PhysicsCoefficients::get_nin(double wavelength) const {
 		mu::Parser p;
 		p.DefineConst("lambda", wavelength);
 		p.SetExpr(nin_expression);
+		return p.Eval();
+	}
+	catch(mu::Parser::exception_type &e) {
+		throw std::string("Wrong expression for nin");
+	}
+}
+
+double PhysicsCoefficients::get_nout(double wavelength) const {
+
+	try {
+		mu::Parser p;
+		p.DefineConst("lambda", wavelength);
+		p.SetExpr(nout_expression);
 		return p.Eval();
 	}
 	catch(mu::Parser::exception_type &e) {

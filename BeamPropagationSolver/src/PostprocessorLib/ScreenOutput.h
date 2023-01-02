@@ -27,13 +27,13 @@ private:
 	std::shared_ptr<std::vector<Eigen::Matrix2cd> > assemble_fourier_filter(
 		double wavelength, std::pair<double,double> q_val) const;
 
+	const PhysicsCoefficients &coefs;
+
 	int Nx, Ny, Nz;
 	double delta_x, delta_y;
 
-	std::vector<double> iso_layer_thickness;
-	std::vector<double> iso_layer_index;
-	double focalisation_z_shift;
-	double numerical_aperture;
+	std::vector<double> iso_layer_thickness, iso_layer_index;
+	double z_foc, numerical_aperture;
 
 	/**
 	 * Array containing all the wavelengths in the light spectrum.

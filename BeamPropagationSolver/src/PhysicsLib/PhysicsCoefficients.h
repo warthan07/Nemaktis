@@ -23,6 +23,7 @@ public:
 	double get_no(double wavelength) const;
 	double get_nhost(double wavelength) const;
 	double get_nin(double wavelength) const;
+	double get_nout(double wavelength) const;
 
 	double mesh_volume() const {
 		return _mesh_volume;
@@ -45,6 +46,7 @@ private:
 	std::string no_expression;
 	std::string nhost_expression;
 	std::string nin_expression;
+	std::string nout_expression;
 
 	const PhysicsSettings &physics_settings;
 

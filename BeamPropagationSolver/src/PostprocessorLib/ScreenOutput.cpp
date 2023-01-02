@@ -17,9 +17,10 @@ ScreenOutput::ScreenOutput(
 		settings.postprocessor.micrograph_output,
 		settings.algorithm.general.results_folder_name,
 		coefs),
+	coefs(coefs),
 	iso_layer_thickness(settings.postprocessor.micrograph_output.iso_layer_thickness),
 	iso_layer_index(settings.postprocessor.micrograph_output.iso_layer_index),
-	focalisation_z_shift(settings.postprocessor.micrograph_output.focalisation_z_shift),
+	z_foc(settings.postprocessor.micrograph_output.focalisation_z_shift),
 	numerical_aperture(settings.postprocessor.micrograph_output.numerical_aperture),
 	wavelengths(coefs.wavelengths()),
 	q_vals(coefs.q_vals()) {
@@ -28,8 +29,13 @@ ScreenOutput::ScreenOutput(
 		throw std::string(
 			"Inconsistent number of isotropic layers");
 
-	// index of the air between the last iso layer and the objective
-	iso_layer_index.push_back(1);
+	// new entry for the refractive index of the medium between the last iso layer and the
+	// objective, will be overwritten later on for each wavelength
+	double n_out = coefs.get_n_out(0.6);
+	iso_layer_index.push_back(n_out);
+
+	for(int i=0; i<iso_layer_thickness.size(); i++)
+		z_foc -= iso_layer_thickness[i] * n_out / iso_layer_index[i];
 }
 
 void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
@@ -74,10 +80,14 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 				fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
 		}
 
+		// We override the last value of refractive index based on n_out, since it can
+		// depends on the wavelength
+		double wavelength = wavelengths[wave_idx];
+		iso_layer_index.back() = coefs.get_n_out(wavelength);
+
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			// Propagation filter for this wavelength and incoming wavevector
-			auto fourier_filter = assemble_fourier_filter(
-				wavelengths[wave_idx], q_vals[q_idx]);
+			auto fourier_filter = assemble_fourier_filter(wavelength, q_vals[q_idx]);
 	
 			for(int pol_idx=0; pol_idx<2; pol_idx++) {
 				auto real_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -238,10 +248,14 @@ void ScreenOutput::apply_no_export(
 				fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
 		}
 
+		// We override the last value of refractive index based on n_out, since it can
+		// depends on the wavelength
+		double wavelength = wavelengths[wave_idx];
+		iso_layer_index.back() = coefs.get_n_out(wavelength);
+
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			// Propagation filter for this wavelength and incoming wavevector
-			auto fourier_filter = assemble_fourier_filter(
-				wavelengths[wave_idx], q_vals[q_idx]);
+			auto fourier_filter = assemble_fourier_filter(wavelengths[wave_idx], q_vals[q_idx]);
 
 			for(int pol_idx=0; pol_idx<2; pol_idx++) {
 				// First, we fill the fftw input arrays with our data and switch to
@@ -297,15 +311,9 @@ void ScreenOutput::apply_no_export(
 std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_filter(
 		double wavelength, std::pair<double,double> q_val) const {
 
-	double z_foc = focalisation_z_shift;
-	double z_end = 0;
-	for(int i=0; i<iso_layer_thickness.size(); i++) {
-		z_foc += iso_layer_thickness[i] * (1-1./iso_layer_index[i]);
-		z_end += iso_layer_thickness[i];
-	}
-
 	auto fourier_filter = std::make_shared<std::vector<Eigen::Matrix2cd> >(Nx*Ny);
 	double k0 = 2*PI/wavelength;
+	double n_out = iso_layer_index.back();
 
 	// total and local transfer matrix for forward and backward modes 
 	Eigen::Matrix4cd tmat, layer_tmat; 
@@ -330,8 +338,6 @@ std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_f
 			if(q_vec.norm()<numerical_aperture) {
 				tmat.setIdentity();
 
-				double final_neff = std::sqrt(1-q_norm_sqr);
-
 				for(int p=0; p<iso_layer_thickness.size(); p++) {
 					double np = iso_layer_index[p];
 					double next_np = iso_layer_index[p+1];
@@ -353,7 +359,7 @@ std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_f
 					tm = identity-tp;
 
 					auto g = std::exp(std::complex<double>(0,
-						(neff-final_neff)*k0*iso_layer_thickness[p]));
+						(neff-np)*k0*iso_layer_thickness[p]));
 					layer_tmat.topLeftCorner<2,2>() = tp*g;
 					layer_tmat.topRightCorner<2,2>() = tm*std::conj(g);
 					layer_tmat.bottomLeftCorner<2,2>() = tm*g;
@@ -369,8 +375,8 @@ std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_f
 				fourier_filter->at(ix+Nx*iy) =
 					tmat.topLeftCorner<2,2>() -
 					tmat.topRightCorner<2,2>()*tmp*tmat.bottomLeftCorner<2,2>();
-				fourier_filter->at(ix+Nx*iy) *=
-					std::exp(std::complex<double>(0,final_neff*k0*z_foc));
+				fourier_filter->at(ix+Nx*iy) *= std::exp(std::complex<double>(0,
+					k0*(std::sqrt(n_out*n_out-q_norm_sqr)-n_out)*k0*z_foc));
 			}
 			else 
 				fourier_filter->at(ix+Nx*iy).setZero();

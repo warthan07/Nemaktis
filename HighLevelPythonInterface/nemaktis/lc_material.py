@@ -29,13 +29,17 @@ class LCMaterial(object):
     nin : optional, float or math string depending on the wavelength variable "lambda" (µm)
         The refractive index associated with the input medium below the LC layer. 
         A default value of 1 is assumed.
+    nout : optional, float or math string depending on the wavelength variable "lambda" (µm)
+        The refractive index associated with the output medium between the sample and
+        objective. A default value of 1 is assumed.
     """
-    def __init__(self, *, lc_field, ne, no, nhost = 1, nin = 1):
+    def __init__(self, *, lc_field, ne, no, nhost = 1, nin = 1, nout = 1):
         self.lc_field = lc_field
         self.ne = ne
         self.no = no
         self.nhost = nhost
         self.nin = nin
+        self.nout = nout
         self.iso_layer_indices = [] 
         self.iso_layer_thicknesses = [] 
 
