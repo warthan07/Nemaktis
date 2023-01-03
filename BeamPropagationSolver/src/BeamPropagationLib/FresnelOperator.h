@@ -9,27 +9,53 @@ class FresnelOperator {
 public: 
 	FresnelOperator(
 		const PermittivityTensorField &eps,
-		double input_refractive_index);
+		double refractive_index);
 
 	/**
-	 * Apply the fresnel boundary conditions at the input interface.
+	 * Apply the fresnel boundary conditions at the interface.
 	 */
-	void apply(TransverseOpticalField &src) const;
+	virtual void apply(TransverseOpticalField &src) const = 0;
 
-private:
+protected:
 	/**
 	 * Number of points in each space direction.
 	 */
 	int Nx, Ny;
 	/**
-	 * Input refractive index.
+	 * Refractive index of isotropic medium.
 	 */
-	const double ni;
+	const double niso;
 	
 	/**
 	 * Reference to the permittivity tensor field
 	 */
 	const PermittivityTensorField &eps;
 };
+
+
+class InputFresnelOperator : public FresnelOperator {
+public: 
+	InputFresnelOperator(
+		const PermittivityTensorField &eps,
+		double input_refractive_index);
+
+	/**
+	 * Apply the fresnel boundary conditions at the input interface.
+	 */
+	virtual void apply(TransverseOpticalField &src) const;
+};
+
+class OutputFresnelOperator : public FresnelOperator {
+public: 
+	OutputFresnelOperator(
+		const PermittivityTensorField &eps,
+		double output_refractive_index);
+
+	/**
+	 * Apply the fresnel boundary conditions at the input interface.
+	 */
+	virtual void apply(TransverseOpticalField &src) const;
+};
+
 
 #endif

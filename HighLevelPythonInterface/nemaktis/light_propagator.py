@@ -185,14 +185,20 @@ class LightPropagator:
         if isinstance(self._material.nout, str):
             l = 0.6
             nout = eval(self._material.nout.replace("lambda","l").replace("^","**"))
+
+            nout_vals = np.empty(len(self._wavelengths))
+            for il,l in enumerate(self._wavelengths):
+                nout_vals[il] = eval(self._material.nout.replace("lambda","l").replace("^","**"))
         else:
             nout = self._material.nout
+            nout_vals = nout*np.ones(len(self._wavelengths))
 
         zfoc_NA_corr = 0
         for (nk,ek) in zip(self._material.iso_layer_indices,self._material.iso_layer_thicknesses):
             zfoc_NA_corr += 3*nout*ek/(14*nk) * (1/nout**2-1/nk**2)
 
         output_fields = OpticalFields(
+            n_out = nout_vals,
             zfoc_NA_corr = zfoc_NA_corr,
             wavelengths = self._wavelengths,
             max_NA_objective = self._max_NA_objective,
@@ -297,11 +303,17 @@ class LightPropagator:
                 beta[1+3*ir*(ir-1)+iphi] = ir*self._max_NA_condenser/(self._N_radial_wavevectors-1)
                 phi[1+3*ir*(ir-1)+iphi] = iphi*np.pi/3
 
+        if isinstance(self._material.nout, str):
+            l = 0.6
+            nout = eval(self._material.nout.replace("lambda","l").replace("^","**"))
+        else:
+            nout = self._material.nout
+
         field_data_in = dtmm.illumination_data(
             (dims[1],dims[0]), wavelengths, pixelsize=1000*spacings[0], n=nin,
             beta=beta, phi=phi, intensity=intensity)
         field_data_out = dtmm.transfer_field(
-            field_data_in, optical_data, nin=nin,
+            field_data_in, optical_data, nin=nin, nout=nout,
             betamax=self._max_NA_objective, diffraction=diffraction,
             ret_bulk=bulk_filename is not None)[0]
         print("")
@@ -357,7 +369,10 @@ class LightPropagator:
             # We only keep the last slice to compute micrographs
             field_data_out = field_data_out[-1,:,:,:,:,:,:]
 
+        nout_vals = np.ones(len(self._wavelengths))*nout
+
         output_fields = OpticalFields(
+            n_out = nout_vals,
             zfoc_NA_corr = 0,
             wavelengths = self._wavelengths,
             max_NA_objective = self._max_NA_objective,
@@ -435,6 +450,11 @@ class OpticalFields:
                 raise Exception(
                     "VTI file is missing the field array \"lambda\" for the wavelengths")
             self._wavelengths = vn.vtk_to_numpy(field_data.GetArray("lambda"))
+
+            if not field_data.HasArray("n_out"):
+                self._n_out = np.ones(self._wavelengths)
+            else:
+                self._n_out = vn.vtk_to_numpy(field_data.GetArray("n_out"))
 
             if not field_data.HasArray("qx"):
                 raise Exception(
@@ -515,6 +535,7 @@ class OpticalFields:
             if len(kwargs["mesh_lengths"])!=2:
                 raise Exception("mesh_lengths should be an array-like object of size 2")
 
+            self._n_out = kwargs["n_out"]
             self._zfoc_NA_corr = kwargs["zfoc_NA_corr"]
             self._wavelengths = np.array(kwargs["wavelengths"])
             self._max_NA_objective = kwargs["max_NA_objective"]
@@ -558,11 +579,11 @@ class OpticalFields:
         else:
             self._delta_qr = 1
 
-
         IY, IX = np.meshgrid(range(0,self._Ny), range(0,self._Nx), indexing="ij")
         kx = ((IX+0.5*self._Nx)%self._Nx - 0.5*self._Nx)*2*np.pi/(self._Nx*self._dx)
         ky = ((IY+0.5*self._Ny)%self._Ny - 0.5*self._Ny)*2*np.pi/(self._Ny*self._dy)
 
+        kn = np.tile(2*np.pi*self._n_out/self._wavelengths, (self._Nx,self._Ny,1,Nq,1)).transpose()
         k0 = np.tile(2*np.pi/self._wavelengths, (self._Nx,self._Ny,1,Nq,1)).transpose()
         px = k0*self._wavevectors[:,0][np.newaxis,:,np.newaxis,np.newaxis,np.newaxis]
         py = k0*self._wavevectors[:,1][np.newaxis,:,np.newaxis,np.newaxis,np.newaxis]
@@ -570,10 +591,13 @@ class OpticalFields:
         kx = kx[np.newaxis,np.newaxis,np.newaxis,:,:]
         ky = ky[np.newaxis,np.newaxis,np.newaxis,:,:]
         kSqr = (kx+px)**2+(ky+py)**2
-        mask = kSqr.flatten()<k0.flatten()**2
+        mask = kSqr.flatten()<kn.flatten()**2
+
+        kn_masked = kn.flatten()[mask]
+        kSqr_masked = kSqr.flatten()[mask]
 
         filt = 1j*np.zeros(Nl*Nq*self._Nx*self._Ny)
-        filt[mask] = np.exp(1j*np.sqrt(k0.flatten()[mask]**2-kSqr.flatten()[mask]))
+        filt[mask] = np.exp(1j*(np.sqrt(kn_masked**2-kSqr_masked)-0*kn_masked))
         self._objective_filter = np.reshape(filt, (Nl,Nq,1,self._Ny,self._Nx))
         self._objective_mask = (kSqr<(k0*self._max_NA_objective)**2).astype(float)
         self._kSqr = kSqr
@@ -696,6 +720,10 @@ class OpticalFields:
         zfoc_data = vn.numpy_to_vtk(np.array([self._zfoc_NA_corr]))
         zfoc_data.SetName("zfoc_NA_corr")
         vti_data.GetFieldData().AddArray(zfoc_data)
+
+        nout_data = vn.numpy_to_vtk(np.array([self._n_out]))
+        nout_data.SetName("n_out")
+        vti_data.GetFieldData().AddArray(nout_data)
 
         qx_data = vn.numpy_to_vtk(self._wavevectors[:,0])
         qx_data.SetName("qx")

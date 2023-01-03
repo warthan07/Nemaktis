@@ -2,17 +2,23 @@
 
 FresnelOperator::FresnelOperator(
 		const PermittivityTensorField &eps,
-		double input_refractive_index) :
+		double refractive_index) :
 	Nx(eps.mesh.Nx),
 	Ny(eps.mesh.Ny),
 	eps(eps),
-	ni(input_refractive_index) {}
+	niso(refractive_index) {}
 
-void FresnelOperator::apply(TransverseOpticalField &src) const {
+InputFresnelOperator::InputFresnelOperator(
+		const PermittivityTensorField &eps,
+		double input_refractive_index) :
+	FresnelOperator(eps, input_refractive_index) {}
+
+void InputFresnelOperator::apply(TransverseOpticalField &src) const {
 
 	const std::complex<double> I(0,1.);
 
-	// Parallel loop which applies the Fresnel boudary conditions to the input fields.
+	// Parallel loop which applies the Fresnel boudary conditions
+	// at the input interface
 	#pragma omp parallel for
 	for(int iperp=0; iperp<Nx*Ny; iperp++) {
 		int ix = iperp%Nx;
@@ -23,10 +29,42 @@ void FresnelOperator::apply(TransverseOpticalField &src) const {
 		double nxy = eps.xy_sqrt({ix,iy,0});
 
 		// We apply the Fresnel BC
-		double det = (ni+nxx)*(ni+nyy)-nxy*nxy;
+		double det = (niso+nxx)*(niso+nyy)-nxy*nxy;
 		std::complex<double> new_field_val[2] = {
-			2*ni*(ni+nyy)/det * src({ix,iy},0) - 2*ni*nxy/det * src({ix,iy},1),
-			- 2*ni*nxy/det * src({ix,iy},0) + 2*ni*(ni+nxx)/det * src({ix,iy},1)};
+			2*niso*(niso+nyy)/det * src({ix,iy},0) - 2*niso*nxy/det * src({ix,iy},1),
+			- 2*niso*nxy/det * src({ix,iy},0) + 2*niso*(niso+nxx)/det * src({ix,iy},1)};
+
+		src({ix,iy},0) = new_field_val[0];
+		src({ix,iy},1) = new_field_val[1];
+	}
+}
+
+OutputFresnelOperator::OutputFresnelOperator(
+		const PermittivityTensorField &eps,
+		double output_refractive_index) :
+	FresnelOperator(eps, output_refractive_index) {}
+
+void OutputFresnelOperator::apply(TransverseOpticalField &src) const {
+
+	const std::complex<double> I(0,1.);
+	int Nz = eps.mesh.Nz;
+
+	// Parallel loop which applies the Fresnel boudary conditions
+	// at the output interface
+	#pragma omp parallel for
+	for(int iperp=0; iperp<Nx*Ny; iperp++) {
+		int ix = iperp%Nx;
+		int iy = iperp/Nx;
+
+		double nxx = eps.xx_sqrt({ix,iy,Nz-1});
+		double nyy = eps.yy_sqrt({ix,iy,Nz-1});
+		double nxy = eps.xy_sqrt({ix,iy,Nz-1});
+
+		// We apply the Fresnel BC
+		double det = (niso+nxx)*(niso+nyy)-nxy*nxy;
+		std::complex<double> new_field_val[2] = {
+			2.*( (1.-niso*(niso+nyy)/det) * src({ix,iy},0) + niso*nxy/det * src({ix,iy},1) ),
+			2.*( (1.-niso*(niso+nxx)/det) * src({ix,iy},1) + niso*nxy/det * src({ix,iy},0) )};
 
 		src({ix,iy},0) = new_field_val[0];
 		src({ix,iy},1) = new_field_val[1];

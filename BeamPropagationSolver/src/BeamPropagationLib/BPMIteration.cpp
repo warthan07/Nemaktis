@@ -60,7 +60,8 @@ void BPMIteration::propagate_fields() {
 			eps, wavelengths[wave_idx], settings);
 		PhaseEvolutionOperator secondary_evolution_operator(
 			eps, wavelengths[wave_idx], settings);
-		FresnelOperator fresnel_operator(eps, coefs.get_nin(wavelengths[wave_idx]));
+		InputFresnelOperator input_fresnel_operator(eps, coefs.get_nin(wavelengths[wave_idx]));
+		OutputFresnelOperator output_fresnel_operator(eps, coefs.get_nout(wavelengths[wave_idx]));
 
 		std::vector<SimpleShiftOperator> shift_operators;
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++)
@@ -92,7 +93,7 @@ void BPMIteration::propagate_fields() {
 					screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,1) =
 						beam_profile->get_Ey(x, y);
 				}
-				fresnel_operator.apply(
+				input_fresnel_operator.apply(
 					screen_optical_fields(wave_idx,q_idx,pol_idx));
 
 				if(bulk_output) {
@@ -151,5 +152,11 @@ void BPMIteration::propagate_fields() {
 				}
 			}
 		}
+
+		// We apply the output Fresnel boundary conditions
+		for(int pol_idx=0; pol_idx<2; pol_idx++)
+			for(int q_idx=0; q_idx<q_vals.size(); q_idx++)
+				output_fresnel_operator.apply(
+					screen_optical_fields(wave_idx,q_idx,pol_idx));
 	}
 }
