@@ -35,10 +35,19 @@ class FieldViewer:
     """Is there a polariser in the optical setup?"""
     analyser = True 
     """Is there an analyser in the optical setup?"""
-    compensator = "No"
+    upper_waveplate = "No"
     """
-    If "No", remove the compensator from the optical setup. Other values set the type of
-    compensator:
+    If "No", remove the upper waveplate from the optical setup. Other values set the type of
+    waveplate:
+
+    * "Quarter-wave": An achromatic quarter-wave compensator
+    * "Half-wave": An achromatic half-wave compensator
+    * "Tint-sensitive": a full-wave compensator at 540 nm.
+    """
+    lower_waveplate = "No"
+    """
+    If "No", remove the upper waveplate from the optical setup. Other values set the type of
+    waveplate:
 
     * "Quarter-wave": An achromatic quarter-wave compensator
     * "Half-wave": An achromatic half-wave compensator
@@ -49,8 +58,10 @@ class FieldViewer:
     """Angle (in degree) between the privileged axis of the polariser and the x-axis"""
     analyser_angle = 90
     """Angle (in degree) between the privileged axis of the analyser and the x-axis"""
-    compensator_angle = 0
-    """Angle (in degree) between the fast axis of the compensator and the x-axis"""
+    upper_waveplate_angle = 0
+    """Angle (in degree) between the fast axis of the upper waveplate and the x-axis"""
+    lower_waveplate_angle = 0
+    """Angle (in degree) between the fast axis of the lower waveplate and the x-axis"""
 
     intensity = 1
     """Intensity factor of the micrograph"""
@@ -126,13 +137,23 @@ class FieldViewer:
             self.update_image()
             self._update_plot()
 
-        def update_compensator(compensator):
-            self.compensator = compensator
+        def update_upper_waveplate(waveplate):
+            self.upper_waveplate = waveplate
             self.update_image()
             self._update_plot()
 
-        def update_compensator_angle(new_angle):
-            self.compensator_angle = new_angle
+        def update_upper_waveplate_angle(new_angle):
+            self.upper_waveplate_angle = new_angle
+            self.update_image()
+            self._update_plot()
+
+        def update_lower_waveplate(waveplate):
+            self.lower_waveplate = waveplate
+            self.update_image()
+            self._update_plot()
+
+        def update_lower_waveplate_angle(new_angle):
+            self.lower_waveplate_angle = new_angle
             self.update_image()
             self._update_plot()
 
@@ -204,10 +225,12 @@ class FieldViewer:
             self._fig, {
             "set_polariser": update_polariser,
             "set_polariser_angle": update_polariser_angle,
+            "set_lower_waveplate": update_lower_waveplate,
+            "set_lower_waveplate_angle": update_lower_waveplate_angle,
+            "set_upper_waveplate": update_upper_waveplate,
+            "set_upper_waveplate_angle": update_upper_waveplate_angle,
             "set_analyser": update_analyser,
             "set_analyser_angle": update_analyser_angle,
-            "set_compensator": update_compensator,
-            "set_compensator_angle": update_compensator_angle,
             "set_intensity": update_intensity,
             "set_z_focus": update_focus,
             "set_NA_condenser": update_NA_condenser,
@@ -217,11 +240,13 @@ class FieldViewer:
             "set_n_tiles_y": update_n_tiles_y,
             "save": save}, {
             "polariser": self.polariser,
+            "lower_waveplate": self.lower_waveplate,
+            "upper_waveplate": self.upper_waveplate,
             "analyser": self.analyser,
-            "compensator": self.compensator,
             "polariser_angle": self.polariser_angle,
+            "lower_waveplate_angle": self.lower_waveplate_angle,
+            "upper_waveplate_angle": self.upper_waveplate_angle,
             "analyser_angle": self.analyser_angle,
-            "compensator_angle": self.compensator_angle,
             "intensity": self.intensity,
             "z_focus": self.z_focus,
             "max_NA_condenser": self._optical_fields._max_NA_condenser,
@@ -249,6 +274,11 @@ class FieldViewer:
         (last dim is 3 if in color mode, 1 if in grayscale mode)."""
         return np.flip(np.tile(self._image,(self.n_tiles_y,self.n_tiles_x,1)), axis=0)
 
+    def get_spectrum(self):
+        """Returns the q-averaged spectrum as a numpy array of shape (Ny,Nx,Nl),
+        (last dim is 3 if in color mode, 1 if in grayscale mode)."""
+        return np.flip(np.tile(self._q_averaged_specter,(self.n_tiles_y,self.n_tiles_x,1)), axis=0)
+
 
     def update_image(self):
         """Recompute the micrograph from the optical fields data"""
@@ -266,27 +296,29 @@ class FieldViewer:
             q_idx_end = get_q_idx(self._optical_fields.get_qr_index(self.NA_condenser)+1)
         fields_vals = self._optical_fields.focused_vals[:,q_idx_start:q_idx_end,:,:,:]
 
-        if not self.polariser and self.compensator=="No" and not self.analyser:
+        if not self.polariser and self.lower_waveplate=="No" and self.upper_waveplate=="No" and not self.analyser:
             self._specter[:,:,:,q_idx_start:q_idx_end] = \
                 0.5*np.sum(np.abs(fields_vals)**2, axis=2, keepdims=False).transpose((2,3,0,1))
         else:
             if self.polariser:
                 trans_mat = polariser_matrix(self.polariser_angle)
+                if self.lower_waveplate!="No":
+                    trans_mat = np.matmul(waveplate_matrix(
+                        self.lower_waveplate, self.lower_waveplate_angle,
+                        self._optical_fields.get_wavelengths()), trans_mat)
+                trans_mat = np.matmul(sample_transfer_matrix(fields_vals), trans_mat)
+            elif self.lower_waveplate!="No":
+                trans_mat = waveplate_matrix(
+                    self.lower_waveplate, self.lower_waveplate_angle,
+                    self._optical_fields.get_wavelengths())
                 trans_mat = np.matmul(sample_transfer_matrix(fields_vals), trans_mat)
             else:
                 trans_mat = sample_transfer_matrix(fields_vals)
 
-            if self.compensator=="Quarter-wave":
-                trans_mat = np.matmul(
-                     quarter_waveplate_matrix(self.compensator_angle), trans_mat)
-            elif self.compensator=="Half-wave":
-                trans_mat = np.matmul(
-                     half_waveplate_matrix(self.compensator_angle), trans_mat)
-            elif self.compensator=="Tint-sensitive":
-                trans_mat = np.matmul(
-                    tint_sensitive_matrix(
-                        self._optical_fields.get_wavelengths(), self.compensator_angle),
-                    trans_mat)
+            if self.upper_waveplate!="No":
+                trans_mat = np.matmul(waveplate_matrix(
+                    self.upper_waveplate, self.upper_waveplate_angle,
+                    self._optical_fields.get_wavelengths()), trans_mat)
 
             if self.analyser:
                 trans_mat = np.matmul(polariser_matrix(self.analyser_angle), trans_mat)
@@ -386,6 +418,14 @@ def tint_sensitive_matrix(wavelengths, angle):
         [np.conj(expG)*cosA**2+expG*sinA**2, (np.conj(expG)-expG)*cosA*sinA],
         [(np.conj(expG)-expG)*cosA*sinA, np.conj(expG)*sinA**2+expG*cosA**2]]).transpose(
             (2,0,1))[:,np.newaxis,np.newaxis,np.newaxis,:,:]
+
+def waveplate_matrix(waveplate_type, angle, wavelengths):
+    if waveplate_type=="Quarter-wave":
+        return quarter_waveplate_matrix(angle)
+    elif waveplate_type=="Half-wave":
+        return half_waveplate_matrix(angle)
+    elif waveplate_type=="Tint-sensitive":
+        return tint_sensitive_matrix(wavelengths, angle)
 
 def sample_transfer_matrix(optical_vals):
     dims = optical_vals.shape

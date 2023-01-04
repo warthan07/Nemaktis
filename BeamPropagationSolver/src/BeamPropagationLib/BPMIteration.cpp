@@ -61,7 +61,14 @@ void BPMIteration::propagate_fields() {
 		PhaseEvolutionOperator secondary_evolution_operator(
 			eps, wavelengths[wave_idx], settings);
 		InputFresnelOperator input_fresnel_operator(eps, coefs.get_nin(wavelengths[wave_idx]));
-		OutputFresnelOperator output_fresnel_operator(eps, coefs.get_nout(wavelengths[wave_idx]));
+
+		double nout_fresnel;
+		auto& micrograph_output = settings.postprocessor.micrograph_output;
+		if(micrograph_output.iso_layer_index.size()>0)
+			nout_fresnel = micrograph_output.iso_layer_index[0];
+		else
+			nout_fresnel = coefs.get_nout(wavelengths[wave_idx]);
+		OutputFresnelOperator output_fresnel_operator(eps, nout_fresnel);
 
 		std::vector<SimpleShiftOperator> shift_operators;
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++)

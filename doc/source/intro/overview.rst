@@ -47,7 +47,8 @@ Highlights
 Limitations
 -----------
 
-* Paraxial propagation is assumed, which excludes high-NA microscope objectives.
+* Paraxial propagation is assumed for the BPM backend (but the PSF of the microscope can be
+  set with a high NA).
 * No support for reflection microscopy
 * No support (yet) for biaxial media
 

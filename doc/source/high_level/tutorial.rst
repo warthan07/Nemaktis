@@ -191,13 +191,17 @@ The next step is to define possible isotropic layers above the LC layer (which c
 the optical fields on the focal plane), as well as the refractive indices of all the
 materials in the sample. Since our system here consists of a droplet embedded in another
 fluid, we need to specify both extraordinay and ordinary indices for the LC droplet and the
-refractive index of the host fluid. All these informations are stored in the class
-:class:`~nemaktis.lc_material.LCMaterial`:
+refractive index of the host fluid. To approximate the reflection loss at the entrance of
+the LC layer, the index ``nin`` of the medium just below the LC layer can also be set.
+Finally, the index ``nout`` of the medium between the sample and the microscope objective
+can also be set and allows to specify an objective's numerical aperture greater than one
+(e.g. in the case of an oil-immersion objective) All these informations are stored in the
+class :class:`~nemaktis.lc_material.LCMaterial`:
 
 .. code-block:: python
 
     mat = nm.LCMaterial(
-        lc_field=nfield, ne=1.5, no=1.7, nhost=1.55)
+        lc_field=nfield, ne=1.5, no=1.7, nhost=1.55, nin=1.51, nout=1)
 
 Note that you can also specify refractive indices with a string expression depending on the
 wavelength variable "lambda" (in µm), in case you want to take into account the dispersivity
@@ -211,10 +215,15 @@ between the droplet and the glass plate:
     mat.add_isotropic_layer(nlayer=1.55, thickness=5) # 5 µm space between the droplet and glass plate
     mat.add_isotropic_layer(nlayer=1.51, thickness=1000) # 1mm-thick glass plate
 
-We don't specify isotropic layers below the sample because in ``nemaktis`` the incident
-optical fields always correspond to a set of plane waves whose wavectors are weakly tilted
-with respect to the ``z`` direction (in which case the amplitude of the fields is uniformly
-affected by any isotropic layers orthogonal to ``z``).
+Using all those informations, Fresnel reflections in the isotropic layers above the sample
+can be calculated exactly and also give the fields transmitted through the sample.
+The full details of the isotropic layers below the sample are not needed because in
+``nemaktis`` the incident optical fields always correspond to a set of plane waves whose
+wavectors are weakly tilted with respect to the ``z`` direction (in which case the amplitude
+of the fields is uniformly affected by any isotropic layers orthogonal to ``z``). However,
+anisotropic Fresnel boundary conditions at the entrance of the LC layer may affect the
+optical fields in a space-dependent way. These interface conditions are determined from the
+refractive indices given in the constructor of the LCMaterial, as explained above.
 
 .. _prop:
 

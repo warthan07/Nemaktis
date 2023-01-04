@@ -21,34 +21,41 @@ import os
 
 class OpticalElementSettings(HasTraits):
     polariser = Enum(("Yes", "No"))
+    lower_waveplate = Enum(("No", "Quarter-wave", "Half-wave", "Tint-sensitive"))
+    upper_waveplate = Enum(("No", "Quarter-wave", "Half-wave", "Tint-sensitive"))
     analyser = Enum(("Yes", "No"))
-    compensator = Enum(("No", "Quarter-wave", "Half-wave", "Tint-sensitive"))
 
     polariser_angle = Float(0)
+    lower_waveplate_angle = Float(0)
+    upper_waveplate_angle = Float(0)
     analyser_angle = Float(90)
-    compensator_angle = Float(0)
 
     view = View(
         Group(
             Spring(),
             Group(
                 Item("polariser", label="Polariser?", style="custom"),
-                Item("compensator", label="Compensator?"),
+                Item("lower_waveplate", label="Lower waveplate?"),
+                Item("upper_waveplate", label="Upper waveplate?"),
                 Item("analyser", label="Analyser?", style="custom"),
+                Spring(width=-50),
                 Spring(width=-50),
                 Spring(width=-50),
                 Spring(width=-50),
                 Item("polariser_angle",enabled_when="polariser==\"Yes\"",editor=RangeEditor(
                     mode="slider", format="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
-                Item("compensator_angle",enabled_when="compensator!=\"No\"",editor=RangeEditor(
+                Item("lower_waveplate_angle",enabled_when="lower_waveplate!=\"No\"",editor=RangeEditor(
+                    mode="slider", format="%.2f",
+                    low=-90., high=90., low_label="-90", high_label="90")),
+                Item("upper_waveplate_angle",enabled_when="upper_waveplate!=\"No\"",editor=RangeEditor(
                     mode="slider", format="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("analyser_angle",enabled_when="analyser==\"Yes\"",editor=RangeEditor(
                     mode="slider", format="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 orientation="horizontal",
-                columns=3),
+                columns=4),
             Spring(),
             orientation="vertical",
             label="Optical elements settings",
@@ -58,24 +65,32 @@ class OpticalElementSettings(HasTraits):
     def __init__(self, callback_dict, default_val_dict):
         self._callback_dict = callback_dict
         self.polariser = "Yes" if default_val_dict["polariser"] else "No"
+        self.lower_waveplate = default_val_dict["lower_waveplate"]
+        self.upper_waveplate = default_val_dict["upper_waveplate"]
         self.analyser = "Yes" if default_val_dict["analyser"] else "No"
-        self.compensator = default_val_dict["compensator"]
+
         self.polariser_angle = default_val_dict["polariser_angle"]
+        self.lower_waveplate_angle = default_val_dict["lower_waveplate_angle"]
+        self.upper_waveplate_angle = default_val_dict["upper_waveplate_angle"]
         self.analyser_angle = default_val_dict["analyser_angle"]
-        self.compensator_angle = default_val_dict["compensator_angle"]
 
     def _polariser_changed(self):
         self._callback_dict["set_polariser"](self.polariser)
+    def _lower_waveplate_changed(self):
+        self._callback_dict["set_lower_waveplate"](self.lower_waveplate)
+    def _upper_waveplate_changed(self):
+        self._callback_dict["set_upper_waveplate"](self.upper_waveplate)
     def _analyser_changed(self):
         self._callback_dict["set_analyser"](self.analyser)
-    def _compensator_changed(self):
-        self._callback_dict["set_compensator"](self.compensator)
+
     def _polariser_angle_changed(self):
         self._callback_dict["set_polariser_angle"](self.polariser_angle)
+    def _lower_waveplate_angle_changed(self):
+        self._callback_dict["set_lower_waveplate_angle"](self.lower_waveplate_angle)
+    def _upper_waveplate_angle_changed(self):
+        self._callback_dict["set_upper_waveplate_angle"](self.upper_waveplate_angle)
     def _analyser_angle_changed(self):
         self._callback_dict["set_analyser_angle"](self.analyser_angle)
-    def _compensator_angle_changed(self):
-        self._callback_dict["set_compensator_angle"](self.compensator_angle)
 
 
 
@@ -262,7 +277,7 @@ class SettingPanels(HasTraits):
         Group(
             Spring(),
             Item("optical_elements_settings",
-                style='custom', show_label=False, height=-140),
+                style='custom', show_label=False, height=-180),
             Spring(height=-20),
             Item("microscope_settings",
                 style='custom', show_label=False, height=-240),
