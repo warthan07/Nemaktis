@@ -597,7 +597,7 @@ class OpticalFields:
         kSqr_masked = kSqr.flatten()[mask]
 
         filt = 1j*np.zeros(Nl*Nq*self._Nx*self._Ny)
-        filt[mask] = np.exp(1j*(np.sqrt(kn_masked**2-kSqr_masked)-0*kn_masked))
+        filt[mask] = np.exp(1j*(np.sqrt(kn_masked**2-kSqr_masked)-kn_masked))
         self._objective_filter = np.reshape(filt, (Nl,Nq,1,self._Ny,self._Nx))
         self._objective_mask = (kSqr<(k0*self._max_NA_objective)**2).astype(float)
         self._kSqr = kSqr
