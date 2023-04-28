@@ -1,2 +1,2 @@
-sphinx==1.8.0
+sphinx==1.7.5
 jinja2<3.1
