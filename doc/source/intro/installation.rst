@@ -65,7 +65,7 @@ to find the associated package and installation command. For example, to install
 you just need to type: ::
 
   mamba activate nm
-  mamba install -conda-forge -y spyder
+  mamba install -c conda-forge -y spyder
 
 Note that when you want to run python scripts using nemaktis, the installed python editor
 should always be run from inside the *nm* environment. For example, to run ``Spyder``, you
