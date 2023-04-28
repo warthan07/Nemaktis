@@ -5,5 +5,6 @@ channels:
     - nodefaults
 dependencies:
     - sphinx=1.7.5
-    - jinja2=2.9.0
     - sphinx_rtd_theme
+    - pip:
+      - jinja2==3.0.0
