@@ -37,11 +37,11 @@ step is as simple as running the following installation script
 
 https://github.com/warthan07/Nemaktis/releases/download/v1.4.4/Install_Nemaktis-1.4.4.cmd
 
-This script will create a special environment for ``Nemaktis`` named *nm* and will install
-everything needed in it. It will also install the python editor ``Spyder`` and create a
-shortcut named *Spyder (Nemakis environment)* for it on your Desktop (this is necessary even
-if you already installed Spyder, since it has to be run from inside the conda environment
-*nm*).
+This script will ask for the root path of the anaconda distribution installed in step a,
+create a special environment for ``Nemaktis`` named *nm* and will install everything needed
+in it. It will also install the python editor ``Spyder`` and create a shortcut named *Spyder
+(Nemakis environment)* for it on your Desktop (this is necessary even if you already
+installed Spyder, since it has to be run from inside the conda environment *nm*).
 
 b2. (Windows/Linux) Install Nemaktis on the command line
 ........................................................
@@ -64,14 +64,14 @@ to install and run it from the same conda environment. You can search https://an
 to find the associated package and installation command. For example, to install ``Spyder``
 you just need to type: ::
 
-  conda activate nm
-  conda install spyder
+  mamba activate nm
+  mamba install -conda-forge -y spyder
 
 Note that when you want to run python scripts using nemaktis, the installed python editor
 should always be run from inside the *nm* environment. For example, to run ``Spyder``, you
 should type in the terminal: ::
 
-  conda activate nm
+  mamba activate nm
   spyder
 
 The advantage of step b1 is that it creates a shortcut for Spyder which automatically does
