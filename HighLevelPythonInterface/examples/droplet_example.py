@@ -42,7 +42,7 @@ else:
     mat.add_isotropic_layer(nlayer=1.51, thickness=1000)
 
     # Since we assumed an index-matched objective, we can set NA above 1
-    wavelengths = np.linspace(0.4, 0.8, 3)
+    wavelengths = np.linspace(0.4, 0.8, 11)
     sim = nm.LightPropagator(
         material=mat, wavelengths=wavelengths, max_NA_objective=1.1)
     output_fields = sim.propagate_fields(method="bpm")
