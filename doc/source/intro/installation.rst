@@ -25,7 +25,7 @@ packages for both **Linux** and **Windows 10**, which means the following method
 on these two operating systems. 
 
 ``mamba`` is a package manager based on the ``conda`` python package manager, but with far better
- performance since it is written in C++. Previous versions of Nemaktis were using ``conda``
+performance since it is written in C++. Previous versions of Nemaktis were using ``conda``
 (or ``mamba`` installed on top of ``conda``) but this proved to be too difficult to maintain because
 of these poor performances. For this reason, any Nemaktis version >=1.4.7 requires the 
 ``Mambaforge`` distribution to be installed locally on your computer (i.e. on your user folder), 
