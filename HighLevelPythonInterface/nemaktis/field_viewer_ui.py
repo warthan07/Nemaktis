@@ -1,8 +1,7 @@
 import six
 from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt'
+ETSConfig.toolkit = 'qt4'
 
-import matplotlib as mpl
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -11,7 +10,7 @@ from traitsui.api import View, Item, Spring, Group, RangeEditor, EnumEditor
 from traitsui.qt4.editor import Editor
 from traitsui.basic_editor_factory import BasicEditorFactory
 
-from pyface.qt import QtGui, QtCore
+from pyface.qt import QtGui
 from pyface.util.guisupport import start_event_loop_qt4
 
 from threading import Thread
@@ -43,16 +42,16 @@ class OpticalElementSettings(HasTraits):
                 Spring(width=-50),
                 Spring(width=-50),
                 Item("polariser_angle",enabled_when="polariser==\"Yes\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("lower_waveplate_angle",enabled_when="lower_waveplate!=\"No\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("upper_waveplate_angle",enabled_when="upper_waveplate!=\"No\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("analyser_angle",enabled_when="analyser==\"Yes\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 orientation="horizontal",
                 columns=4),
@@ -119,17 +118,17 @@ class MicroscopeSettings(HasTraits):
             Spring(),
             Group(
                 Item("intensity", editor=RangeEditor(
-                    mode="slider", format="%.2f", is_float=True,
+                    mode="slider", format_str="%.2f", is_float=True,
                     low_name="min_intensity", high_name="max_intensity")),
                 Item("z_focus", label="Z-focus", editor=RangeEditor(
-                    mode="slider", format="%.2f", is_float=True,
+                    mode="slider", format_str="%.2f", is_float=True,
                     low_name="min_focus", high_name="max_focus")),
                 Item("NA_condenser", enabled_when="activate_NA_condenser==True",
                     label="Condenser NA", editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=0., high_name="max_NA_condenser", low_label="0", high_label="1")),
                 Item("NA_objective", label="Objective NA", editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=0., high_name="max_NA_objective", low_label="0", high_label="1")),
                 Spring(width=-50),
                 Spring(width=-50),
@@ -343,12 +342,13 @@ class FieldViewerUI(HasTraits):
             Spring(width=-20),
             orientation="horizontal"),
         kind="live",
+        title="Nemaktis field viewer UI",
         resizable=True)
 
     def __init__(self, figure, callback_dict, default_val_dict):
         self.setting_panels = SettingPanels(callback_dict, default_val_dict)
         self.figure_panel = FigurePanel(figure)
-
+        
         self.edit_traits()
         app = QtGui.QApplication.instance()
         app.lastWindowClosed.connect(app.quit)
