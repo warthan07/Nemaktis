@@ -55,7 +55,7 @@ Alternatively, if you are a Linux user or want to type the installation commands
 (they are not very complicated after all!), open a terminal (Windows: application "Miniforge
 prompt" installed with Mambaforge, Linux: any terminal) and type the following command: ::
   
-  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.6
+  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.7
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
 to install and run it from the same mamba environment. You can search https://anaconda.org/
