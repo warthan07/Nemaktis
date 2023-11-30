@@ -16,6 +16,8 @@ import numpy as np
 import multiprocessing
 import pyfftw 
 
+pyfftw.config.NUM_THREADS = multiprocessing.cpu_count()
+
 from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
@@ -67,7 +69,8 @@ class LightPropagator:
         Nr correspond to the value of this parameter.
     """
     def __init__(self, *, material, wavelengths, max_NA_objective,
-            max_NA_condenser = 0, N_radial_wavevectors = 1):
+            max_NA_condenser = 0, N_radial_wavevectors = 1,
+            koehler_1D = False):
         if not isinstance(material, LCMaterial):
             raise TypeError("material should be a LCMaterial object")
         self._material = material
@@ -75,15 +78,29 @@ class LightPropagator:
         self._max_NA_objective = max_NA_objective
         self._max_NA_condenser = max_NA_condenser
         self._N_radial_wavevectors = N_radial_wavevectors
+        self._koehler_1D = koehler_1D
 
-        self._wavevectors = np.zeros(
-            (1+3*N_radial_wavevectors*(N_radial_wavevectors-1),2))
-        for ir in range(1,N_radial_wavevectors):
-            beta = ir*self._max_NA_condenser/(N_radial_wavevectors-1)
-            for iphi in range(0,6*ir):
-                phi = iphi*np.pi/(3*ir)
-                self._wavevectors[1+3*ir*(ir-1)+iphi,0] = beta*np.cos(phi)
-                self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
+        Nr = N_radial_wavevectors
+        if material.lc_field.get_mesh_dimensions()[0]==1 and koehler_1D:
+            self._wavevectors = np.zeros((2*Nr-1,2))
+            for ir in range(1,Nr):
+                beta = ir*self._max_NA_condenser/(Nr-1)
+                self._wavevectors[Nr-1+ir,1] = beta
+                self._wavevectors[Nr-1-ir,1] = -beta
+        elif material.lc_field.get_mesh_dimensions()[1]==1 and koehler_1D:
+            self._wavevectors = np.zeros((2*Nr-1,2))
+            for ir in range(1,Nr):
+                beta = ir*self._max_NA_condenser/(Nr-1)
+                self._wavevectors[Nr-1+ir,0] = beta
+                self._wavevectors[Nr-1-ir,0] = -beta
+        else:
+            self._wavevectors = np.zeros((1+3*Nr*(Nr-1),2))
+            for ir in range(1,Nr):
+                beta = ir*self._max_NA_condenser/(Nr-1)
+                for iphi in range(0,6*ir):
+                    phi = iphi*np.pi/(3*ir)
+                    self._wavevectors[1+3*ir*(ir-1)+iphi,0] = beta*np.cos(phi)
+                    self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
 
     @property
     def material(self):
@@ -129,6 +146,7 @@ class LightPropagator:
 
         lc_field = self._material.lc_field
         dims = lc_field.get_mesh_dimensions()
+        lengths = lc_field.get_mesh_lengths()
         spacings = lc_field.get_mesh_spacings()
         wavevectors = self._wavevectors.flatten().tolist()
         json_str = JSONEncoder().encode({
@@ -149,6 +167,7 @@ class LightPropagator:
                 "Coefficients": {
                     "no":               str(self._material.no),
                     "ne":               str(self._material.ne),
+                    "ne_imag":          str(self._material.ne_imag),
                     "nhost":            str(self._material.nhost),
                     "nin":              str(self._material.nin),
                     "nout":             str(self._material.nout),
@@ -204,7 +223,8 @@ class LightPropagator:
             max_NA_objective = self._max_NA_objective,
             max_NA_condenser = self._max_NA_condenser,
             N_radial_wavevectors = self._N_radial_wavevectors,
-            mesh_lengths = (spacings[0]*(dims[0]-1), spacings[1]*(dims[1]-1)),
+            koehler_1D = self._koehler_1D,
+            mesh_lengths = (lengths[0], lengths[1]),
             mesh_dimensions = (dims[0], dims[1]))
 
         Nl = len(self._wavelengths)
@@ -218,6 +238,7 @@ class LightPropagator:
 
         lc_field = self._material.lc_field
         dims = lc_field.get_mesh_dimensions()
+        lengths = lc_field.get_mesh_lengths()
         spacings = lc_field.get_mesh_spacings()
 
         if np.abs(spacings[0]-spacings[1])>1e-6:
@@ -378,7 +399,8 @@ class LightPropagator:
             max_NA_objective = self._max_NA_objective,
             max_NA_condenser = self._max_NA_condenser,
             N_radial_wavevectors = self._N_radial_wavevectors,
-            mesh_lengths = (spacings[0]*(dims[0]-1), spacings[1]*(dims[1]-1)),
+            koehler_1D = self._koehler_1D,
+            mesh_lengths = (lengths[0], lengths[1]),
             mesh_dimensions = (dims[0], dims[1]))
 
         Nl = len(self._wavelengths)
@@ -466,20 +488,23 @@ class OpticalFields:
                 (vn.vtk_to_numpy(field_data.GetArray("qx")),
                 vn.vtk_to_numpy(field_data.GetArray("qy"))), axis=-1)
             Nq = len(self._wavevectors)
-            Nr = int(np.round((1+np.sqrt((4*Nq-1)/3))/2))
-            if Nq!=1+3*Nr*(Nr-1):
-                raise Exception(
-                    "VTI file contain the wrong number of wavevectors")
+
+            if field_data.HasArray("koehler_1D"):
+                self._koehler_1D = vn.vtk_to_numpy(field_data.GetArray("koehler_1D"))[0]==1
             else:
-                self._N_radial_wavevectors = Nr
-            self._max_NA_condenser = np.sqrt(np.sum(self._wavevectors**2,axis=1))[-1]
-            for qr_idx in range(0,Nr):
-                q_idx_start = 1+3*qr_idx*(qr_idx-1) if qr_idx>0 else 0
-                q_idx_end = 1+3*qr_idx*(qr_idx+1)
-                q_norms = np.sqrt(np.sum(self._wavevectors[q_idx_start:q_idx_end,:]**2,axis=1))
-                if qr_idx>0 and np.max(np.abs(q_norms-qr_idx*self._max_NA_condenser/(Nr-1)))>1e-8:
+                self._koehler_1D = False
+            if (dims[0]==1 or dims[1]==1) and self._koehler_1D:
+                Nr = Nq//2
+                if Nq!=1+2*Nr:
                     raise Exception(
-                        "Incompatible wavevector mesh inside the VTI file")
+                            "VTI file contain the wrong number of wavevectors")
+            else:
+                Nr = int(np.round((1+np.sqrt((4*Nq-1)/3))/2))
+                if Nq!=1+3*Nr*(Nr-1):
+                    raise Exception(
+                            "VTI file contain the wrong number of wavevectors")
+            self._N_radial_wavevectors = Nr
+            self._max_NA_condenser = np.sqrt(np.sum(self._wavevectors**2,axis=1))[-1]
 
             if not field_data.HasArray("max_NA_objective"):
                 raise Exception(
@@ -535,25 +560,40 @@ class OpticalFields:
             if len(kwargs["mesh_lengths"])!=2:
                 raise Exception("mesh_lengths should be an array-like object of size 2")
 
-            self._n_out = kwargs["n_out"]
-            self._zfoc_NA_corr = kwargs["zfoc_NA_corr"]
+            self._n_out = kwargs["n_out"] if "n_out" in kwargs else 1
+            self._zfoc_NA_corr = kwargs["zfoc_NA_corr"] if "zfoc_NA_corr" in kwargs else 0
             self._wavelengths = np.array(kwargs["wavelengths"])
             self._max_NA_objective = kwargs["max_NA_objective"]
-            self._max_NA_condenser = kwargs["max_NA_condenser"]
-            self._N_radial_wavevectors = kwargs["N_radial_wavevectors"]
+            self._max_NA_condenser = kwargs["max_NA_condenser"] if "max_NA_condenser" in kwargs else 0
+            self._N_radial_wavevectors = \
+                kwargs["N_radial_wavevectors"] if "N_radial_wavevectors" in kwargs else 1
+            self._koehler_1D = kwargs["koehler_1D"] if "koehler_1D" in kwargs else False
             self._NA = self._max_NA_objective
-
-            Nr = self._N_radial_wavevectors
-            self._wavevectors = np.zeros((1+3*Nr*(Nr-1),2))
-            for ir in range(1,Nr):
-                beta = ir*self._max_NA_condenser/(Nr-1)
-                for iphi in range(0,6*ir):
-                    phi = iphi*np.pi/(3*ir)
-                    self._wavevectors[1+3*ir*(ir-1)+iphi,0] = beta*np.cos(phi)
-                    self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
 
             dims = np.array(kwargs["mesh_dimensions"])
             lengths = np.array(kwargs["mesh_lengths"])
+            Nr = self._N_radial_wavevectors
+
+            if dims[0]==1 and self._koehler_1D:
+                self._wavevectors = np.zeros((2*Nr-1,2))
+                for ir in range(1,Nr):
+                    beta = ir*self._max_NA_condenser/(Nr-1)
+                    self._wavevectors[Nr-1+ir,1] = beta
+                    self._wavevectors[Nr-1-ir,1] = -beta
+            elif dims[1]==1 and self._koehler_1D:
+                self._wavevectors = np.zeros((2*Nr-1,2))
+                for ir in range(1,Nr):
+                    beta = ir*self._max_NA_condenser/(Nr-1)
+                    self._wavevectors[Nr-1+ir,0] = beta
+                    self._wavevectors[Nr-1-ir,0] = -beta
+            else:
+                self._wavevectors = np.zeros((1+3*Nr*(Nr-1),2))
+                for ir in range(1,Nr):
+                    beta = ir*self._max_NA_condenser/(Nr-1)
+                    for iphi in range(0,6*ir):
+                        phi = iphi*np.pi/(3*ir)
+                        self._wavevectors[1+3*ir*(ir-1)+iphi,0] = beta*np.cos(phi)
+                        self._wavevectors[1+3*ir*(ir-1)+iphi,1] = beta*np.sin(phi)
 
             (self._Nx, self._Ny) = tuple(int(dim) for dim in dims)
             (self._Lx, self._Ly) = tuple(lengths)
@@ -609,8 +649,12 @@ class OpticalFields:
         """Returns a hard copy of this OpticalFields object"""
         new_fields = OpticalFields(
             wavelengths = self._wavelengths,
+            max_NA_objective = self._max_NA_objective,
             max_NA_condenser = self._max_NA_condenser,
             N_radial_wavevectors = self._N_radial_wavevectors,
+            koehler_1D = self._koehler_1D,
+            zfoc_NA_corr = self._zfoc_NA_corr,
+            n_out = self._n_out,
             mesh_dimensions = (self._Nx, self._Ny),
             mesh_lengths = (self._Lx, self._Ly))
         new_fields.vals = self.vals # need to use the setter method for byte-aligned hard copy
@@ -665,10 +709,8 @@ class OpticalFields:
         to the focusing plane (whose altitude inside the sample is set with the parameter
         z_focus)."""
         if z_focus is not None:
-            zf = z_focus + self._NA**2*self._zfoc_NA_corr
             self._z = z_focus
-        else:
-            zf = self._z + self._NA**2*self._zfoc_NA_corr
+        zf = self._z + self._NA**2*self._zfoc_NA_corr
         filt = self._objective_mask*self._objective_filter**np.abs(zf)
 
         self._fft_plan()
@@ -724,6 +766,10 @@ class OpticalFields:
         nout_data = vn.numpy_to_vtk(np.array([self._n_out]))
         nout_data.SetName("n_out")
         vti_data.GetFieldData().AddArray(nout_data)
+
+        koehler_1D_data = vn.numpy_to_vtk(np.array([self._koehler_1D]).astype(float))
+        koehler_1D_data.SetName("koehler_1D")
+        vti_data.GetFieldData().AddArray(koehler_1D_data)
 
         qx_data = vn.numpy_to_vtk(self._wavevectors[:,0])
         qx_data.SetName("qx")

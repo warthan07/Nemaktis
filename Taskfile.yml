@@ -1,0 +1,42 @@
+version: '3'
+
+vars:
+  NEMAKTIS_DIR: '{{.PWD}}/HighLevelPythonInterface/nemaktis'
+  BPM_BUILD_DIR: '{{.PWD}}/BeamPropagationSolver/bin'
+  ENV_DIR: '{{.PWD}}/dev/envs'
+  DEV_ENV_DIR: '{{.ENV_DIR}}/dev-nm'
+  SITE_PACKAGES_DIR: '{{.DEV_ENV_DIR}}/lib/python3.9/site-packages/'
+  DEV_RUN: 'mamba run --prefix {{.DEV_ENV_DIR}}'
+
+tasks:
+  _create-env:
+    run: 'when_changed'
+    internal: true
+    cmds:
+      - 'mamba create -y -p "{{.prefix}}" -c conda-forge --file ./dev/environment-dev.txt'
+      - '{{.DEV_RUN}} pip install dtmm'
+      - 'ln -s {{.NEMAKTIS_DIR}} {{.SITE_PACKAGES_DIR}}'
+    sources:
+      - './dev/environment-dev.yml'
+    generates:
+      - '{{.prefix}}/conda-meta/**/*'
+
+  create-dev-env:
+    desc: Create a local mamba environment with all needed dependencies for development
+    summary: |
+      Create development mamba environment with dependencies and development packages used to build
+      Nemaktis. The environment is located at "{{.DEV_ENV_DIR}}" and can also be activated with mamba.
+    cmds: [{task: '_create-env', vars: {prefix: '{{.DEV_ENV_DIR}}'}}]
+
+  make-bpm:
+    desc: Compile the BPM backend and automatically link it in the mamba dev environment
+    cmds:
+      - mkdir -p {{.BPM_BUILD_DIR}}
+      - cd {{.BPM_BUILD_DIR}} && {{.DEV_RUN}} cmake .. && {{.DEV_RUN}} make
+      - ln -sf {{.BPM_BUILD_DIR}}/bpm_backend.py {{.SITE_PACKAGES_DIR}}
+      - ln -sf {{.BPM_BUILD_DIR}}/_bpm_backend.so {{.SITE_PACKAGES_DIR}}
+
+  clean:
+    desc: Clean the mamba development environment and C++ build directories
+    cmds:
+      - rm -r "{{.ENV_DIR}}" "{{.BPM_BUILD_DIR}}"

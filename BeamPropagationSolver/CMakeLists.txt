@@ -2,8 +2,8 @@
 # General settings
 ##################
 
-project(bpm-solver)
 cmake_minimum_required(VERSION 3.11.2)
+project(bpm-solver)
 
 # generate json file for completion with YCM
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 
@@ -13,6 +13,11 @@ if(DEFINED ENV{MYROOT})
 endif()
 if(DEFINED ENV{PREFIX})
 	set(CMAKE_INSTALL_PREFIX $ENV{PREFIX})
+endif()
+if(DEFINED ENV{CONDA_PREFIX})
+	set(CMAKE_PREFIX_PATH $ENV{CONDA_PREFIX})
+	include_directories($ENV{CONDA_PREFIX}/include)
+	link_directories($ENV{CONDA_PREFIX}/lib)
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
@@ -31,7 +36,7 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.73 EXACT REQUIRED COMPONENTS filesystem regex system)
+find_package(Boost 1.76 EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
@@ -50,7 +55,7 @@ find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
 set(Python3_FIND_REGISTRY LAST)
-find_package(Python3 3.8 EXACT REQUIRED COMPONENTS Development NumPy)
+find_package(Python3 3.9 EXACT REQUIRED COMPONENTS Development NumPy)
 
 
 ###########################################################################

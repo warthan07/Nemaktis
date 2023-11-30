@@ -8,7 +8,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from traits.api import HasTraits, Enum, Float, Bool, Int, Str, Directory, Instance, Button
 from traitsui.api import View, Item, Spring, Group, RangeEditor, EnumEditor
-from traitsui.qt4.editor import Editor
+from traitsui.qt.editor import Editor
 from traitsui.basic_editor_factory import BasicEditorFactory
 
 from pyface.qt import QtGui, QtCore
@@ -29,6 +29,7 @@ class OpticalElementSettings(HasTraits):
     lower_waveplate_angle = Float(0)
     upper_waveplate_angle = Float(0)
     analyser_angle = Float(90)
+    angle_lock = Enum(("Yes", "No"))
 
     view = View(
         Group(
@@ -42,20 +43,23 @@ class OpticalElementSettings(HasTraits):
                 Spring(width=-50),
                 Spring(width=-50),
                 Spring(width=-50),
+                Spring(width=-50),
+                Spring(width=-50),
                 Item("polariser_angle",enabled_when="polariser==\"Yes\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("lower_waveplate_angle",enabled_when="lower_waveplate!=\"No\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("upper_waveplate_angle",enabled_when="upper_waveplate!=\"No\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
                 Item("analyser_angle",enabled_when="analyser==\"Yes\"",editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=-90., high=90., low_label="-90", high_label="90")),
+                Item("angle_lock", label="Lock relative angles?", style="custom"),
                 orientation="horizontal",
-                columns=4),
+                columns=5),
             Spring(),
             orientation="vertical",
             label="Optical elements settings",
@@ -73,6 +77,7 @@ class OpticalElementSettings(HasTraits):
         self.lower_waveplate_angle = default_val_dict["lower_waveplate_angle"]
         self.upper_waveplate_angle = default_val_dict["upper_waveplate_angle"]
         self.analyser_angle = default_val_dict["analyser_angle"]
+        self.angle_lock = "Yes" if default_val_dict["angle_lock"] else "No"
 
     def _polariser_changed(self):
         self._callback_dict["set_polariser"](self.polariser)
@@ -83,14 +88,29 @@ class OpticalElementSettings(HasTraits):
     def _analyser_changed(self):
         self._callback_dict["set_analyser"](self.analyser)
 
+    def _update_angles(self, new_angles):
+        if "polariser" in new_angles:
+            self.polariser_angle = new_angles["polariser"]
+        if "analyser" in new_angles:
+            self.analyser_angle = new_angles["analyser"]
+        if "upper_waveplate" in new_angles:
+            self.upper_waveplate_angle = new_angles["upper_waveplate"]
+        if "lower_waveplate" in new_angles:
+            self.lower_waveplate_angle = new_angles["lower_waveplate"]
     def _polariser_angle_changed(self):
-        self._callback_dict["set_polariser_angle"](self.polariser_angle)
+        new_angles = self._callback_dict["set_polariser_angle"](self.polariser_angle)
+        self._update_angles(new_angles)
     def _lower_waveplate_angle_changed(self):
-        self._callback_dict["set_lower_waveplate_angle"](self.lower_waveplate_angle)
+        new_angles = self._callback_dict["set_lower_waveplate_angle"](self.lower_waveplate_angle)
+        self._update_angles(new_angles)
     def _upper_waveplate_angle_changed(self):
-        self._callback_dict["set_upper_waveplate_angle"](self.upper_waveplate_angle)
+        new_angles = self._callback_dict["set_upper_waveplate_angle"](self.upper_waveplate_angle)
+        self._update_angles(new_angles)
     def _analyser_angle_changed(self):
-        self._callback_dict["set_analyser_angle"](self.analyser_angle)
+        new_angles = self._callback_dict["set_analyser_angle"](self.analyser_angle)
+        self._update_angles(new_angles)
+    def _angle_lock_changed(self):
+        self._callback_dict["set_angle_lock"](self.angle_lock)
 
 
 
@@ -119,17 +139,17 @@ class MicroscopeSettings(HasTraits):
             Spring(),
             Group(
                 Item("intensity", editor=RangeEditor(
-                    mode="slider", format="%.2f", is_float=True,
+                    mode="slider", format_str="%.2f", is_float=True,
                     low_name="min_intensity", high_name="max_intensity")),
                 Item("z_focus", label="Z-focus", editor=RangeEditor(
-                    mode="slider", format="%.2f", is_float=True,
+                    mode="slider", format_str="%.2f", is_float=True,
                     low_name="min_focus", high_name="max_focus")),
                 Item("NA_condenser", enabled_when="activate_NA_condenser==True",
                     label="Condenser NA", editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=0., high_name="max_NA_condenser", low_label="0", high_label="1")),
                 Item("NA_objective", label="Objective NA", editor=RangeEditor(
-                    mode="slider", format="%.2f",
+                    mode="slider", format_str="%.2f",
                     low=0., high_name="max_NA_objective", low_label="0", high_label="1")),
                 Spring(width=-50),
                 Spring(width=-50),

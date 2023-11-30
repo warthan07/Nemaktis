@@ -31,10 +31,15 @@ private:
 	const std::complex<double> I;
 
 	/**
-	 * Reference refractive index.
+	 * Reference refractive index, set to the ordinary index of the LC
 	 */
-	const double nref;
-	
+	const double no;
+
+    /**
+     * Complex factor allowing to take into account a nonzero imaginary part for the
+     * extraordinary index, linked to absorption along the director
+     */
+    const std::complex<double> absorp_fac;	
 };
 
 #endif

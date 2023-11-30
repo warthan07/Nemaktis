@@ -25,8 +25,9 @@ class CoefficientsSettings : public BaseSettings {
 public:
 	CoefficientsSettings(const nlohmann::json &j);
 
-	const std::string ne_expression;
 	const std::string no_expression;
+	const std::string ne_expression;
+	const std::string ne_imag_expression;
 	const std::string nhost_expression;
 	const std::string nin_expression;
 	const std::string nout_expression;

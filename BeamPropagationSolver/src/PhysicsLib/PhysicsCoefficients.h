@@ -20,6 +20,7 @@ public:
 		const CartesianMesh &mesh);
 
 	double get_ne(double wavelength) const;
+	double get_ne_imag(double wavelength) const;
 	double get_no(double wavelength) const;
 	double get_nhost(double wavelength) const;
 	double get_nin(double wavelength) const;
@@ -43,6 +44,7 @@ public:
 
 private:
 	std::string ne_expression;
+	std::string ne_imag_expression;
 	std::string no_expression;
 	std::string nhost_expression;
 	std::string nin_expression;

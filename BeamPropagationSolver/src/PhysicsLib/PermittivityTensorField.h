@@ -18,6 +18,9 @@ public:
 	double get_ne() const {
 		return ne;
 	}
+	double get_ne_imag() const {
+		return ne_imag;
+	}
 	double get_no() const {
 		return no;
 	}
@@ -84,6 +87,10 @@ private:
 	 * Extraordinary refractive index sqrt(eps_parallel)
 	 */
 	const double ne;
+	/**
+	 * Imaginary part of the extraordinary refractive index
+	 */
+	const double ne_imag;
 	/**
 	 * Reference index (mean eigenvalue of the averaged square root transverse permittivity)
 	 */

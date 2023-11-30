@@ -7,6 +7,7 @@ PermittivityTensorField::PermittivityTensorField(
 	VectorField<double>(lc_sol.mesh, 12),
 	no(coefs.get_no(wavelength)),
 	ne(coefs.get_ne(wavelength)),
+	ne_imag(coefs.get_ne_imag(wavelength)),
 	eps_perp(std::pow(no,2.)),
 	eps_a(std::pow(ne,2.)-eps_perp),
 	eps_host(std::pow(coefs.get_nhost(wavelength),2.)) {

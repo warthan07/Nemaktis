@@ -8,7 +8,8 @@ PhaseEvolutionOperator::PhaseEvolutionOperator(
 	op_yy(Nx*Ny),
 	op_xy(Nx*Ny),
 	I(0,1),
-	nref(eps.get_no()) {}
+	no(eps.get_no()),
+    absorp_fac(std::complex<double>(1, eps.get_ne_imag()/(eps.get_ne()-no))) {}
 
 int PhaseEvolutionOperator::apply(TransverseOpticalField &field) {
 
@@ -32,8 +33,6 @@ int PhaseEvolutionOperator::apply(TransverseOpticalField &field) {
 
 void PhaseEvolutionOperator::update() {
 
-	// Parallel loop computing the phase evolution operator inside the LC layer:
-	// exp(mu*(sqrt(eps_tr)-nref)).
 	#pragma omp parallel for
 	for(int iy=0; iy<Ny; iy++) {
 		for(int ix=0; ix<Nx; ix++) {
@@ -43,23 +42,22 @@ void PhaseEvolutionOperator::update() {
 			double w = eps.get_interp_weight(p, 0);
 			double w_pz = eps.get_interp_weight(p, 1);
 
-			// Components of tensor d = (sqrt(eps_tr)-nref)*delta_Z/2
-			double dxx = 0.5*delta_Z*(w*eps.xx_sqrt(p)+w_pz*eps.xx_sqrt(p_pz)-nref);
-			double dyy = 0.5*delta_Z*(w*eps.yy_sqrt(p)+w_pz*eps.yy_sqrt(p_pz)-nref);
+			// Components of tensor d = (sqrt(eps_tr)-no)*delta_Z/2
+			double dxx = 0.5*delta_Z*(w*eps.xx_sqrt(p)+w_pz*eps.xx_sqrt(p_pz)-no);
+			double dyy = 0.5*delta_Z*(w*eps.yy_sqrt(p)+w_pz*eps.yy_sqrt(p_pz)-no);
 			double dxy = 0.5*delta_Z*(w*eps.xy_sqrt(p)+w_pz*eps.xy_sqrt(p_pz));
 
-			// Efficient calculation of exp(I*d) based on the
+			// Efficient calculation of exp(I*absorp_fac*d) based on the
 			// Cayleigh-Hamilton theorem and Sylvester formula (see
 			// wikipedia page "Matrix exponential").
 			double diff = (dxx-dyy)/2.;
 			double tr = (dxx+dyy)/2.;
 			double det = std::sqrt(dxy*dxy+diff*diff);
-			double sinc_det = (std::abs(det)<1e-8) ? 1 : std::sin(det)/det;
+            std::complex<double> sinc_det = (std::abs(det)<1e-8) ? 1 : std::sin(absorp_fac*det)/det;
 
-			op_xx[ix+Nx*iy] = std::exp(I*tr) * ( std::cos(det) + I*diff*sinc_det );
-			op_yy[ix+Nx*iy] = std::exp(I*tr) * ( std::cos(det) - I*diff*sinc_det );
-			op_xy[ix+Nx*iy] = std::exp(I*tr) * I*dxy*sinc_det;
+			op_xx[ix+Nx*iy] = std::exp(I*absorp_fac*tr) * ( std::cos(absorp_fac*det) + I*diff*sinc_det );
+			op_yy[ix+Nx*iy] = std::exp(I*absorp_fac*tr) * ( std::cos(absorp_fac*det) - I*diff*sinc_det );
+			op_xy[ix+Nx*iy] = std::exp(I*absorp_fac*tr) * I*dxy*sinc_det;
 		}
 	}
-	
 }

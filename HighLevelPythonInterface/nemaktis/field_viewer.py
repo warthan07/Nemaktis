@@ -62,13 +62,13 @@ class FieldViewer:
     """Angle (in degree) between the fast axis of the upper waveplate and the x-axis"""
     lower_waveplate_angle = 0
     """Angle (in degree) between the fast axis of the lower waveplate and the x-axis"""
+    angle_lock = False
+    """Should the relative angles between optical elements be locked?"""
 
     intensity = 1
     """Intensity factor of the micrograph"""
     NA_condenser = 0
     """Numerical aperture of the microscope's condenser"""
-    NA_objective = 1
-    """Numerical aperture of the microscope's objective"""
     
     n_tiles_x = 1
     """Number of repetitions of the micrograph in the x-direction"""
@@ -83,7 +83,7 @@ class FieldViewer:
             raise TypeError("optical_fields should be an OpticalFields object")
         self._optical_fields = optical_fields
         optical_fields.focus_fields(0)
-        self.NA_objective = optical_fields._max_NA_objective
+        self._NA_objective = optical_fields._max_NA_objective
 
         shape = self._optical_fields.vals.shape
         self._specter = np.zeros((shape[3],shape[4],shape[0],shape[1]))
@@ -94,6 +94,9 @@ class FieldViewer:
             self._cmf = color.load_tcmf(1000*optical_fields.get_wavelengths())
         else:
             self._cmf = cmf
+
+        self._koehler_1D = self._optical_fields._koehler_1D
+        self._N_radial_wavevectors = self._optical_fields._N_radial_wavevectors
 
     def plot(self):
         """Run a graphical user interface allowing to dynamically adjust
@@ -117,15 +120,36 @@ class FieldViewer:
             origin="lower", interpolation="bicubic",
             extent=self._im_extent)
 
+        def update_all_angles(angle_increment):
+            new_angles = {}
+            if self.polariser:
+                self.polariser_angle = (self.polariser_angle+angle_increment+90)%180-90
+                new_angles["polariser"] = self.polariser_angle
+            if self.analyser:
+                self.analyser_angle = (self.analyser_angle+angle_increment+90)%180-90
+                new_angles["analyser"] = self.analyser_angle
+            if self.lower_waveplate!="No":
+                self.lower_waveplate_angle = (self.lower_waveplate_angle+angle_increment+90)%180-90
+                new_angles["lower_waveplate"] = self.lower_waveplate_angle
+            if self.upper_waveplate!="No":
+                self.upper_waveplate_angle = (self.upper_waveplate_angle+angle_increment+90)%180-90
+                new_angles["upper_waveplate"] = self.upper_waveplate_angle
+            return new_angles
+
         def update_polariser(polariser):
             self.polariser = polariser=="Yes"
             self.update_image()
             self._update_plot()
 
         def update_polariser_angle(new_angle):
-            self.polariser_angle = new_angle
+            if self.angle_lock:
+                new_angles = update_all_angles(new_angle-self.polariser_angle)
+            else:
+                self.polariser_angle = new_angle
+                new_angles = {}
             self.update_image()
             self._update_plot()
+            return new_angles
 
         def update_analyser(analyser):
             self.analyser = analyser=="Yes"
@@ -133,9 +157,14 @@ class FieldViewer:
             self._update_plot()
 
         def update_analyser_angle(new_angle):
-            self.analyser_angle = new_angle
+            if self.angle_lock:
+                new_angles = update_all_angles(new_angle-self.analyser_angle)
+            else:
+                self.analyser_angle = new_angle
+                new_angles = {}
             self.update_image()
             self._update_plot()
+            return new_angles
 
         def update_upper_waveplate(waveplate):
             self.upper_waveplate = waveplate
@@ -143,9 +172,14 @@ class FieldViewer:
             self._update_plot()
 
         def update_upper_waveplate_angle(new_angle):
-            self.upper_waveplate_angle = new_angle
+            if self.angle_lock:
+                new_angles = update_all_angles(new_angle-self.upper_waveplate_angle)
+            else:
+                self.upper_waveplate_angle = new_angle
+                new_angles = {}
             self.update_image()
             self._update_plot()
+            return new_angles
 
         def update_lower_waveplate(waveplate):
             self.lower_waveplate = waveplate
@@ -153,9 +187,17 @@ class FieldViewer:
             self._update_plot()
 
         def update_lower_waveplate_angle(new_angle):
-            self.lower_waveplate_angle = new_angle
+            if self.angle_lock:
+                new_angles = update_all_angles(new_angle-self.lower_waveplate_angle)
+            else:
+                self.lower_waveplate_angle = new_angle
+                new_angles = {}
             self.update_image()
             self._update_plot()
+            return new_angles
+
+        def update_angle_lock(angle_lock):
+            self.angle_lock = angle_lock=="Yes"
 
         def update_intensity(new_intensity):
             self.intensity = new_intensity
@@ -178,7 +220,7 @@ class FieldViewer:
             self._update_plot()
 
         def update_NA_objective(new_NA):
-            self.NA_objective = new_NA
+            self._NA_objective = new_NA
             self._optical_fields.update_NA_objective(new_NA)
             self._optical_fields.focus_fields()
             self.update_image()
@@ -231,6 +273,7 @@ class FieldViewer:
             "set_upper_waveplate_angle": update_upper_waveplate_angle,
             "set_analyser": update_analyser,
             "set_analyser_angle": update_analyser_angle,
+            "set_angle_lock": update_angle_lock,
             "set_intensity": update_intensity,
             "set_z_focus": update_focus,
             "set_NA_condenser": update_NA_condenser,
@@ -247,12 +290,13 @@ class FieldViewer:
             "lower_waveplate_angle": self.lower_waveplate_angle,
             "upper_waveplate_angle": self.upper_waveplate_angle,
             "analyser_angle": self.analyser_angle,
+            "angle_lock": self.angle_lock,
             "intensity": self.intensity,
             "z_focus": self.z_focus,
             "max_NA_condenser": self._optical_fields._max_NA_condenser,
             "max_NA_objective": self._optical_fields._max_NA_objective,
             "NA_condenser": self.NA_condenser,
-            "NA_objective": self.NA_objective,
+            "NA_objective": self._NA_objective,
             "n_tiles_x": self.n_tiles_x,
             "n_tiles_y": self.n_tiles_y,
             "grayscale": self.grayscale})
@@ -267,6 +311,19 @@ class FieldViewer:
     @z_focus.setter
     def z_focus(self, new_z):
         self._optical_fields.focus_fields(new_z)
+
+
+    @property
+    def NA_objective(self):
+        """Numerical aperture of the microscope's objective"""
+        return self._NA_objective
+
+
+    @z_focus.setter
+    def NA_objective(self, new_NA):
+        self._NA_objective = new_NA
+        self._optical_fields.update_NA_objective(new_NA)
+        self._optical_fields.focus_fields()
 
 
     def get_image(self):
@@ -287,13 +344,16 @@ class FieldViewer:
         self._update_POM_image()
 
 
-    def _update_specter(self, qr_range=None):
-        if qr_range is not None:
-            q_idx_start = get_q_idx(qr_range[0]) if qr_range[0]!=0 else 0
-            q_idx_end = get_q_idx(qr_range[1]+1) if qr_range[1]!=0 else 0
-        else:
+    def _update_specter(self):
+        qr_idx_max = min(
+            self._N_radial_wavevectors-1,
+            self._optical_fields.get_qr_index(self.NA_condenser))
+        if not self._koehler_1D:
             q_idx_start = 0
-            q_idx_end = get_q_idx(self._optical_fields.get_qr_index(self.NA_condenser)+1)
+            q_idx_end = get_q_idx(qr_idx_max+1)
+        else:
+            q_idx_start = self._N_radial_wavevectors-1-qr_idx_max
+            q_idx_end = self._N_radial_wavevectors+qr_idx_max
         fields_vals = self._optical_fields.focused_vals[:,q_idx_start:q_idx_end,:,:,:]
 
         if not self.polariser and self.lower_waveplate=="No" and self.upper_waveplate=="No" and not self.analyser:
@@ -332,7 +392,8 @@ class FieldViewer:
             # For vanishingly small NA, we only need the data from the wavector q=(0,0)
             # It is necessary to distinguish this case since we renormalize the integration
             # weights by the NA of the condenser in the following general case
-            self._q_averaged_specter = self._specter[:,:,:,0]
+            q_idx = self._N_radial_wavevectors-1 if self._koehler_1D else 0
+            self._q_averaged_specter = self._specter[:,:,:,q_idx]
         else:
             # We assemble the integration weights for the integral:
             #   \int specter(q,theta)*g(q) dq d(theta), with g(q)=q/(1-q**2)
@@ -341,40 +402,57 @@ class FieldViewer:
             # exact primitives related to g(q) to get an acurate integration even when the
             # NA of the condenser is smoothly varied
             qr_idx_max = min(
-                self._optical_fields._N_radial_wavevectors-1,
+                self._N_radial_wavevectors-1,
                 self._optical_fields.get_qr_index(self.NA_condenser))
             delta_qr = self._optical_fields.get_delta_qr()
-            integration_weights = np.zeros((get_q_idx(qr_idx_max+1)))
-            if qr_idx_max==1:
-                integration_weights[0] = \
-                    (q_int_func(self.NA_condenser,delta_qr)-q_int_func(0,delta_qr))/delta_qr
-                integration_weights[1:7] = \
-                    (q_int_func(0,0)-q_int_func(self.NA_condenser,0))/(6*delta_qr)
+            if not self._koehler_1D:
+                integration_weights = np.zeros((get_q_idx(qr_idx_max+1)))
+                if qr_idx_max==1:
+                    integration_weights[0] = \
+                        (q_int_func(self.NA_condenser,delta_qr)-q_int_func(0,delta_qr))/delta_qr
+                    integration_weights[1:7] = \
+                        (q_int_func(0,0)-q_int_func(self.NA_condenser,0))/(6*delta_qr)
+                else:
+                    integration_weights[0] = \
+                        (q_int_func(delta_qr,delta_qr)-q_int_func(0,delta_qr))/delta_qr
+                    for qr_idx in range(1,qr_idx_max-1):
+                        integration_weights[get_q_idx(qr_idx):get_q_idx(qr_idx+1)] = \
+                            ( q_int_func((qr_idx+1)*delta_qr,(qr_idx+1)*delta_qr) \
+                            + q_int_func((qr_idx-1)*delta_qr,(qr_idx-1)*delta_qr) \
+                            - 2*q_int_func(qr_idx*delta_qr,qr_idx*delta_qr) ) \
+                                / (6*qr_idx*delta_qr)
+                    integration_weights[get_q_idx(qr_idx_max-1):get_q_idx(qr_idx_max)] = \
+                        ( q_int_func(self.NA_condenser,qr_idx_max*delta_qr) \
+                        + q_int_func((qr_idx_max-2)*delta_qr,(qr_idx_max-2)*delta_qr) \
+                        - 2*q_int_func((qr_idx_max-1)*delta_qr,(qr_idx_max-1)*delta_qr) ) \
+                            / (6*(qr_idx_max-1)*delta_qr)
+                    integration_weights[get_q_idx(qr_idx_max):get_q_idx(qr_idx_max+1)] = \
+                        ( q_int_func((qr_idx_max-1)*delta_qr,(qr_idx_max-1)*delta_qr) \
+                        - q_int_func(self.NA_condenser,(qr_idx_max-1)*delta_qr) ) \
+                            / (6*qr_idx_max*delta_qr)
+                self._q_averaged_specter = np.sum(
+                    self._specter[:,:,:,0:get_q_idx(qr_idx_max+1)] * (2/self.NA_condenser**2) *
+                    integration_weights[np.newaxis,np.newaxis,np.newaxis,:],
+                    axis=3, keepdims=False)
             else:
-                integration_weights[0] = \
-                    (q_int_func(delta_qr,delta_qr)-q_int_func(0,delta_qr))/delta_qr
-                for qr_idx in range(1,qr_idx_max-1):
-                    integration_weights[get_q_idx(qr_idx):get_q_idx(qr_idx+1)] = \
-                        ( q_int_func((qr_idx+1)*delta_qr,(qr_idx+1)*delta_qr) \
-                        + q_int_func((qr_idx-1)*delta_qr,(qr_idx-1)*delta_qr) \
-                        - 2*q_int_func(qr_idx*delta_qr,qr_idx*delta_qr) ) \
-                            / (6*qr_idx*delta_qr)
-                integration_weights[get_q_idx(qr_idx_max-1):get_q_idx(qr_idx_max)] = \
-                    ( q_int_func(self.NA_condenser,qr_idx_max*delta_qr) \
-                    + q_int_func((qr_idx_max-2)*delta_qr,(qr_idx_max-2)*delta_qr) \
-                    - 2*q_int_func((qr_idx_max-1)*delta_qr,(qr_idx_max-1)*delta_qr) ) \
-                        / (6*(qr_idx_max-1)*delta_qr)
-                integration_weights[get_q_idx(qr_idx_max):get_q_idx(qr_idx_max+1)] = \
-                    ( q_int_func((qr_idx_max-1)*delta_qr,(qr_idx_max-1)*delta_qr) \
-                    - q_int_func(self.NA_condenser,(qr_idx_max-1)*delta_qr) ) \
-                        / (6*qr_idx_max*delta_qr)
+                Nr = self._N_radial_wavevectors
+                delta_qr_edge = self.NA_condenser-(qr_idx_max-1)*delta_qr
 
-            # We integrate over relevant wavectors
-            self._q_averaged_specter = np.sum(
-                self._specter[:,:,:,0:get_q_idx(qr_idx_max+1)] * (2/self.NA_condenser**2) *
-                integration_weights[np.newaxis,np.newaxis,np.newaxis,:],
-                axis=3, keepdims=False)
-                
+                integration_weights = np.zeros(2*qr_idx_max+1)
+                integration_weights[:] = delta_qr
+                if qr_idx_max==1:
+                    integration_weights[[0,-1]] = delta_qr_edge**2/(2*delta_qr)
+                    integration_weights[1] = delta_qr_edge*( 2-delta_qr_edge/delta_qr )
+                else:
+                    integration_weights[[0,-1]] = delta_qr_edge**2/(2*delta_qr)
+                    integration_weights[[1,-2]] = delta_qr_edge*( 1-delta_qr_edge/(2*delta_qr) ) + delta_qr/2
+
+                q_vals = np.arange(-qr_idx_max,qr_idx_max+1)*delta_qr
+                self._q_averaged_specter = np.sum(
+                    self._specter[:,:,:,(Nr-1-qr_idx_max):(Nr+qr_idx_max)] / (2*self.NA_condenser) *
+                    integration_weights[np.newaxis,np.newaxis,np.newaxis,:],
+                    axis=3, keepdims=False)
+
 
     def _update_POM_image(self):
         color.specter2color(

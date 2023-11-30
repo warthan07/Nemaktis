@@ -27,6 +27,9 @@ CoefficientsSettings::CoefficientsSettings(const nlohmann::json &j) :
 	BaseSettings(j, "Coefficients"),
 	no_expression(parse<std::string>("no")),
 	ne_expression(parse<std::string>("ne")),
+	ne_imag_expression(
+		(json_node.find("ne_imag") != json_node.end()) ?
+		parse<std::string>("ne_imag") : "0"),
 	nhost_expression(
 		(json_node.find("nhost") != json_node.end()) ?
 		parse<std::string>("nhost") : "1"),

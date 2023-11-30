@@ -32,10 +32,14 @@ class LCMaterial(object):
     nout : optional, float or math string depending on the wavelength variable "lambda" (µm)
         The refractive index associated with the output medium between the sample and
         objective. A default value of 1 is assumed.
+    ne_imag : optional, float or math string depending on the wavelength variable "lambda" (µm)
+        Imaginary part of the extroardinary index allowing to take into account absorption
+        along the optical axis. A default value of 0 is assumed
     """
-    def __init__(self, *, lc_field, ne, no, nhost = 1, nin = 1, nout = 1):
+    def __init__(self, *, lc_field, ne, no, nhost = 1, nin = 1, nout = 1, ne_imag = 0):
         self.lc_field = lc_field
         self.ne = ne
+        self.ne_imag = ne_imag
         self.no = no
         self.nhost = nhost
         self.nin = nin
@@ -622,6 +626,34 @@ class DirectorField(TensorField):
                                        np.expand_dims(ny_func(xx, yy, zz), axis=3),
                                        np.expand_dims(nz_func(xx, yy, zz), axis=3)), 3)
 
+    def init_from_func(self, n_func):
+        """Initialize the director field from a single function returning an array whose
+        last axis is associated with each director components. The function must depend on
+        the space variables ``x``, ``y`` and ``z``. We recall that the mesh is centered on
+        the origin.
+
+        If the given functions are numpy-vectorizable, this function should be pretty fast. If
+        not, a warning will be printed and the faulty function(s) will be vectorized with the
+        numpy method ``vectorize`` (in which case you should expect a much slower execution
+        time).
+        """
+
+        print("{ Calculating director values from user function }")
+        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
+                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
+                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
+                                 indexing="ij")
+
+        # We verify if the user function is vectorizable
+        dummy_arr = np.ones((2,2,2))
+        try:
+            n_func(dummy_arr,dummy_arr,dummy_arr)
+        except:
+            print("\tn_func is not vectorized, using a non-optimized version instead.")
+            n_func = np.vectorize(n_func)
+
+        self._vals = n_func(xx, yy, zz)
+
 
     def normalize(self):
         """Normalize the director field values to unit norm."""
@@ -765,6 +797,34 @@ class QTensorField(TensorField):
                                      np.expand_dims(Qxy_func(xx, yy, zz), axis=3),
                                      np.expand_dims(Qxz_func(xx, yy, zz), axis=3),
                                      np.expand_dims(Qyz_func(xx, yy, zz), axis=3)), 3)
+
+    def init_from_func(self, Q_func):
+        """Initialize the Q-tensor field from a single function returning an array whose
+        last axis is associated with each Q-tensor components (xx, yy, zz, xy, xz, yz). The
+        function must depend on the space variables ``x``, ``y`` and ``z``. We recall that
+        the mesh is centered on the origin.
+
+        If the given functions are numpy-vectorizable, this function should be pretty fast. If
+        not, a warning will be printed and the faulty function(s) will be vectorized with the
+        numpy method ``vectorize`` (in which case you should expect a much slower execution
+        time).
+        """
+
+        print("{ Calculating Q-tensor values from user function }")
+        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
+                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
+                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
+                                 indexing="ij")
+
+        # We verify if the user function is vectorizable
+        dummy_arr = np.ones((2,2,2))
+        try:
+            Q_func(dummy_arr,dummy_arr,dummy_arr)
+        except:
+            print("\tQ_func is not vectorized, using a non-optimized version instead.")
+            Q_func = np.vectorize(Q_func)
+
+        self._vals = Q_func(xx, yy, zz)
 
 
     def apply_traceless_constraint(self):

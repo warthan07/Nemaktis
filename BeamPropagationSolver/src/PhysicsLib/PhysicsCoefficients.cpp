@@ -10,6 +10,7 @@ PhysicsCoefficients::PhysicsCoefficients(
 	_q_vals(settings.physics.coefs.q_vals()) {
 
 	ne_expression = physics_settings.coefs.ne_expression;
+	ne_imag_expression = physics_settings.coefs.ne_imag_expression;
 	no_expression = physics_settings.coefs.no_expression;
 	nhost_expression = physics_settings.coefs.nhost_expression;
 	nin_expression = physics_settings.coefs.nin_expression;
@@ -33,6 +34,19 @@ double PhysicsCoefficients::get_ne(double wavelength) const {
 	}
 	catch(mu::Parser::exception_type &e) {
 		throw std::string("Wrong expression for ne");
+	}
+}
+
+double PhysicsCoefficients::get_ne_imag(double wavelength) const {
+
+	try {
+		mu::Parser p;
+		p.DefineConst("lambda", wavelength);
+		p.SetExpr(ne_imag_expression);
+		return p.Eval();
+	}
+	catch(mu::Parser::exception_type &e) {
+		throw std::string("Wrong expression for ne_imag");
 	}
 }
 
