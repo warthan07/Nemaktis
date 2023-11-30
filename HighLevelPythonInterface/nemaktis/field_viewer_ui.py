@@ -1,8 +1,7 @@
 import six
 from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt'
+ETSConfig.toolkit = 'qt4'
 
-import matplotlib as mpl
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -11,7 +10,7 @@ from traitsui.api import View, Item, Spring, Group, RangeEditor, EnumEditor
 from traitsui.qt.editor import Editor
 from traitsui.basic_editor_factory import BasicEditorFactory
 
-from pyface.qt import QtGui, QtCore
+from pyface.qt import QtGui
 from pyface.util.guisupport import start_event_loop_qt4
 
 from threading import Thread
@@ -363,12 +362,13 @@ class FieldViewerUI(HasTraits):
             Spring(width=-20),
             orientation="horizontal"),
         kind="live",
+        title="Nemaktis field viewer UI",
         resizable=True)
 
     def __init__(self, figure, callback_dict, default_val_dict):
         self.setting_panels = SettingPanels(callback_dict, default_val_dict)
         self.figure_panel = FigurePanel(figure)
-
+        
         self.edit_traits()
         app = QtGui.QApplication.instance()
         app.lastWindowClosed.connect(app.quit)

@@ -1,4 +1,4 @@
-__version__ = "1.4.6"
+__version__ = "1.4.7"
 
 import matplotlib
 matplotlib.use("Qt5Agg")
