@@ -16,7 +16,7 @@ mentioned above (windows 7, macOS...), provided you know what you are doing :)
 With Mamba (windows or linux)
 -----------------------------
 
-a. Install Mambaforge
+a. Install Miniforge
 ...................
 
 The simplest way of installing the ``Nemaktis`` package is through the package manager
@@ -28,11 +28,11 @@ on these two operating systems.
 performance since it is written in C++. Previous versions of Nemaktis were using ``conda``
 (or ``mamba`` installed on top of ``conda``) but this proved to be too difficult to maintain because
 of these poor performances. For this reason, any Nemaktis version >=1.4.7 requires the 
-``Mambaforge`` distribution to be installed locally on your computer (i.e. on your user folder), 
+``Miniforge`` distribution to be installed locally on your computer (i.e. on your user folder), 
 and will not necessarily work with the ``Anaconda`` or ``Miniconda`` distributions. The installation 
-files of ``Mambaforge`` for Windows/Linux are available at this address (be careful to choose the
-``Mambaforge`` distribution, not the ``Mambaforge-pypy3`` distribution):
-https://github.com/conda-forge/miniforge#mambaforge
+files of ``Miniforge`` for Windows/Linux are available at this address (be careful to choose the
+``Miniforge`` distribution, not the ``Miniforge-pypy3`` distribution):
+https://github.com/conda-forge/miniforge#miniforge3
 
 b1. (Windows) Install Nemaktis automatically
 ............................................
@@ -40,9 +40,9 @@ b1. (Windows) Install Nemaktis automatically
 If you are a Windows 10 user and do not want to copy-paste commands in a terminal, the next
 step is as simple as running the following installation script 
 
-https://github.com/warthan07/Nemaktis/releases/download/v1.4.7/Install_Nemaktis-1.4.7.cmd
+https://github.com/warthan07/Nemaktis/releases/download/v1.4.8/Install_Nemaktis-1.4.8.cmd
 
-This script will ask for the root path of the ``Mambaforge`` distribution installed in step a,
+This script will ask for the root path of the ``Miniforge`` distribution installed in step a,
 create a special environment for ``Nemaktis`` named *nm* and will install everything needed
 in it. It will also install the python editor ``Spyder`` and create a shortcut named *Spyder
 (Nemakis environment)* for it on your Desktop (this is necessary even if you already
@@ -53,9 +53,9 @@ b2. (Windows/Linux) Install Nemaktis on the command line
 
 Alternatively, if you are a Linux user or want to type the installation commands yourself
 (they are not very complicated after all!), open a terminal (Windows: application "Miniforge
-prompt" installed with Mambaforge, Linux: any terminal) and type the following command: ::
+prompt" installed with Miniforge, Linux: any terminal) and type the following command: ::
   
-  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.7
+  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.8
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
 to install and run it from the same mamba environment. You can search https://anaconda.org/
@@ -87,7 +87,7 @@ packaging with complex dependencies.
 
 In this case, how can you safely update Nemaktis? The simplest way is to fully remove the
 mamba environment *nm*, either by removing the folder "envs/nm" inside the root folder of
-Mambaforge or by opening a terminal ("Miniforge prompt" for windows, any terminal for linux)
+Miniforge or by opening a terminal ("Miniforge prompt" for windows, any terminal for linux)
 and typing: ::
 
   mamba remove --name nm --all 
