@@ -23,8 +23,8 @@ MOCK_MODULES = [
     "traits.etsconfig.api",
     "traitsui",
     "traitsui.api",
-    "traitsui.qt4",
-    "traitsui.qt4.editor",
+    "traitsui.qt",
+    "traitsui.qt.editor",
     "traitsui.basic_editor_factory",
     "traitsui.delegating_handler",
 ]
