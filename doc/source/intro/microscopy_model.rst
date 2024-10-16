@@ -1,5 +1,8 @@
 .. _microscopy_model:
 
+.. raw:: html
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css">
+
 Microscopy model for Nemaktis
 =============================
 
@@ -36,7 +39,6 @@ above, as schematized below in a simplified representation of our virtual micros
 transmission mode:
 
 .. raw:: html
-
   <div id="microscope-fig">
     <div class="observablehq-chart_microscope"></div>
   </div>
