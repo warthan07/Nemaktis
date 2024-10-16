@@ -1,10 +1,10 @@
-import {Runtime,Library} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+import {Runtime,Library} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
 
 export function getRuntime(fig_id) {
-    const stdlib = new Library;
-    const target = document.querySelector(fig_id);
+	const stdlib = new Library;
+	const target = document.querySelector(fig_id);
 
-    function width() {
+	function width() {
 		return stdlib.Generators.observe(notify => {
 			let width = notify(target.clientWidth);
 			function resized() {
@@ -14,7 +14,7 @@ export function getRuntime(fig_id) {
 			window.addEventListener("resize", resized);
 			return () => window.removeEventListener("resize", resized);
 		});
-    }
+	}
 
 	return (new Runtime(Object.assign(stdlib, {width:width})));
 }

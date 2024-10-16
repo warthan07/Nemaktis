@@ -37,15 +37,33 @@ transmission mode:
 
 .. raw:: html
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css">
   <div id="microscope-fig">
     <div class="observablehq-chart_microscope"></div>
   </div>
   <script type="module">
-    import {Runtime,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=4";
-    new Runtime().module(notebook, name => {
-      if(name === "chart_microscope") return new Inspector(document.querySelector("#microscope-fig .observablehq-chart_microscope"));
+    import {Runtime,Library,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
+    function getRuntime(fig_id) {
+      const stdlib = new Library;
+      const target = document.querySelector(fig_id);
+    
+      function width() {
+        return stdlib.Generators.observe(notify => {
+          let width = notify(target.clientWidth);
+          function resized() {
+            let width1 = target.clientWidth;
+            if (width1 !== width) notify(width = width1);
+          }
+          window.addEventListener("resize", resized);
+          return () => window.removeEventListener("resize", resized);
+        });
+      }
+    
+      return (new Runtime(Object.assign(stdlib, {width:width})));
+    }
+
+    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+    getRuntime("#microscope-fig").module(notebook, name => {
+      if(name === "chart_microscope") return Inspector.into("#microscope-fig .observablehq-chart_microscope")();
     });
   </script>
 
