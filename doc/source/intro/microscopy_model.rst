@@ -40,32 +40,6 @@ transmission mode:
   <div id="microscope-fig">
     <div class="observablehq-chart_microscope"></div>
   </div>
-  <script type="module">
-    import {Runtime,Library,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
-    function getRuntime(fig_id) {
-      const stdlib = new Library;
-      const target = document.querySelector(fig_id);
-    
-      function width() {
-        return stdlib.Generators.observe(notify => {
-          let width = notify(target.clientWidth);
-          function resized() {
-            let width1 = target.clientWidth;
-            if (width1 !== width) notify(width = width1);
-          }
-          window.addEventListener("resize", resized);
-          return () => window.removeEventListener("resize", resized);
-        });
-      }
-    
-      return (new Runtime(Object.assign(stdlib, {width:width})));
-    }
-
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
-    getRuntime("#microscope-fig").module(notebook, name => {
-      if(name === "chart_microscope") return Inspector.into("#microscope-fig .observablehq-chart_microscope")();
-    });
-  </script>
 
 We also provide an additional Sec. 5 to explain the modeling of optical elements for
 polarized micrographs, which are mostly ignored in Sec. 2-4.
@@ -102,16 +76,6 @@ field and condenser apertures:
     <div class="observablehq-viewof-field_ap_opening"></div>
     <div class="observablehq-chart_koehler"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
-    getRuntime("#koehler-fig").module(notebook, name => {
-      if(name === "viewof cond_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-cond_ap_opening")();
-      if(name === "viewof field_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-field_ap_opening")();
-      if(name === "chart_koehler") return Inspector.into("#koehler-fig .observablehq-chart_koehler")();
-    });
-  </script>
 
 A correctly assembled Koehler illumination setup has the following properties:
 
@@ -160,16 +124,6 @@ by adjusting the sliders for :math:`N_r` and :math:`\mathrm{NA}`.
     <div class="observablehq-viewof-Nr_condenser"></div>
     <div class="observablehq-chart_aperture"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
-    getRuntime("#aperture-fig").module(notebook, name => {
-      if(name === "viewof NA_condenser") return Inspector.into("#aperture-fig .observablehq-viewof-NA_condenser")();
-      if(name === "viewof Nr_condenser") return Inspector.into("#aperture-fig .observablehq-viewof-Nr_condenser")();
-      if(name === "chart_aperture") return Inspector.into("#aperture-fig .observablehq-chart_aperture")();
-    });
-  </script>
 
 In Nematkis, this mesh is fully characterized by the two parameters,
 :math:`\mathrm{NA}_\mathrm{max}` and :math:`N_r`, and has a total number of points of
@@ -445,16 +399,6 @@ distorted through the imaging system:
     <div class="observablehq-viewof-NA_objective"></div>
     <div class="observablehq-chart_imaging"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
-    getRuntime("#imaging-fig").module(notebook, name => {
-      if(name === "viewof NA_objective") return Inspector.into("#imaging-fig .observablehq-viewof-NA_objective")();
-      if(name === "viewof z_foc") return Inspector.into("#imaging-fig .observablehq-viewof-z_foc")();
-      if(name === "chart_imaging") return Inspector.into("#imaging-fig .observablehq-chart_imaging")();
-    });
-  </script>
 
 
 5. Optical elements for polarized optical micrographs
@@ -478,14 +422,6 @@ change much for the calculation of POMs.
   <div id="pom-fig">
     <div class="observablehq-chart_pom"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
-    getRuntime("#pom-fig").module(notebook, name => {
-      if(name === "chart_pom") return Inspector.into("#pom-fig .observablehq-chart_pom")();
-    });
-  </script>
 
 5.1 Calculation of natural light optical micrographs
 ....................................................
@@ -616,3 +552,55 @@ The validity of our method is again ensured by our assumption of paraxial propag
 * The transfer matrices of the polariser/analyser and waveplate, as introduced above, do not
   depend on the wavevector of the incoming plane wave, which is not true for wide-angle
   incoming plane waves.
+
+.. raw:: html
+
+  <script type="module">
+    import {Runtime,Library,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
+    function getRuntime(fig_id) {
+      const stdlib = new Library;
+      const target = document.querySelector(fig_id);
+    
+      function width() {
+        return stdlib.Generators.observe(notify => {
+          let width = notify(target.clientWidth);
+          function resized() {
+            let width1 = target.clientWidth;
+            if (width1 !== width) notify(width = width1);
+          }
+          window.addEventListener("resize", resized);
+          return () => window.removeEventListener("resize", resized);
+        });
+      }
+    
+      return (new Runtime(Object.assign(stdlib, {width:width})));
+    }
+
+    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+
+    getRuntime("#microscope-fig").module(notebook, name => {
+      if(name === "chart_microscope") return Inspector.into("#microscope-fig .observablehq-chart_microscope")();
+    });
+
+    getRuntime("#koehler-fig").module(notebook, name => {
+      if(name === "viewof cond_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-cond_ap_opening")();
+      if(name === "viewof field_ap_opening") return Inspector.into("#koehler-fig .observablehq-viewof-field_ap_opening")();
+      if(name === "chart_koehler") return Inspector.into("#koehler-fig .observablehq-chart_koehler")();
+    });
+
+    getRuntime("#aperture-fig").module(notebook, name => {
+      if(name === "viewof NA_condenser") return Inspector.into("#aperture-fig .observablehq-viewof-NA_condenser")();
+      if(name === "viewof Nr_condenser") return Inspector.into("#aperture-fig .observablehq-viewof-Nr_condenser")();
+      if(name === "chart_aperture") return Inspector.into("#aperture-fig .observablehq-chart_aperture")();
+    });
+
+    getRuntime("#imaging-fig").module(notebook, name => {
+      if(name === "viewof NA_objective") return Inspector.into("#imaging-fig .observablehq-viewof-NA_objective")();
+      if(name === "viewof z_foc") return Inspector.into("#imaging-fig .observablehq-viewof-z_foc")();
+      if(name === "chart_imaging") return Inspector.into("#imaging-fig .observablehq-chart_imaging")();
+    });
+
+    getRuntime("#pom-fig").module(notebook, name => {
+      if(name === "chart_pom") return Inspector.into("#pom-fig .observablehq-chart_pom")();
+    });
+  </script>
