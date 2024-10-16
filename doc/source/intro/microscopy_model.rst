@@ -36,6 +36,7 @@ above, as schematized below in a simplified representation of our virtual micros
 transmission mode:
 
 .. raw:: html
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css">
   <div id="microscope-fig">
     <div class="observablehq-chart_microscope"></div>
