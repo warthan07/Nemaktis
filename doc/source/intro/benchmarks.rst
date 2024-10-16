@@ -206,7 +206,7 @@ and accurate simulation scheme whatever the size of the computational mesh.
       return (new Runtime(Object.assign(stdlib, {width:width})));
     }
 
-    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+    import notebook from "https://api.observablehq.com/@warthan07/accuracy-and-efficiency-of-nemaktis-backends.js?v=4";
 
     getRuntime("#err-2D-fig").module(notebook, name => {
       if(name === "err_vs_d_chart_2D") return Inspector.into("#err-2D-fig .observablehq-err_vs_d_chart_2D")();
