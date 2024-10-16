@@ -43,8 +43,8 @@ transmission mode:
   <script type="module">
     import {Runtime,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
     import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=4";
-    new Runtime("#microscope-fig").module(notebook, name => {
-      if(name === "chart_microscope") return Inspector.into("#microscope-fig .observablehq-chart_microscope")();
+    new Runtime().module(notebook, name => {
+      if(name === "chart_microscope") return new Inspector(document.querySelector("#microscope-fig .observablehq-chart_microscope"));
     });
   </script>
 
