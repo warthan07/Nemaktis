@@ -4,7 +4,7 @@ pkgconfig
 muparser
 pyfftw=0.12.*
 fftw
-boost=1.76.*
+boost=1.82.*
 openmp
 vtk=9.*
 eigen
