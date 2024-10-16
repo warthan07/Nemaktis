@@ -91,14 +91,6 @@ different choice of backends:`
   <div id="err-2D-fig">
     <div class="observablehq-err_vs_d_chart_2D"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/accuracy-and-efficiency-of-nemaktis-backends.js?v=3";
-    getRuntime("#err-2D-fig").module(notebook, name => {
-      if(name === "err_vs_d_chart_2D") return Inspector.into("#err-2D-fig .observablehq-err_vs_d_chart_2D")();
-    });
-  </script>
 
 The saturation of the computational mesh on very fine mesh can be simply understood from the
 fact that all backends in Nemaktis are approximate and not exact, even with an infinite
@@ -130,17 +122,6 @@ years old laptop with a processor i7-4600M (4 threads).
     <div class="observablehq-viewof-order_by_2D"></div>
     <div class="observablehq-err_times_chart_2D"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/accuracy-and-efficiency-of-nemaktis-backends.js?v=3";
-    getRuntime("#times-2D-fig").module(notebook, name => {
-      if(name === "viewof dy_idx_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-dy_idx_2D")();
-      if(name === "viewof order_by_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-order_by_2D")();
-      if(name === "err_times_chart_2D") return Inspector.into("#times-2D-fig .observablehq-err_times_chart_2D")();
-      if(name === "err_times_chart_2D_update") return true;
-    });
-  </script>
 
 Not very surprinsingly, the inacurate DTMM(1) and DTMM(3) backends are also the fastest.
 Basically, these low-order DTMM schemes correspond to Jones-like calculus with a
@@ -177,14 +158,6 @@ sufficiently fine mesh.`
   <div id="err-3D-fig">
     <div class="observablehq-err_vs_d_chart_3D"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/accuracy-and-efficiency-of-nemaktis-backends.js?v=3";
-    getRuntime("#err-3D-fig").module(notebook, name => {
-      if(name === "err_vs_d_chart_3D") return Inspector.into("#err-3D-fig .observablehq-err_vs_d_chart_3D")();
-    });
-  </script>
 
 However the running times of DTMM backends vs BPM backend are vastly different than in the
 2D case, as expected from the :math:`D^{(d-1)}` factor in the complexity of DTMM backends
@@ -200,17 +173,6 @@ i7-7800X (12 threads).
     <div class="observablehq-err_times_chart_3D"></div>
     <div class="observablehq-err_times_chart_3D_update"></div>
   </div>
-  <script type="module">
-    import {getRuntime} from "../_static/observable.js"
-    import {Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-    import notebook from "https://api.observablehq.com/@warthan07/accuracy-and-efficiency-of-nemaktis-backends.js?v=3";
-    getRuntime("#times-3D-fig").module(notebook, name => {
-      if(name === "viewof dy_idx_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-dy_idx_3D")();
-      if(name === "viewof order_by_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-order_by_3D")();
-      if(name === "err_times_chart_3D") return Inspector.into("#times-3D-fig .observablehq-err_times_chart_3D")();
-      if(name === "err_times_chart_3D_update") return true;
-    });
-  </script>
 
 This time, the BPM backend is practically always faster than DTMM schemes (only the DTMM(1)
 can be faster than BPM on fine meshes), while having a very good computational error for
@@ -220,3 +182,51 @@ recommend to use the DTMM schemes on 3D meshes only when you want a fast simulat
 without accurate diffraction (DTMM(1) backend) or a very accurate but very slow simulation
 (DTMM(7) backend). For all other case of applications, the BPM backend provide a reliable
 and accurate simulation scheme whatever the size of the computational mesh.
+
+.. raw:: html
+
+  <script type="module">
+    import {Runtime,Library,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
+    function getRuntime(fig_id) {
+      const stdlib = new Library;
+      const target = document.querySelector(fig_id);
+    
+      function width() {
+        return stdlib.Generators.observe(notify => {
+          let width = notify(target.clientWidth);
+          function resized() {
+            let width1 = target.clientWidth;
+            if (width1 !== width) notify(width = width1);
+          }
+          window.addEventListener("resize", resized);
+          return () => window.removeEventListener("resize", resized);
+        });
+      }
+    
+      return (new Runtime(Object.assign(stdlib, {width:width})));
+    }
+
+    import notebook from "https://api.observablehq.com/@warthan07/microscopy-model-for-nemaktis.js?v=3";
+
+    getRuntime("#err-2D-fig").module(notebook, name => {
+      if(name === "err_vs_d_chart_2D") return Inspector.into("#err-2D-fig .observablehq-err_vs_d_chart_2D")();
+    });
+
+    getRuntime("#times-2D-fig").module(notebook, name => {
+      if(name === "viewof dy_idx_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-dy_idx_2D")();
+      if(name === "viewof order_by_2D") return Inspector.into("#times-2D-fig .observablehq-viewof-order_by_2D")();
+      if(name === "err_times_chart_2D") return Inspector.into("#times-2D-fig .observablehq-err_times_chart_2D")();
+      if(name === "err_times_chart_2D_update") return true;
+    });
+
+    getRuntime("#err-3D-fig").module(notebook, name => {
+      if(name === "err_vs_d_chart_3D") return Inspector.into("#err-3D-fig .observablehq-err_vs_d_chart_3D")();
+    });
+
+    getRuntime("#times-3D-fig").module(notebook, name => {
+      if(name === "viewof dy_idx_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-dy_idx_3D")();
+      if(name === "viewof order_by_3D") return Inspector.into("#times-3D-fig .observablehq-viewof-order_by_3D")();
+      if(name === "err_times_chart_3D") return Inspector.into("#times-3D-fig .observablehq-err_times_chart_3D")();
+      if(name === "err_times_chart_3D_update") return true;
+    });
+  </script>
