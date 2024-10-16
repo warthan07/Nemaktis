@@ -39,4 +39,4 @@ tasks:
   clean:
     desc: Clean the mamba development environment and C++ build directories
     cmds:
-      - rm -r "{{.ENV_DIR}}" "{{.BPM_BUILD_DIR}}"
+      - rm -rf "{{.ENV_DIR}}" "{{.BPM_BUILD_DIR}}"
