@@ -10,7 +10,29 @@ public:
 		Nx(mesh.Nx),
 		Ny(mesh.Ny),
 		N(Nx*Ny),
-		vec(2*Nx*Ny) {}
+		own_data(true),
+		raw_data(new std::complex<double>[2*Nx*Ny]),
+		vec(raw_data, 2*Nx*Ny) {}
+
+	TransverseOpticalField(const CartesianMesh &mesh, std::complex<double>* raw_data) :
+		Nx(mesh.Nx),
+		Ny(mesh.Ny),
+		N(Nx*Ny),
+		own_data(false),
+		raw_data(raw_data),
+		vec(raw_data, 2*Nx*Ny) {}
+
+	~TransverseOpticalField() {
+		if(own_data)
+			delete raw_data;
+	}
+
+	const auto& operator()() const {
+		return vec;
+	}
+	auto& operator()() {
+		return vec;
+	}
 
 	void operator=(const TransverseOpticalField &src) {
 		vec = src.vec;
@@ -52,13 +74,6 @@ public:
 		vec.segment(comp*N, N) += src().segment(comp*N, N);
 	}
 
-	const Eigen::VectorXcd& operator()() const {
-		return vec;
-	}
-	Eigen::VectorXcd& operator()() {
-		return vec;
-	}
-
 	std::complex<double> operator()(int mesh_idx, int comp) const {
 		return vec[mesh_idx+N*comp];
 	}
@@ -75,48 +90,9 @@ public:
 
 private:
 	const int Nx, Ny, N;
-	Eigen::VectorXcd vec; 
+	bool own_data;
+	std::complex<double>* raw_data;
+	Eigen::Map<Eigen::VectorXcd> vec; 
 };
-
-class LongitudinalOpticalField {
-public:
-	LongitudinalOpticalField(const CartesianMesh &mesh) :
-		Nx(mesh.Nx),
-		Ny(mesh.Ny),
-		vec(2*Nx*Ny) {}
-
-	void operator=(const LongitudinalOpticalField &src) {
-		vec = src.vec;
-	}
-	void operator=(const Eigen::VectorXcd &src) {
-		vec = src;
-	}
-
-	const Eigen::VectorXcd& operator()() const {
-		return vec;
-	}
-	Eigen::VectorXcd& operator()() {
-		return vec;
-	}
-
-	std::complex<double> operator()(int mesh_idx) const {
-		return vec[mesh_idx];
-	}
-	std::complex<double>& operator()(int mesh_idx) {
-		return vec[mesh_idx];
-	}
-
-	std::complex<double> operator()(const Index2D &p) const {
-		return vec[p.x+Nx*p.y];
-	}
-	std::complex<double>& operator()(const Index2D &p) {
-		return vec[p.x+Nx*p.y];
-	}
-
-private:
-	const int Nx, Ny;
-	Eigen::VectorXcd vec; 
-};
-
 
 #endif

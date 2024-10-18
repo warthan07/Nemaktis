@@ -36,7 +36,7 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.82 EXACT REQUIRED COMPONENTS filesystem regex system)
+find_package(Boost 1.82.0 CONFIG EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
@@ -212,10 +212,10 @@ target_link_libraries(bpm-lib
 	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES})
 swig_link_libraries(${PYTHONBACKEND_BASENAME} bpm-lib ${Python3_LIBRARIES})
 
-vtk_module_autoinit(
-	TARGETS Postprocessor Utilities bpm-lib
-	MODULES ${VKT_LIBRARIES}
-)
+# vtk_module_autoinit(
+# 	TARGETS Postprocessor Utilities bpm-lib
+# 	MODULES ${VKT_LIBRARIES}
+# )
 
 #################
 # Install targets

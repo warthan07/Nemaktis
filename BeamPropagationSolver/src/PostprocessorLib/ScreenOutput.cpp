@@ -68,27 +68,36 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 		"    Filtering optical fields..." << std::endl;
 	std::string pol_strs[2] ={"inputX_", "inputY_"};
 
+
 	#pragma omp parallel for
 	for(int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
-		// FFTW arrays for this thread
-		fftw_complex* field[2];
-		fftw_complex* fft_field[2];
-		for(int comp=0; comp<2; comp++) {
-			field[comp] = static_cast<fftw_complex*>(
-				fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-			fft_field[comp] = static_cast<fftw_complex*>(
-				fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-		}
-
 		// We override the last value of refractive index based on n_out, since it can
 		// depends on the wavelength
 		double wavelength = wavelengths[wave_idx];
 		iso_layer_index.back() = coefs.get_nout(wavelength);
 
+		screen_optical_fields.apply_forward_fft_plan(wave_idx);
+
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			// Propagation filter for this wavelength and incoming wavevector
 			auto fourier_filter = assemble_fourier_filter(wavelength, q_vals[q_idx]);
 	
+			for(int pol_idx=0; pol_idx<2; pol_idx++) {
+	
+				// We apply the fourier filter
+				auto& fft_field = screen_optical_fields.fft(wave_idx, q_idx, pol_idx);
+				for(int i=0; i<Nx*Ny; i++) {
+					Eigen::Vector2cd tmp =
+						fourier_filter->at(i) * Eigen::Vector2cd(fft_field(i,0), fft_field(i,1));
+					fft_field(i,0) = tmp[0]/double(Nx*Ny);
+					fft_field(i,1) = tmp[1]/double(Nx*Ny);
+				}
+			}
+		}
+
+		screen_optical_fields.apply_backward_fft_plan(wave_idx);
+
+		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			for(int pol_idx=0; pol_idx<2; pol_idx++) {
 				auto real_data = vtkSmartPointer<vtkDoubleArray>::New();
 				real_data->SetNumberOfComponents(3);
@@ -108,38 +117,13 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 	
 				vti_data_arrays[4*(q_idx+q_vals.size()*wave_idx)+2*pol_idx] = real_data;
 				vti_data_arrays[4*(q_idx+q_vals.size()*wave_idx)+2*pol_idx+1] = imag_data;
-	
-				// First, we fill the fftw input arrays with our data and switch to
-				// Fourier space
+
+				auto& field = screen_optical_fields(wave_idx, q_idx, pol_idx);
+
 				for(int comp=0; comp<2; comp++) {
 					for(int i=0; i<Nx*Ny; i++) {
-						field[comp][i][0] = 
-							std::real(screen_optical_fields(wave_idx,q_idx,pol_idx)(i,comp));
-						field[comp][i][1] = 
-							std::imag(screen_optical_fields(wave_idx,q_idx,pol_idx)(i,comp));
-					}
-					fftw_execute_dft(forward_plan, field[comp], fft_field[comp]);
-				}
-
-				// We apply the fourier filter
-				for(int i=0; i<Nx*Ny; i++) {
-					auto tmp =
-						fourier_filter->at(i)*
-						Eigen::Vector2cd(
-							std::complex<double>(fft_field[0][i][0], fft_field[0][i][1]),
-							std::complex<double>(fft_field[1][i][0], fft_field[1][i][1]));
-					for(int comp=0; comp<2; comp++) {
-						fft_field[comp][i][0] = std::real(tmp[comp]);
-						fft_field[comp][i][1] = std::imag(tmp[comp]);
-					}
-				}
-
-				// We come back to real space and save the transformed data
-				for(int comp=0; comp<2; comp++) {
-					fftw_execute_dft(backward_plan, fft_field[comp], field[comp]);
-					for(int i=0; i<Nx*Ny; i++) {
-						real_data->SetComponent(i, comp, field[comp][i][0]/(Nx*Ny));
-						imag_data->SetComponent(i, comp, field[comp][i][1]/(Nx*Ny));
+						real_data->SetComponent(i, comp, field(i, comp).real());
+						imag_data->SetComponent(i, comp, field(i, comp).imag());
 					}
 				}
 				for(int i=0; i<Nx*Ny; i++) {
@@ -148,19 +132,7 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 				}
 			}
 		}
-
-		// We free the FFTW pointers
-		for(int comp=0; comp<2; comp++) {
-			fftw_free(field[comp]);
-			fftw_free(fft_field[comp]);
-		}
 	}
-
-	// We free the FFTW pointers
-	fftw_destroy_plan(forward_plan);
-	fftw_destroy_plan(backward_plan);
-	fftw_free(in);
-	fftw_free(out);
 
 	// We export all the calculated data
 	auto vti_data = vtkSmartPointer<vtkImageData>::New();
@@ -209,9 +181,7 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 	writer->Write();
 }
 
-void ScreenOutput::apply_no_export(
-		ScreenOpticalFieldCollection &screen_optical_fields,
-		std::complex<double>* fields_vals) {
+void ScreenOutput::apply_no_export(ScreenOpticalFieldCollection &screen_optical_fields) {
 
 	std::cout << "Calculating output transverse fields..." << std::endl;
 
@@ -221,91 +191,36 @@ void ScreenOutput::apply_no_export(
 	delta_x = mesh.delta_x;
 	delta_y = mesh.delta_y;
 
-	// We create the FFTW plans for the forward and backward transform
-	std::cout << "    Accumulating FFTW wisdom..." << std::endl;
-
-	fftw_complex *in = static_cast<fftw_complex*>(
-		fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-	fftw_complex *out = static_cast<fftw_complex*>(
-		fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-	fftw_plan forward_plan =
-		fftw_plan_dft_2d(Ny, Nx, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan backward_plan =
-		fftw_plan_dft_2d(Ny, Nx, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
-
 	std::cout <<
 		"    Filtering optical fields..." << std::endl;
 
 	#pragma omp parallel for
 	for(int wave_idx=0; wave_idx<wavelengths.size(); wave_idx++) {
-		// FFTW arrays for this thread
-		fftw_complex* field[2];
-		fftw_complex* fft_field[2];
-		for(int comp=0; comp<2; comp++) {
-			field[comp] = static_cast<fftw_complex*>(
-				fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-			fft_field[comp] = static_cast<fftw_complex*>(
-				fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-		}
-
 		// We override the last value of refractive index based on n_out, since it can
 		// depends on the wavelength
 		double wavelength = wavelengths[wave_idx];
 		iso_layer_index.back() = coefs.get_nout(wavelength);
+
+		screen_optical_fields.apply_forward_fft_plan(wave_idx);
 
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
 			// Propagation filter for this wavelength and incoming wavevector
 			auto fourier_filter = assemble_fourier_filter(wavelengths[wave_idx], q_vals[q_idx]);
 
 			for(int pol_idx=0; pol_idx<2; pol_idx++) {
-				// First, we fill the fftw input arrays with our data and switch to
-				// Fourier space
-				for(int comp=0; comp<2; comp++) {
-					for(int i=0; i<Nx*Ny; i++) {
-						field[comp][i][0] = 
-							std::real(screen_optical_fields(wave_idx,q_idx,pol_idx)(i,comp));
-						field[comp][i][1] = 
-							std::imag(screen_optical_fields(wave_idx,q_idx,pol_idx)(i,comp));
-					}
-					fftw_execute_dft(forward_plan, field[comp], fft_field[comp]);
-				}
-
 				// We apply the fourier filter
+				auto& fft_field = screen_optical_fields.fft(wave_idx, q_idx, pol_idx);
 				for(int i=0; i<Nx*Ny; i++) {
 					Eigen::Vector2cd tmp =
-						fourier_filter->at(i)*
-						Eigen::Vector2cd(
-							std::complex<double>(fft_field[0][i][0], fft_field[0][i][1]),
-							std::complex<double>(fft_field[1][i][0], fft_field[1][i][1]));
-					for(int comp=0; comp<2; comp++) {
-						fft_field[comp][i][0] = std::real(tmp[comp]);
-						fft_field[comp][i][1] = std::imag(tmp[comp]);
-					}
-				}
-
-				// We come back to real space and save the transformed data
-				for(int comp=0; comp<2; comp++) {
-					fftw_execute_dft(backward_plan, fft_field[comp], field[comp]);
-					for(int i=0; i<Nx*Ny; i++)
-						fields_vals[i+Nx*Ny*(comp+2*pol_idx+4*(q_idx+q_vals.size()*wave_idx))]=
-							std::complex<double>(field[comp][i][0],field[comp][i][1]) /
-							double(Nx*Ny);
+						fourier_filter->at(i) * Eigen::Vector2cd(fft_field(i,0), fft_field(i,1));
+					fft_field(i,0) = tmp[0]/double(Nx*Ny);
+					fft_field(i,1) = tmp[1]/double(Nx*Ny);
 				}
 			}
 		}
 
-		// We free the FFTW pointers
-		for(int comp=0; comp<2; comp++) {
-			fftw_free(field[comp]);
-			fftw_free(fft_field[comp]);
-		}
+		screen_optical_fields.apply_backward_fft_plan(wave_idx);
 	}
-
-	// We free the FFTW pointers
-	fftw_destroy_plan(forward_plan);
-	fftw_destroy_plan(backward_plan);
-	fftw_free(in);
-	fftw_free(out);
 }
 
 std::shared_ptr<std::vector<Eigen::Matrix2cd> > ScreenOutput::assemble_fourier_filter(

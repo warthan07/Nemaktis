@@ -1,4 +1,6 @@
 #include "OpticalFieldCollection.h"
+#include "OpticalField.h"
+#include <memory>
 
 ScreenOpticalFieldCollection::ScreenOpticalFieldCollection(
 		const CartesianMesh &mesh,
@@ -6,7 +8,68 @@ ScreenOpticalFieldCollection::ScreenOpticalFieldCollection(
 	mesh(mesh),
 	wavelengths(coefs.wavelengths()),
 	q_vals(coefs.q_vals()),
-	fields(2*wavelengths.size()*q_vals.size(), mesh) {}
+	fields(2*wavelengths.size()*q_vals.size()),
+	fft_fields(2*wavelengths.size()*q_vals.size()),
+	own_field_vals(true),
+	stride_fields(mesh.Nx*mesh.Ny*2),
+	stride_plans(stride_fields*2*q_vals.size()),
+	field_vals(static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex)*stride_fields*fields.size()))),
+	fft_field_vals(static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex)*stride_fields*fields.size()))) {
+
+	init_fields_and_plans();
+}
+
+ScreenOpticalFieldCollection::ScreenOpticalFieldCollection(
+		const CartesianMesh &mesh,
+		const PhysicsCoefficients &coefs,
+		std::complex<double>* user_vals,
+		unsigned int n_user_vals) :
+	mesh(mesh),
+	wavelengths(coefs.wavelengths()),
+	q_vals(coefs.q_vals()),
+	fields(2*wavelengths.size()*q_vals.size()),
+	fft_fields(2*wavelengths.size()*q_vals.size()),
+	own_field_vals(false),
+	stride_fields(mesh.Nx*mesh.Ny*2),
+	stride_plans(stride_fields*2*q_vals.size()),
+	field_vals(reinterpret_cast<fftw_complex*>(user_vals)),
+	fft_field_vals(static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex)*stride_fields*fields.size()))) {
+
+	if(n_user_vals!=stride_fields*fields.size())
+		throw std::string("Wrong dimension for the user pointer array (OpticalFieldCollection)");
+
+	init_fields_and_plans();
+}
+
+void ScreenOpticalFieldCollection::init_fields_and_plans() {
+
+	unsigned int iw, iq, pol_idx, flat_idx;
+	for(iw=0; iw<wavelengths.size(); iw++) {
+		for(iq=0; iq<q_vals.size(); iq++) {
+			for(pol_idx=0; pol_idx<2; pol_idx++) {
+				flat_idx = pol_idx+2*(iq+q_vals.size()*iw);
+				fields[flat_idx] = std::make_shared<TransverseOpticalField>(
+					mesh, reinterpret_cast<std::complex<double>*>(&field_vals[flat_idx*stride_fields]));
+				fft_fields[flat_idx] = std::make_shared<TransverseOpticalField>(
+					mesh, reinterpret_cast<std::complex<double>*>(&fft_field_vals[flat_idx*stride_fields]));
+			}
+		}
+	}
+
+	int rank = 2;
+	int field_dims[] = {mesh.Ny, mesh.Nx};
+	int field_size = field_dims[0]*field_dims[1];
+	forward_plan = fftw_plan_many_dft(
+		rank, field_dims, 4*q_vals.size(),
+		field_vals, field_dims, 1, field_size,
+		fft_field_vals, field_dims, 1, field_size,
+		FFTW_FORWARD, FFTW_ESTIMATE);
+	backward_plan = fftw_plan_many_dft(
+		rank, field_dims, 4*q_vals.size(),
+		fft_field_vals, field_dims, 1, field_size,
+		field_vals, field_dims, 1, field_size,
+		FFTW_BACKWARD, FFTW_ESTIMATE);
+}
 
 
 BulkOpticalFieldCollection::BulkOpticalFieldCollection(

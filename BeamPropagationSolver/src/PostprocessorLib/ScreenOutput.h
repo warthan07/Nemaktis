@@ -13,10 +13,7 @@ public:
 		const PhysicsCoefficients &coefs);
 
 	void apply(ScreenOpticalFieldCollection &screen_optical_fields);
-
-	void apply_no_export(
-		ScreenOpticalFieldCollection &screen_optical_fields,
-		std::complex<double>* output_fields_vals);
+	void apply_no_export(ScreenOpticalFieldCollection &screen_optical_fields);
 
 private:
 	/**

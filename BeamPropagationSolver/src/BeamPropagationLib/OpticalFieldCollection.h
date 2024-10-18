@@ -2,12 +2,15 @@
 #define OPTICALFIELDCOLLECTION_H
 
 #include <complex>
+#include <memory>
 #include <utility>
 
 #include <vtkSmartPointer.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
+
+#include <fftw3.h>
 
 #include "CartesianMesh.h"
 #include "PhysicsCoefficients.h"
@@ -19,13 +22,42 @@ public:
 		const CartesianMesh &mesh,
 		const PhysicsCoefficients &coefs);
 
+	ScreenOpticalFieldCollection(
+		const CartesianMesh &mesh,
+		const PhysicsCoefficients &coefs,
+		std::complex<double>* user_vals,
+		unsigned int n_user_vals);
+
+	~ScreenOpticalFieldCollection() {
+		if(own_field_vals)
+			fftw_free(field_vals);
+		fftw_free(fft_field_vals);
+	}
+
 	TransverseOpticalField& operator()(int wave_idx, int q_idx, int pol_idx) {
-		return fields[pol_idx+2*(q_idx+q_vals.size()*wave_idx)];
+		return *fields[pol_idx+2*(q_idx+q_vals.size()*wave_idx)];
+	}
+	TransverseOpticalField& fft(int wave_idx, int q_idx, int pol_idx) {
+		return *fft_fields[pol_idx+2*(q_idx+q_vals.size()*wave_idx)];
+	}
+
+	void apply_forward_fft_plan(int wave_idx) {
+		fftw_execute_dft(
+			forward_plan, &field_vals[wave_idx*stride_plans], &fft_field_vals[wave_idx*stride_plans]);
+	}
+	void apply_backward_fft_plan(int wave_idx) {
+		fftw_execute_dft(
+			backward_plan, &fft_field_vals[wave_idx*stride_plans], &field_vals[wave_idx*stride_plans]);
 	}
 
 	const CartesianMesh mesh;
 
 private:
+	/**
+	 * Initialize all transverse optical fields and fft plans
+	 */
+	void init_fields_and_plans();
+
 	/**
 	 * Array containing all the wavelengths in the light spectrum.
 	 */
@@ -37,9 +69,15 @@ private:
 
 	/**
 	 * Vectors of transverse optical fields for each wavelength, wavevector, and
-	 * polarisation.
+	 * polarisation. The underlying data vectors are aligned and contiguous in memory and
+	 * pointed by the private attribute field_vals and fft_field_vals that can be used with fftw.
 	 */
-	std::vector<TransverseOpticalField> fields;
+	std::vector<std::shared_ptr<TransverseOpticalField> > fields, fft_fields;
+
+	bool own_field_vals;
+	int stride_fields, stride_plans;
+	fftw_complex *field_vals, *fft_field_vals;
+	fftw_plan forward_plan, backward_plan;
 };
 
 class BulkOpticalFieldCollection {

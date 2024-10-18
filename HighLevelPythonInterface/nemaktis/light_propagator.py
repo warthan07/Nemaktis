@@ -141,7 +141,7 @@ class LightPropagator:
             else:
                 raise Exception("Unrecognised method, should be 'bpm' or 'dtmm'")
 
-    def _bpm_propagation(self, bulk_filename):
+    def _bpm_propagation(self, bulk_filename, input_field_vals=None):
         print("{ Running beam propagation backend }\n")
 
         lc_field = self._material.lc_field
@@ -159,7 +159,7 @@ class LightPropagator:
                     "Number of substeps per slab": 1 }},
             "Physics settings": {
                 "Initial conditions": {
-                    "Beam profile":     "UniformBeam",
+                    "Beam profile":     "UniformBeam" if input_field_vals is None else "None",
                     "LC field file":    "",
                     "Mesh dimensions":  dims,
                     "Mesh spacings":    spacings,
@@ -191,16 +191,6 @@ class LightPropagator:
             mask_formula = lc_field.mask_formula if lc_field.mask_formula is not None else ""
             mask_formula = mask_formula.replace("np.","").replace("**","^")
 
-        N_E_vals = \
-            self._wavevectors.shape[0]*len(self._wavelengths)*4*dims[0]*dims[1]
-        if lc_field.mask_type is None:
-            data_out = bpm.run_backend_without_mask(
-                json_str, lc_vals, N_E_vals)
-        else:
-            data_out = bpm.run_backend_with_mask(
-                json_str, mask_formula, lc_vals, mask_vals, N_E_vals)
-        print("")
-
         if isinstance(self._material.nout, str):
             l = 0.6
             nout = eval(self._material.nout.replace("lambda","l").replace("^","**"))
@@ -227,9 +217,17 @@ class LightPropagator:
             mesh_lengths = (lengths[0], lengths[1]),
             mesh_dimensions = (dims[0], dims[1]))
 
-        Nl = len(self._wavelengths)
-        Nq = len(self._wavevectors)
-        output_fields.vals = data_out.reshape((Nl, Nq, 4, dims[1], dims[0]))/np.sqrt(2)
+        if input_field_vals is not None:    
+            if input_field_vals.shape!=(4,dims[1],dims[0]):
+                raise Exception("Wrong shape for the input fields")
+            output_fields.vals[:,:,...] = input_field_vals
+
+        if lc_field.mask_type is None:
+            bpm.run_backend_without_mask(json_str, lc_vals, output_fields.vals)
+        else:
+            bpm.run_backend_with_mask(json_str, mask_formula, lc_vals, mask_vals, output_fields.vals)
+        print("")
+
         return output_fields
 
 

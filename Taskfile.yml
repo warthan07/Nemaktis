@@ -32,7 +32,7 @@ tasks:
     desc: Compile the BPM backend and automatically link it in the mamba dev environment
     cmds:
       - mkdir -p {{.BPM_BUILD_DIR}}
-      - cd {{.BPM_BUILD_DIR}} && {{.DEV_RUN}} cmake .. && {{.DEV_RUN}} make
+      - cd {{.BPM_BUILD_DIR}} && {{.DEV_RUN}} cmake .. && {{.DEV_RUN}} make release
       - ln -sf {{.BPM_BUILD_DIR}}/bpm_backend.py {{.SITE_PACKAGES_DIR}}
       - ln -sf {{.BPM_BUILD_DIR}}/_bpm_backend.so {{.SITE_PACKAGES_DIR}}
 

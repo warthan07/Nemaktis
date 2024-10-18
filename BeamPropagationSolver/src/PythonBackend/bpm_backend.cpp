@@ -28,16 +28,14 @@ void run_backend_without_mask(
 				"Unexpected dimension for the LC orientational field, should be 3 or 6.");
 
 		PhysicsCoefficients coefs(settings, lc_field->mesh);
-		ScreenOpticalFieldCollection screen_optical_fields(lc_field->mesh, coefs);
+		ScreenOpticalFieldCollection screen_optical_fields(lc_field->mesh, coefs, E_field_vals, n_E_vals);
 
 		BPMIteration bpm_iteration(
 			*lc_field, screen_optical_fields, coefs, settings);
 		bpm_iteration.propagate_fields();
 
 		ScreenOutput micrograph_output(settings, coefs);
-		if(n_E_vals != coefs.wavelengths().size()*coefs.q_vals().size()*4*dims[0]*dims[1])
-			throw std::string("Wrong dimension for the raw fields array");
-		micrograph_output.apply_no_export(screen_optical_fields, E_field_vals);
+		micrograph_output.apply_no_export(screen_optical_fields);
 
 		if(settings.postprocessor.volume_output.activate) {
 			VolumeOutput volume_output(settings, coefs);
@@ -108,7 +106,7 @@ void run_backend_with_mask(
 				"Unexpected dimension for the LC orientational field, should be 3 or 6.");
 
 		PhysicsCoefficients coefs(settings, lc_field->mesh);
-		ScreenOpticalFieldCollection screen_optical_fields(lc_field->mesh, coefs);
+		ScreenOpticalFieldCollection screen_optical_fields(lc_field->mesh, coefs, E_field_vals, n_E_vals);
 
 		BPMIteration bpm_iteration(
 			*lc_field, screen_optical_fields, coefs, settings);
@@ -117,7 +115,7 @@ void run_backend_with_mask(
 		ScreenOutput micrograph_output(settings, coefs);
 		if(n_E_vals != coefs.wavelengths().size()*coefs.q_vals().size()*4*dims[0]*dims[1])
 			throw std::string("Wrong dimension for the raw fields array");
-		micrograph_output.apply_no_export(screen_optical_fields, E_field_vals);
+		micrograph_output.apply_no_export(screen_optical_fields);
 
 		if(settings.postprocessor.volume_output.activate) {
 			VolumeOutput volume_output(settings, coefs);

@@ -7,7 +7,8 @@
 
 enum class BeamProfileType {
 	GaussianBeam,
-	UniformBeam
+	UniformBeam,
+	None
 };
 
 class BeamProfile {

@@ -19,3 +19,4 @@ python=3.9.*
 ipython
 traits
 traitsui
+pyqt

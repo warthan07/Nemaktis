@@ -2,6 +2,7 @@
 #include <boost/regex.hpp>
 
 #include "BPMIteration.h"
+#include "BeamProfile.h"
 #include "ParaxialPrimaryEvolutionOperator.h"
 #include "PhaseEvolutionOperator.h"
 #include "FresnelOperator.h"
@@ -30,6 +31,8 @@ BPMIteration::BPMIteration(
 	auto& ic_settings = settings.physics.initial_conditions;
 	if(ic_settings.beam_profile_type == "UniformBeam")
 		beam_profile_type = BeamProfileType::UniformBeam;
+	else if(ic_settings.beam_profile_type == "UniformBeam")
+		beam_profile_type = BeamProfileType::None;
 	else {
 		boost::smatch match_res;
 		if(boost::regex_match(
@@ -83,25 +86,27 @@ void BPMIteration::propagate_fields() {
 			"\tInitializing optical fields..." << std::endl;
 		for(int pol_idx=0; pol_idx<2; pol_idx++) {
 			for(int q_idx=0; q_idx<q_vals.size(); q_idx++) {
-				std::shared_ptr<BeamProfile> beam_profile;
-				if(beam_profile_type == BeamProfileType::GaussianBeam)
-					beam_profile = std::make_shared<GaussianBeam>(
-						coefs, waist, 0.5*PI*pol_idx, wavelengths[wave_idx]);
-				else if(beam_profile_type == BeamProfileType::UniformBeam)
-					beam_profile = std::make_shared<UniformBeam>(
-						coefs, 0.5*PI*pol_idx, wavelengths[wave_idx]);
+				if(beam_profile_type!=BeamProfileType::None) {
+					std::shared_ptr<BeamProfile> beam_profile;
+					if(beam_profile_type == BeamProfileType::GaussianBeam)
+						beam_profile = std::make_shared<GaussianBeam>(
+							coefs, waist, 0.5*PI*pol_idx, wavelengths[wave_idx]);
+					else if(beam_profile_type == BeamProfileType::UniformBeam)
+						beam_profile = std::make_shared<UniformBeam>(
+							coefs, 0.5*PI*pol_idx, wavelengths[wave_idx]);
 	
-				double x, y;
-				for(int iperp=0; iperp<Nx*Ny; iperp++) {
-					x = ((iperp%Nx) - (Nx-1)/2.) * delta_x;
-					y = ((iperp/Nx) - (Ny-1)/2.) * delta_y;
-					screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,0) =
-						beam_profile->get_Ex(x, y);
-					screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,1) =
-						beam_profile->get_Ey(x, y);
+					double x, y;
+					for(int iperp=0; iperp<Nx*Ny; iperp++) {
+						x = ((iperp%Nx) - (Nx-1)/2.) * delta_x;
+						y = ((iperp/Nx) - (Ny-1)/2.) * delta_y;
+						screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,0) =
+							beam_profile->get_Ex(x, y);
+						screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,1) =
+							beam_profile->get_Ey(x, y);
+					}
+					input_fresnel_operator.apply(
+						screen_optical_fields(wave_idx,q_idx,pol_idx));
 				}
-				input_fresnel_operator.apply(
-					screen_optical_fields(wave_idx,q_idx,pol_idx));
 
 				if(bulk_output) {
 					#pragma omp parallel for

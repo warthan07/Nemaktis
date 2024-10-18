@@ -34,7 +34,7 @@ VectorField<T>::VectorField(
 	mask_exists(false) {
 
 	if(n_user_vals!=n_vertex*field_dim)
-		throw std::string("Wrong dimension for the user pointer array");
+		throw std::string("Wrong dimension for the user pointer array (VectorField)");
 	for(int i=0; i<n_vertex*field_dim; i++)
 		vals[i] = user_vals[i];
 }
