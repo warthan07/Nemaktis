@@ -332,9 +332,10 @@ class LightPropagator:
             (dims[1],dims[0]), wavelengths, pixelsize=1000*spacings[0], n=nin,
             beta=beta, phi=phi, intensity=intensity)
         field_data_out = dtmm.transfer_field(
-            field_data_in, optical_data, nin=nin, nout=nout,
+            field_data_in, optical_data, nin=nin, nout=nout, eff_data="uniaxial",
             betamax=self._max_NA_objective, diffraction=diffraction,
-            ret_bulk=bulk_filename is not None)[0]
+            method = "4x4",
+            reflection=3, ret_bulk=bulk_filename is not None)[0]
         print("")
 
         if bulk_filename is not None:
@@ -342,9 +343,9 @@ class LightPropagator:
             lengths = lc_field.get_mesh_lengths()
 
             vti_data = vtkImageData()
-            vti_data.SetDimensions(dims[0], dims[1], dims[2]+1)
+            vti_data.SetDimensions(dims[0], dims[1], dims[2])
             vti_data.SetOrigin(-lengths[0]/2, -lengths[1]/2, -lengths[2]/2)
-            vti_data.SetSpacing(spacings[0], spacings[1], spacings[2]*(dims[2]-1)/dims[2])
+            vti_data.SetSpacing(spacings[0], spacings[1], spacings[2])
 
             wavelengths_data = vn.numpy_to_vtk(self._wavelengths)
             wavelengths_data.SetName("lambda")
@@ -358,13 +359,15 @@ class LightPropagator:
             qy_data.SetName("qy")
             vti_data.GetFieldData().AddArray(qy_data)
 
-            Np = dims[0]*dims[1]*(dims[2]+1)
+            Np = dims[0]*dims[1]*dims[2]
             for wave_idx in range(0,len(self._wavelengths)):
                 for q_idx in range(0,len(self._wavevectors)):
-                    E_inputX = field_data_out[:-1,q_idx,0,wave_idx,[0,2],:,:].transpose(
-                        (1,0,2,3)).reshape((2,Np)).transpose()
-                    E_inputY = field_data_out[:-1,q_idx,1,wave_idx,[0,2],:,:].transpose(
-                        (1,0,2,3)).reshape((2,Np)).transpose()
+                    E_inputX = np.zeros((dims[0]*dims[1]*dims[2],3),dtype=np.complex128)
+                    E_inputY = np.zeros((dims[0]*dims[1]*dims[2],3),dtype=np.complex128)
+                    E_inputX[:,:2] = field_data_out[1:-1,q_idx,0,wave_idx,[0,2],:,:].transpose(
+                        (1,0,2,3)).reshape((2,Np)).transpose()*1.7
+                    E_inputY[:,:2] = field_data_out[1:-1,q_idx,1,wave_idx,[0,2],:,:].transpose(
+                        (1,0,2,3)).reshape((2,Np)).transpose()*1.7
 
                     E_real_inputX = vn.numpy_to_vtk(np.real(E_inputX))
                     E_real_inputX.SetName("E_real_inputX_%d_%d" % (wave_idx,q_idx))

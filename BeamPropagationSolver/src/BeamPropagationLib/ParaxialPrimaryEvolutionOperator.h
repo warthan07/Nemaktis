@@ -90,7 +90,7 @@ private:
 	/**
 	 * A temporary transverse field used in the apply method.
 	 */
-	TransverseOpticalField tmp;
+	TransverseOpticalField tmp, tmp2;
 	/**
 	 * The evolution operator is rigourously defined as exp(2*mu*R_matrix), where
 	 * mu=I*delta_Z/2 is stored in this variable.

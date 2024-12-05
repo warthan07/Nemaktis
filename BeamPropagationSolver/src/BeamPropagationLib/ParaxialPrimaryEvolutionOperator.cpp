@@ -1,4 +1,5 @@
 #include "ParaxialPrimaryEvolutionOperator.h"
+#include "BlockSparseMatrix.h"
 
 ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 		const PermittivityTensorField& eps,
@@ -19,6 +20,7 @@ ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 	N(Nx*Ny),
 	N_woodbury_steps(settings.algorithm.bpm.n_woodbury_steps),
 	tmp(eps.mesh),
+	tmp2(eps.mesh),
 	mu(std::complex<double>(0,delta_Z/2.)){
 
 	std::vector<Eigen::Triplet<double> > triplet_list;
@@ -101,55 +103,79 @@ int ParaxialPrimaryEvolutionOperator::apply(TransverseOpticalField &field) {
 
 	// Forward y-step
 	R_matrix.DY_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	R_matrix.DY_op().block_vmult(Block01, tmp, 0, field, 1, true);
 	R_matrix.DY_op().block_vmult(Block11, tmp, 1, field, 1, false);
-	R_matrix.block_vmult(Block10, tmp, 1, field, 0, true);
+	R_matrix.DY_op().block_vmult(Block10, tmp, 1, field, 0, true);
 	field.add_scaled_field(mu, tmp);
-
-
-	// Backward x-step
-	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
-	R_matrix.block_vmult(Block01, tmp, 0, tmp, 1);
-	tmp.scale_and_add_block(mu, field, 0);
-	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, field, 0, tmp, 0);
-	field.copy_block(tmp, 1);
-
-	tmp.copy_block(field, 0);
-	for(int it=0; it<N_woodbury_steps; it++) {
-		R_matrix.DXDY_op().block_vmult(Block00, tmp, 1, tmp, 0);
-		tmp.scale_block(-mu, 1);
-		R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp, 1);
-		field.add_block(tmp, 0);
-	}
-
-
-	// Forward x-step
-	R_matrix.DX_op().block_vmult(Block00, tmp, 0, field, 0, false);
-	R_matrix.DX_op().block_vmult(Block11, tmp, 1, field, 1, false);
-	R_matrix.block_vmult(Block01, tmp, 0, field, 1, true);
-	field.add_scaled_field(mu, tmp);
-
 
 	// Backward y-step
 	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, field, 0);
-	R_matrix.block_vmult(Block10, tmp, 1, tmp, 0);
-	tmp.scale_and_add_block(mu, field, 1);
-	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, field, 1, tmp, 1);
+	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
 	field.copy_block(tmp, 0);
+	field.copy_block(tmp, 1);
 
-	tmp.copy_block(field, 1);
 	for(int it=0; it<N_woodbury_steps; it++) {
-		R_matrix.DXDY_op().block_vmult(Block11, tmp, 0, tmp, 1);
-		tmp.scale_block(-mu, 0);
-		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp, 0);
+		R_matrix.DY_op().block_vmult(Block01, tmp2, 0, tmp, 1, false);
+		R_matrix.DY_op().block_vmult(Block10, tmp2, 1, tmp, 0, false);
+		tmp2.scale_block(mu, 0);
+		tmp2.scale_block(mu, 1);
+		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp2, 0);
+		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp2, 1);
+		field.add_block(tmp, 0);
 		field.add_block(tmp, 1);
 	}
 
+	// Forward y-step
+	// R_matrix.DY_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	// R_matrix.DY_op().block_vmult(Block11, tmp, 1, field, 1, false);
+	// R_matrix.block_vmult(Block10, tmp, 1, field, 0, true);
+	// field.add_scaled_field(mu, tmp);
+	//
+	//
+	// // Backward x-step
+	// R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
+	// R_matrix.block_vmult(Block01, tmp, 0, tmp, 1);
+	// tmp.scale_and_add_block(mu, field, 0);
+	// R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, field, 0, tmp, 0);
+	// field.copy_block(tmp, 1);
+	//
+	// tmp.copy_block(field, 0);
+	// for(int it=0; it<N_woodbury_steps; it++) {
+	// 	R_matrix.DXDY_op().block_vmult(Block00, tmp, 1, tmp, 0);
+	// 	tmp.scale_block(-mu, 1);
+	// 	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp, 1);
+	// 	field.add_block(tmp, 0);
+	// }
+	//
+	//
+	// // Forward x-step
+	// R_matrix.DX_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	// R_matrix.DX_op().block_vmult(Block11, tmp, 1, field, 1, false);
+	// R_matrix.block_vmult(Block01, tmp, 0, field, 1, true);
+	// field.add_scaled_field(mu, tmp);
+	//
+	//
+	// // Backward y-step
+	// R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, field, 0);
+	// R_matrix.block_vmult(Block10, tmp, 1, tmp, 0);
+	// tmp.scale_and_add_block(mu, field, 1);
+	// R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, field, 1, tmp, 1);
+	// field.copy_block(tmp, 0);
+	//
+	// tmp.copy_block(field, 1);
+	// for(int it=0; it<N_woodbury_steps; it++) {
+	// 	R_matrix.DXDY_op().block_vmult(Block11, tmp, 0, tmp, 1);
+	// 	tmp.scale_block(-mu, 0);
+	// 	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp, 0);
+	// 	field.add_block(tmp, 1);
+	// }
+	//
 	return 2*N_woodbury_steps;
 }
 
 void ParaxialPrimaryEvolutionOperator::update() {
 
-	// First we update the D1 and D  matrices with the values of permittivity for the current
+	// First we update the D1 and D matrices with the values of permittivity for the current
 	// transverse plane
 	update_D1();
 	update_D();
@@ -232,7 +258,7 @@ void ParaxialPrimaryEvolutionOperator::update() {
 				dst_it->val += 0.25*D_it.val*exy_sqrt_inv;
 			}
 
-			// We add the right blocks (Block01 and Block11) of D1*K to D_matrix
+			// We add the right blocks (Block01 and Block11) of 0.25*D*sqrt(K)^-1 to R_matrix
 			dst_it = R_matrix.column_iterators(diff_type, mesh_idx+N).begin();
 			for(auto D_it : D_matrix.column_iterators(diff_type, mesh_idx)) {
 				while(dst_it->row<D_it.row)
@@ -314,7 +340,7 @@ void ParaxialPrimaryEvolutionOperator::update_D() {
 		}
 	}
 
-	// We add D1*K to D
+	// We add D1*K to D column-wise
 	#pragma omp parallel for private(exx_tr, exy_tr, eyy_tr)
 	for(int mesh_idx=0; mesh_idx<N; mesh_idx++) {
 		Index3D p{mesh_idx%Nx,mesh_idx/Nx,iz};

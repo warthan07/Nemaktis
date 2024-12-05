@@ -31,7 +31,7 @@ BPMIteration::BPMIteration(
 	auto& ic_settings = settings.physics.initial_conditions;
 	if(ic_settings.beam_profile_type == "UniformBeam")
 		beam_profile_type = BeamProfileType::UniformBeam;
-	else if(ic_settings.beam_profile_type == "UniformBeam")
+	else if(ic_settings.beam_profile_type == "None")
 		beam_profile_type = BeamProfileType::None;
 	else {
 		boost::smatch match_res;
@@ -110,11 +110,13 @@ void BPMIteration::propagate_fields() {
 
 				if(bulk_output) {
 					#pragma omp parallel for
-					for(int iperp=0; iperp<Nx*Ny; iperp++)
+					for(int iperp=0; iperp<Nx*Ny; iperp++) {
 						for(int comp=0; comp<2; comp++)
 							bulk_optical_fields->set_field_val(
 								wave_idx, q_idx, pol_idx, comp, iperp,
 								screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,comp));
+						bulk_optical_fields->set_field_val(wave_idx, q_idx, pol_idx, 2, iperp, 0);
+					}
 				}
 			}
 		}
@@ -159,6 +161,7 @@ void BPMIteration::propagate_fields() {
 								bulk_optical_fields->set_field_val(
 									wave_idx, q_idx, pol_idx, comp, global_index,
 									screen_optical_fields(wave_idx,q_idx,pol_idx)(iperp,comp));
+							bulk_optical_fields->set_field_val(wave_idx, q_idx, pol_idx, 2, global_index, 0);
 						}
 					}
 				}
