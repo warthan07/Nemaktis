@@ -105,7 +105,37 @@ int ParaxialPrimaryEvolutionOperator::apply(TransverseOpticalField &field) {
 	R_matrix.DY_op().block_vmult(Block00, tmp, 0, field, 0, false);
 	R_matrix.DY_op().block_vmult(Block01, tmp, 0, field, 1, true);
 	R_matrix.DY_op().block_vmult(Block11, tmp, 1, field, 1, false);
+	R_matrix.DXDY_op().block_vmult(Block11, tmp, 1, field, 1, true);
 	R_matrix.DY_op().block_vmult(Block10, tmp, 1, field, 0, true);
+	R_matrix.DXDY_op().block_vmult(Block10, tmp, 1, field, 0, true);
+	field.add_scaled_field(mu, tmp);
+
+	// Backward x-step
+	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, field, 0);
+	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
+	field.copy_block(tmp, 0);
+	field.copy_block(tmp, 1);
+
+	for(int it=0; it<N_woodbury_steps; it++) {
+		R_matrix.DX_op().block_vmult(Block01, tmp2, 0, tmp, 1, false);
+		R_matrix.DXDY_op().block_vmult(Block01, tmp2, 0, tmp, 1, true);
+		R_matrix.DXDY_op().block_vmult(Block00, tmp2, 0, tmp, 0, true);
+		R_matrix.DX_op().block_vmult(Block10, tmp2, 1, tmp, 0, false);
+		tmp2.scale_block(mu, 0);
+		tmp2.scale_block(mu, 1);
+		R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp2, 0);
+		R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp2, 1);
+		field.add_block(tmp, 0);
+		field.add_block(tmp, 1);
+	}
+
+	// Forward x-step
+	R_matrix.DX_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	R_matrix.DXDY_op().block_vmult(Block00, tmp, 0, field, 0, true);
+	R_matrix.DX_op().block_vmult(Block01, tmp, 0, field, 1, true);
+	R_matrix.DXDY_op().block_vmult(Block01, tmp, 0, field, 1, true);
+	R_matrix.DX_op().block_vmult(Block11, tmp, 1, field, 1, false);
+	R_matrix.DX_op().block_vmult(Block10, tmp, 1, field, 0, true);
 	field.add_scaled_field(mu, tmp);
 
 	// Backward y-step
@@ -117,6 +147,8 @@ int ParaxialPrimaryEvolutionOperator::apply(TransverseOpticalField &field) {
 	for(int it=0; it<N_woodbury_steps; it++) {
 		R_matrix.DY_op().block_vmult(Block01, tmp2, 0, tmp, 1, false);
 		R_matrix.DY_op().block_vmult(Block10, tmp2, 1, tmp, 0, false);
+		R_matrix.DXDY_op().block_vmult(Block10, tmp2, 1, tmp, 0, true);
+		R_matrix.DXDY_op().block_vmult(Block11, tmp2, 1, tmp, 1, true);
 		tmp2.scale_block(mu, 0);
 		tmp2.scale_block(mu, 1);
 		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp2, 0);
