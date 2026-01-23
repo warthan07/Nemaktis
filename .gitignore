@@ -1,6 +1,7 @@
 RayTracingSolver/rt-solver
 BeamPropagationSolver/bpm-solver
 dev/envs
+**/.cache
 **/bin
 **/data
 **/results

@@ -1,6 +1,6 @@
 package:
     name: nemaktis 
-    version: "1.4.8"
+    version: "1.4.9"
 
 source:
     - path: ../BeamPropagationSolver
@@ -32,7 +32,8 @@ requirements:
         - numpy 1.21.*
         - numba
         - scipy
-        - matplotlib
+        - matplotlib-base
+        - pyqt
         - setuptools
         - python 3.9.*
     run:
@@ -46,7 +47,8 @@ requirements:
         - {{ pin_compatible('numpy',min_pin="1.20",max_pin="1.22") }}
         - numba
         - scipy
-        - matplotlib
+        - matplotlib-base
+        - pyqt
         - python  3.9.*
         - ipython
         - traits

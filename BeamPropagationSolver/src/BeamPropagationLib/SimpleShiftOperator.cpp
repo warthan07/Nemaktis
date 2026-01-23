@@ -2,7 +2,7 @@
 
 SimpleShiftOperator::SimpleShiftOperator(
 		const PermittivityTensorField& eps, double wavelength,
-		std::pair<double,double> q_val, const RootSettings &settings) :
+		const std::pair<double,double> &q_val, const RootSettings &settings) :
 	BaseBPMOperator(eps, wavelength),
 	tmp(eps.mesh) {
 

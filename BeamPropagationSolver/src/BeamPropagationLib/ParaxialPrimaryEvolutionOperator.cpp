@@ -102,74 +102,74 @@ ParaxialPrimaryEvolutionOperator::ParaxialPrimaryEvolutionOperator(
 int ParaxialPrimaryEvolutionOperator::apply(TransverseOpticalField &field) {
 
 	// Forward y-step
-	R_matrix.DY_op().block_vmult(Block00, tmp, 0, field, 0, false);
-	R_matrix.DY_op().block_vmult(Block01, tmp, 0, field, 1, true);
-	R_matrix.DY_op().block_vmult(Block11, tmp, 1, field, 1, false);
-	R_matrix.DY_op().block_vmult(Block10, tmp, 1, field, 0, true);
-	field.add_scaled_field(mu, tmp);
-
-	// Backward y-step
-	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, field, 0);
-	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
-	field.copy_block(tmp, 0);
-	field.copy_block(tmp, 1);
-
-	for(int it=0; it<N_woodbury_steps; it++) {
-		R_matrix.DY_op().block_vmult(Block01, tmp2, 0, tmp, 1, false);
-		R_matrix.DY_op().block_vmult(Block10, tmp2, 1, tmp, 0, false);
-		tmp2.scale_block(mu, 0);
-		tmp2.scale_block(mu, 1);
-		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp2, 0);
-		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp2, 1);
-		field.add_block(tmp, 0);
-		field.add_block(tmp, 1);
-	}
-
-	// Forward y-step
 	// R_matrix.DY_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	// R_matrix.DY_op().block_vmult(Block01, tmp, 0, field, 1, true);
 	// R_matrix.DY_op().block_vmult(Block11, tmp, 1, field, 1, false);
-	// R_matrix.block_vmult(Block10, tmp, 1, field, 0, true);
+	// R_matrix.DY_op().block_vmult(Block10, tmp, 1, field, 0, true);
 	// field.add_scaled_field(mu, tmp);
-	//
-	//
-	// // Backward x-step
-	// R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
-	// R_matrix.block_vmult(Block01, tmp, 0, tmp, 1);
-	// tmp.scale_and_add_block(mu, field, 0);
-	// R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, field, 0, tmp, 0);
-	// field.copy_block(tmp, 1);
-	//
-	// tmp.copy_block(field, 0);
-	// for(int it=0; it<N_woodbury_steps; it++) {
-	// 	R_matrix.DXDY_op().block_vmult(Block00, tmp, 1, tmp, 0);
-	// 	tmp.scale_block(-mu, 1);
-	// 	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp, 1);
-	// 	field.add_block(tmp, 0);
-	// }
-	//
-	//
-	// // Forward x-step
-	// R_matrix.DX_op().block_vmult(Block00, tmp, 0, field, 0, false);
-	// R_matrix.DX_op().block_vmult(Block11, tmp, 1, field, 1, false);
-	// R_matrix.block_vmult(Block01, tmp, 0, field, 1, true);
-	// field.add_scaled_field(mu, tmp);
-	//
 	//
 	// // Backward y-step
 	// R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, field, 0);
-	// R_matrix.block_vmult(Block10, tmp, 1, tmp, 0);
-	// tmp.scale_and_add_block(mu, field, 1);
-	// R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, field, 1, tmp, 1);
+	// R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
 	// field.copy_block(tmp, 0);
+	// field.copy_block(tmp, 1);
 	//
-	// tmp.copy_block(field, 1);
 	// for(int it=0; it<N_woodbury_steps; it++) {
-	// 	R_matrix.DXDY_op().block_vmult(Block11, tmp, 0, tmp, 1);
-	// 	tmp.scale_block(-mu, 0);
-	// 	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp, 0);
+	// 	R_matrix.DY_op().block_vmult(Block01, tmp2, 0, tmp, 1, false);
+	// 	R_matrix.DY_op().block_vmult(Block10, tmp2, 1, tmp, 0, false);
+	// 	tmp2.scale_block(mu, 0);
+	// 	tmp2.scale_block(mu, 1);
+	// 	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp2, 0);
+	// 	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp2, 1);
+	// 	field.add_block(tmp, 0);
 	// 	field.add_block(tmp, 1);
 	// }
-	//
+
+	// Forward y-step
+	R_matrix.DY_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	R_matrix.DY_op().block_vmult(Block11, tmp, 1, field, 1, false);
+	R_matrix.block_vmult(Block10, tmp, 1, field, 0, true);
+	field.add_scaled_field(mu, tmp);
+
+
+	// Backward x-step
+	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, field, 1);
+	R_matrix.block_vmult(Block01, tmp, 0, tmp, 1);
+	tmp.scale_and_add_block(mu, field, 0);
+	R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, field, 0, tmp, 0);
+	field.copy_block(tmp, 1);
+
+	tmp.copy_block(field, 0);
+	for(int it=0; it<N_woodbury_steps; it++) {
+		R_matrix.DXDY_op().block_vmult(Block00, tmp, 1, tmp, 0);
+		tmp.scale_block(-mu, 1);
+		R_matrix.DX_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, tmp, 1);
+		field.add_block(tmp, 0);
+	}
+
+
+	// Forward x-step
+	R_matrix.DX_op().block_vmult(Block00, tmp, 0, field, 0, false);
+	R_matrix.DX_op().block_vmult(Block11, tmp, 1, field, 1, false);
+	R_matrix.block_vmult(Block01, tmp, 0, field, 1, true);
+	field.add_scaled_field(mu, tmp);
+
+
+	// Backward y-step
+	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block00, tmp, 0, field, 0);
+	R_matrix.block_vmult(Block10, tmp, 1, tmp, 0);
+	tmp.scale_and_add_block(mu, field, 1);
+	R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, field, 1, tmp, 1);
+	field.copy_block(tmp, 0);
+
+	tmp.copy_block(field, 1);
+	for(int it=0; it<N_woodbury_steps; it++) {
+		R_matrix.DXDY_op().block_vmult(Block11, tmp, 0, tmp, 1);
+		tmp.scale_block(-mu, 0);
+		R_matrix.DY_op().shifted_block_vmult_inv(-mu, Block11, tmp, 1, tmp, 0);
+		field.add_block(tmp, 1);
+	}
+
 	return 2*N_woodbury_steps;
 }
 

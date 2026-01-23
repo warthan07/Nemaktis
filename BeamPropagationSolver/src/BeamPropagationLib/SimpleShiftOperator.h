@@ -8,7 +8,7 @@ class SimpleShiftOperator : public BaseBPMOperator {
 public:
 	SimpleShiftOperator(
 		const PermittivityTensorField& eps, double wavelength,
-		std::pair<double,double> q_val, const RootSettings &settings);
+		const std::pair<double,double> &q_val, const RootSettings &settings);
 
 	/**
 	 * Apply this operator to a transverse optical field.

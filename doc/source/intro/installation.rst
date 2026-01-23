@@ -40,7 +40,7 @@ b1. (Windows) Install Nemaktis automatically
 If you are a Windows 10 user and do not want to copy-paste commands in a terminal, the next
 step is as simple as running the following installation script 
 
-https://github.com/warthan07/Nemaktis/releases/download/v1.4.8/Install_Nemaktis-1.4.8.cmd
+https://github.com/warthan07/Nemaktis/releases/download/v1.4.9/Install_Nemaktis-1.4.9.cmd
 
 This script will ask for the root path of the ``Miniforge`` distribution installed in step a,
 create a special environment for ``Nemaktis`` named *nm* and will install everything needed
@@ -55,7 +55,7 @@ Alternatively, if you are a Linux user or want to type the installation commands
 (they are not very complicated after all!), open a terminal (Windows: application "Miniforge
 prompt" installed with Miniforge, Linux: any terminal) and type the following command: ::
   
-  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.8
+  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.9
 
 (Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
 to install and run it from the same mamba environment. You can search https://anaconda.org/

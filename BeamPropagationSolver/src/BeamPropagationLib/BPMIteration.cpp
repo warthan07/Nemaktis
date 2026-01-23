@@ -74,6 +74,7 @@ void BPMIteration::propagate_fields() {
 		OutputFresnelOperator output_fresnel_operator(eps, nout_fresnel);
 
 		std::vector<SimpleShiftOperator> shift_operators;
+		shift_operators.reserve(q_vals.size());
 		for(int q_idx=0; q_idx<q_vals.size(); q_idx++)
 			shift_operators.emplace_back(eps, wavelengths[wave_idx], q_vals[q_idx], settings);
 		

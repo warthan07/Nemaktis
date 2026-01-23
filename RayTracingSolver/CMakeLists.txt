@@ -3,7 +3,7 @@
 ##################
 
 project(rt-solver)
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.11.2)
 
 # generate json file for completion with YCM
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 

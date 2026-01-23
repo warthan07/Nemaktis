@@ -607,17 +607,17 @@ class DirectorField(TensorField):
         # We verify if the user functions are vectorizable
         dummy_arr = np.ones((2,2,2))
         try:
-            nx_func(dummy_arr,dummy_arr,dummy_arr)
+            assert nx_func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
         except:
             print("\tnx_func is not vectorized, using a non-optimized version instead.")
             nx_func = np.vectorize(nx_func)
         try:
-            ny_func(dummy_arr,dummy_arr,dummy_arr)
+            assert ny_func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
         except:
             print("\tny_func is not vectorized, using a non-optimized version instead.")
             ny_func = np.vectorize(ny_func)
         try:
-            nz_func(dummy_arr,dummy_arr,dummy_arr)
+            assert nz_func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
         except:
             print("\tnz_func is not vectorized, using a non-optimized version instead.")
             nz_func = np.vectorize(nz_func)

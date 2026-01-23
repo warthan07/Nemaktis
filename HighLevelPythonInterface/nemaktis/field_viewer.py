@@ -78,12 +78,13 @@ class FieldViewer:
     """Should we calculate a grayscale micrograph (True) or a color micrograph (False)"""
 
 
-    def __init__(self, optical_fields, cmf = None):
+    def __init__(self, optical_fields, cmf = None, gamma = True):
         if not isinstance(optical_fields, OpticalFields):
             raise TypeError("optical_fields should be an OpticalFields object")
         self._optical_fields = optical_fields
         optical_fields.focus_fields(0)
         self._NA_objective = optical_fields._max_NA_objective
+        self._gamma = gamma
 
         shape = self._optical_fields.vals.shape
         self._specter = np.zeros((shape[3],shape[4],shape[0],shape[1]))
@@ -457,7 +458,9 @@ class FieldViewer:
     def _update_POM_image(self):
         color.specter2color(
             self.intensity*self._q_averaged_specter, self._cmf,
-            out = self._image, gray = self.grayscale)
+            out = self._image, gray = self.grayscale, gamma=self._gamma)
+        if not self._gamma:
+            self._image = np.minimum(1, np.maximum(0, self._image))
  
 
     def _update_plot(self):
