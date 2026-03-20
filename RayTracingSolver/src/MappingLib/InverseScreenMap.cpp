@@ -10,8 +10,8 @@ InverseScreenMap<dim>::InverseScreenMap(
 	screen_map(_screen_map),
 	coarse_mesh(_coarse_mesh),
 	fine_mesh(_coarse_mesh),
-	typical_length(_typical_length),
 	screen_domain(_screen_domain),
+	typical_length(_typical_length),
 	coarse_hc_parameters(j.at("Coarse step HC parameters")), 
 	refinement_hc_parameters(j.at("Refinement step HC parameters")) {
 

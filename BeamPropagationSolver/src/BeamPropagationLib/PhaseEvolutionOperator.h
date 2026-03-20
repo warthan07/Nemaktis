@@ -8,6 +8,7 @@ public:
 	PhaseEvolutionOperator(
 		const PermittivityTensorField& eps,
 		double wavelength, const RootSettings &settings);
+	virtual ~PhaseEvolutionOperator() {}
 
 	/**
 	 * Apply this evolution operator to a transverse optical field.

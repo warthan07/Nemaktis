@@ -43,7 +43,7 @@ private:
 	/**
 	 * Mesh spacings.
 	 */
-	double delta_x, delta_y, delta_z;
+	double delta_x, delta_y;
 	/**
 	 * Number of points in each space direction for the global mesh
 	 */
@@ -51,7 +51,7 @@ private:
 	/**
 	 * Number of evolution sub-steps per z-slab
 	 */
-	unsigned int Nz_substeps;
+	//unsigned int Nz_substeps;
 
 	/**
 	 * Beam waist (in case of a gaussian input

@@ -2,7 +2,7 @@
 # General settings
 ##################
 
-cmake_minimum_required(VERSION 3.11.2)
+cmake_minimum_required(VERSION 3.15)
 project(bpm-solver)
 
 # generate json file for completion with YCM
@@ -11,9 +11,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 if(DEFINED ENV{MYROOT})
 	link_directories($ENV{MYROOT}/lib)
 endif()
-if(DEFINED ENV{PREFIX})
-	set(CMAKE_INSTALL_PREFIX $ENV{PREFIX})
-endif()
+# if(DEFINED ENV{PREFIX})
+# 	set(CMAKE_INSTALL_PREFIX $ENV{PREFIX})
+# endif()
 if(DEFINED ENV{CONDA_PREFIX})
 	set(CMAKE_PREFIX_PATH $ENV{CONDA_PREFIX})
 	include_directories($ENV{CONDA_PREFIX}/include)
@@ -38,24 +38,20 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.82.0 CONFIG EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
-  add_definitions( -DBOOST_ALL_NO_LIB )
-  add_definitions( -DBOOST_ALL_DYN_LINK )
+	add_definitions( -DBOOST_ALL_NO_LIB )
+	add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
 
 find_package(OpenMP REQUIRED)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOXML)
 
 cmake_policy(SET CMP0078 NEW)
 cmake_policy(SET CMP0086 NEW)
 find_package(SWIG REQUIRED)
-include(${SWIG_USE_FILE})
+include(UseSWIG)
 
-set(Python3_FIND_REGISTRY LAST)
-find_package(Python3 3.9 EXACT REQUIRED COMPONENTS Development NumPy)
+find_package(Python 3.9 EXACT REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 
 ###########################################################################
@@ -126,24 +122,13 @@ file(GLOB SETTINGSLIB_CPP ${SETTINGSLIB_DIR}/*.cpp)
 set(UTILITIESLIB_DIR src/UtilitiesLib)
 file(GLOB UTILITIESLIB_CPP ${UTILITIESLIB_DIR}/*.cpp)
 
-set(PYTHONBACKEND_DIR src/PythonBackend)
 set(PYTHONBACKEND_BASENAME bpm_backend)
+set(PYTHONBACKEND_DIR src/PythonBackend)
 set(PYTHONBACKEND_CPP ${PYTHONBACKEND_DIR}/${PYTHONBACKEND_BASENAME}.cpp)
+set(PYTHONBACKEND_SWIG ${PYTHONBACKEND_DIR}/${PYTHONBACKEND_BASENAME}.i)
+set_property(SOURCE ${PYTHONBACKEND_SWIG} PROPERTY CPLUSPLUS ON)
 
-if(WIN32)
-	set(PYTHON_INSTALL_FILES
-        	${CMAKE_CURRENT_BINARY_DIR}/${PYTHONBACKEND_BASENAME}.py
-	        ${CMAKE_CURRENT_BINARY_DIR}/_${PYTHONBACKEND_BASENAME}.pyd)
-else()
-	set(PYTHON_INSTALL_FILES
-        	${CMAKE_CURRENT_BINARY_DIR}/${PYTHONBACKEND_BASENAME}.py
-	        ${CMAKE_CURRENT_BINARY_DIR}/_${PYTHONBACKEND_BASENAME}.so)
-endif()
-set(SETUP_PY_IN ${PYTHONBACKEND_DIR}/setup.py.in)
-set(SETUP_PY_OUT ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-configure_file(${SETUP_PY_IN} ${SETUP_PY_OUT})
-
-INCLUDE_DIRECTORIES(
+include_directories(
 	${BPMLIB_DIR}
 	${PHYSICSLIB_DIR}
 	${POSTPROCESSORLIB_DIR}
@@ -153,8 +138,8 @@ INCLUDE_DIRECTORIES(
 	${MUPARSER_INCLUDE_DIRS}
 	${FFTW_INCLUDES}
 	${Boost_INCLUDE_DIRS}
-	${Python3_INCLUDE_DIRS}
-	${Python3_NumPy_INCLUDE_DIRS}
+	${Python_INCLUDE_DIRS}
+	${Python_NumPy_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR}
 )
 
@@ -179,53 +164,36 @@ add_custom_target(run
 # The library targets
 #####################
 
-add_library(BPM ${BPMLIB_CPP})
-add_library(Physics ${PHYSICSLIB_CPP})
-add_library(Postprocessor ${POSTPROCESSORLIB_CPP})
-add_library(Settings ${SETTINGSLIB_CPP})
-add_library(Utilities ${UTILITIESLIB_CPP})
+add_library(bpm-lib STATIC ${BPMLIB_CPP} ${PHYSICSLIB_CPP} ${POSTPROCESSORLIB_CPP}
+	${SETTINGSLIB_CPP} ${UTILITIESLIB_CPP})
 
-add_library(bpm-lib ${BPMLIB_CPP} ${PHYSICSLIB_CPP} ${POSTPROCESSORLIB_CPP}
-	${SETTINGSLIB_CPP} ${UTILITIESLIB_CPP} ${PYTHONBACKEND_CPP})
-set_target_properties(bpm-lib PROPERTIES
-	OUTPUT_NAME ${PROJECT_NAME}
-	PUBLIC_HEADER ${PYTHONBACKEND_DIR}/${PYTHONBACKEND_BASENAME}.h)
-
-set_property(SOURCE ${PYTHONBACKEND_DIR}/${PYTHONBACKEND_BASENAME}.i PROPERTY CPLUSPLUS ON)
-swig_add_library(${PYTHONBACKEND_BASENAME} LANGUAGE python
-	SOURCES ${PYTHONBACKEND_DIR}/${PYTHONBACKEND_BASENAME}.i)
+set(SWIG_USE_SWIG_DEPENDENCIES true)
+swig_add_library(${PYTHONBACKEND_BASENAME} TYPE STATIC LANGUAGE python
+	SOURCES ${PYTHONBACKEND_SWIG} ${PYTHONBACKEND_CPP})
+get_property(PYTHONBACKEND_FILES TARGET ${PYTHONBACKEND_BASENAME} PROPERTY SWIG_SUPPORT_FILES)
+message(${PYTHONBACKEND_FILES})
+if(WIN32)
+	set_property(TARGET ${PYTHONBACKEND_BASENAME}
+		PROPERTY SUFFIX ".${Python_SOABI}.pyd")
+else()
+	set_property(TARGET ${PYTHONBACKEND_BASENAME}
+		PROPERTY SUFFIX ".${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}")
+endif()
 
 
 ############################################
 # We link the main targets and the libraries
 ############################################
 
-target_link_libraries(${PROJECT_NAME} Settings)
-target_link_libraries(Settings BPM Postprocessor)
-target_link_libraries(Postprocessor Physics
-	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES})
-target_link_libraries(BPM ${Boost_LIBRARIES} Utilities Physics)
-target_link_libraries(Physics ${MUPARSER_LIBRARIES})
-target_link_libraries(Utilities ${VTK_LIBRARIES})
-
-target_link_libraries(bpm-lib
+target_link_libraries(${PROJECT_NAME}
+	bpm-lib OpenMP::OpenMP_CXX Eigen3::Eigen)
+target_link_libraries(${PYTHONBACKEND_BASENAME}
+	bpm-lib Python::NumPy OpenMP::OpenMP_CXX Eigen3::Eigen)
+target_link_libraries(bpm-lib 
 	${Boost_LIBRARIES} ${VTK_LIBRARIES} ${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES})
-swig_link_libraries(${PYTHONBACKEND_BASENAME} bpm-lib ${Python3_LIBRARIES})
 
-# vtk_module_autoinit(
-# 	TARGETS Postprocessor Utilities bpm-lib
-# 	MODULES ${VKT_LIBRARIES}
-# )
-
-#################
-# Install targets
-#################
-
-add_custom_target(python-install
-	DEPENDS bpm_backend
-	COMMAND python ${SETUP_PY_OUT} install
-)
-install(TARGETS ${PROJECT_NAME} bpm-lib
+install(TARGETS ${PYTHONBACKEND_BASENAME} DESTINATION .)
+install(TARGETS ${PROJECT_NAME} bpm-lib 
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 )

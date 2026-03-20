@@ -18,10 +18,10 @@ SimpleShiftOperator::SimpleShiftOperator(
 		double nu = xshift-mesh_xshift; // local noninteger shift inside a cell
 
 		for(int ix=0; ix<Nx; ix++) {
-			shifted_ix[0].push_back(xwrap(ix+mesh_xshift-1));
-			shifted_ix[1].push_back(xwrap(ix+mesh_xshift));
-			shifted_ix[2].push_back(xwrap(ix+mesh_xshift+1));
-			shifted_ix[3].push_back(xwrap(ix+mesh_xshift+2));
+			shifted_ix[0].push_back(xwrap(static_cast<int>(ix+mesh_xshift-1)));
+			shifted_ix[1].push_back(xwrap(static_cast<int>(ix+mesh_xshift)));
+			shifted_ix[2].push_back(xwrap(static_cast<int>(ix+mesh_xshift+1)));
+			shifted_ix[3].push_back(xwrap(static_cast<int>(ix+mesh_xshift+2)));
 		}
 
 		pol_weight_x[0] = -nu*std::pow(1-nu,2)/2;
@@ -36,10 +36,10 @@ SimpleShiftOperator::SimpleShiftOperator(
 		double nu = yshift-mesh_yshift; // local noninteger shift inside a cell
 
 		for(int iy=0; iy<Ny; iy++) {
-			shifted_iy[0].push_back(ywrap(iy+mesh_yshift-1));
-			shifted_iy[1].push_back(ywrap(iy+mesh_yshift));
-			shifted_iy[2].push_back(ywrap(iy+mesh_yshift+1));
-			shifted_iy[3].push_back(ywrap(iy+mesh_yshift+2));
+			shifted_iy[0].push_back(ywrap(static_cast<int>(iy+mesh_yshift-1)));
+			shifted_iy[1].push_back(ywrap(static_cast<int>(iy+mesh_yshift)));
+			shifted_iy[2].push_back(ywrap(static_cast<int>(iy+mesh_yshift+1)));
+			shifted_iy[3].push_back(ywrap(static_cast<int>(iy+mesh_yshift+2)));
 		}
 
 		pol_weight_y[0] = -nu*std::pow(1-nu,2)/2;

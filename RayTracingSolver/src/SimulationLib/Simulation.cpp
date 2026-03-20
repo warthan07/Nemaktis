@@ -7,8 +7,8 @@ template <int dim>
 Simulation<dim>::Simulation(
 		json settings, double lc_thickness, unsigned int N_lc_steps,
 		std::shared_ptr<CubicInterpolatedMapping<dim,3,double> > &n_field) :
-	mat_properties(settings.at("Material properties")),
 	N_lc_steps(N_lc_steps),
+	mat_properties(settings.at("Material properties")),
 	lc_thickness(lc_thickness),
 	n_field(n_field) {
 

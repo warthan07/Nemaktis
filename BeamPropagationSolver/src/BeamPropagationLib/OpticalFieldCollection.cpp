@@ -12,7 +12,7 @@ ScreenOpticalFieldCollection::ScreenOpticalFieldCollection(
 	fft_fields(2*wavelengths.size()*q_vals.size()),
 	own_field_vals(true),
 	stride_fields(mesh.Nx*mesh.Ny*2),
-	stride_plans(stride_fields*2*q_vals.size()),
+	stride_plans(stride_fields*2*int(q_vals.size())),
 	field_vals(static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex)*stride_fields*fields.size()))),
 	fft_field_vals(static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex)*stride_fields*fields.size()))) {
 
@@ -31,7 +31,7 @@ ScreenOpticalFieldCollection::ScreenOpticalFieldCollection(
 	fft_fields(2*wavelengths.size()*q_vals.size()),
 	own_field_vals(false),
 	stride_fields(mesh.Nx*mesh.Ny*2),
-	stride_plans(stride_fields*2*q_vals.size()),
+	stride_plans(static_cast<int>(stride_fields*2*q_vals.size())),
 	field_vals(reinterpret_cast<fftw_complex*>(user_vals)),
 	fft_field_vals(static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex)*stride_fields*fields.size()))) {
 
@@ -43,11 +43,11 @@ ScreenOpticalFieldCollection::ScreenOpticalFieldCollection(
 
 void ScreenOpticalFieldCollection::init_fields_and_plans() {
 
-	unsigned int iw, iq, pol_idx, flat_idx;
+	int iw, iq, pol_idx, flat_idx;
 	for(iw=0; iw<wavelengths.size(); iw++) {
 		for(iq=0; iq<q_vals.size(); iq++) {
 			for(pol_idx=0; pol_idx<2; pol_idx++) {
-				flat_idx = pol_idx+2*(iq+q_vals.size()*iw);
+				flat_idx = static_cast<int>(pol_idx+2*(iq+q_vals.size()*iw));
 				fields[flat_idx] = std::make_shared<TransverseOpticalField>(
 					mesh, reinterpret_cast<std::complex<double>*>(&field_vals[flat_idx*stride_fields]));
 				fft_fields[flat_idx] = std::make_shared<TransverseOpticalField>(
@@ -60,12 +60,12 @@ void ScreenOpticalFieldCollection::init_fields_and_plans() {
 	int field_dims[] = {mesh.Ny, mesh.Nx};
 	int field_size = field_dims[0]*field_dims[1];
 	forward_plan = fftw_plan_many_dft(
-		rank, field_dims, 4*q_vals.size(),
+		rank, field_dims, static_cast<int>(4*q_vals.size()),
 		field_vals, field_dims, 1, field_size,
 		fft_field_vals, field_dims, 1, field_size,
 		FFTW_FORWARD, FFTW_ESTIMATE);
 	backward_plan = fftw_plan_many_dft(
-		rank, field_dims, 4*q_vals.size(),
+		rank, field_dims, static_cast<int>(4*q_vals.size()),
 		fft_field_vals, field_dims, 1, field_size,
 		field_vals, field_dims, 1, field_size,
 		FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -142,7 +142,7 @@ void BulkOpticalFieldCollection::set_field_val(
 		int wave_idx, int q_idx, int pol_idx, int comp, int mesh_idx,
 		std::complex<double> val) {
 
-	int idx = pol_idx+2*(q_idx+q_vals.size()*wave_idx);
+	int idx = static_cast<int>(pol_idx+2*(q_idx+q_vals.size()*wave_idx));
 	real_data_arrays[idx]->SetComponent(mesh_idx, comp, std::real(val));
 	imag_data_arrays[idx]->SetComponent(mesh_idx, comp, std::imag(val));
 }

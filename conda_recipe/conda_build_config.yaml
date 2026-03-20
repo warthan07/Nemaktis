@@ -1,6 +1,12 @@
-win_cxx_compiler: # [win]
-  - vs2017        # [win]
+cxx_compiler:
+  - vs2022 # [win]
+  - gcc    # [linux]
 target_platform:  # [win]
   - win-64        # [win]
 cxx_compiler_version: # [linux]
-    - 10.3            # [linux]
+  - 10.3              # [linux]
+c_stdlib:
+  - vs      # [win]
+  - sysroot # [linux]
+numpy:
+  - 1.21

@@ -19,10 +19,10 @@ RayBundle<dim>::RayBundle(
 		double init_ampl, double fd_step) :
 	cur_geom_spreading(1),
 	cur_optical_index(init_optical_index),
-	fd_step(fd_step),
-	init_rescaled_amplitude(init_ampl*init_optical_index),
 	NA_limited(false),
-	evanescent(false) {
+	evanescent(false),
+	fd_step(fd_step),
+	init_rescaled_amplitude(init_ampl*init_optical_index) {
 
 	for(int i=0; i<2; i++) {
 		cur_pols[i] = init_pols[i];

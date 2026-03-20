@@ -10,6 +10,7 @@ template <int dim>
 class ODEFunction {
 public:
 	ODEFunction(const std::shared_ptr<const DefinitionDomain<dim> > &def_domain);
+	virtual ~ODEFunction() {}
 
 	virtual std::shared_ptr<ODEFunction<dim> > clone() const = 0;
 

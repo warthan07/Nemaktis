@@ -67,7 +67,7 @@ PermittivityTensorField::PermittivityTensorField(
 	// Values of the components of the transverse permittivity tensor and its square root.
 	// We also estimate the reference index for the shift operator from the mean of the
 	// eigenvalues of the mesh-averaged square root transverse permittivity tensor.
-	double det, tr, neff, nref_sum;
+	double det, tr, neff, nref_sum = 0;
 	#pragma omp parallel for private(det, tr, neff) reduction(+:nref_sum)
 	for(int iz=0; iz<mesh.Nz; iz++) {
 		for(int iy=0; iy<mesh.Ny; iy++) {

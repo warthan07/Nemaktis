@@ -26,7 +26,7 @@ private:
 
 	const PhysicsCoefficients &coefs;
 
-	int Nx, Ny, Nz;
+	int Nx, Ny;
 	double delta_x, delta_y;
 
 	std::vector<double> iso_layer_thickness, iso_layer_index;

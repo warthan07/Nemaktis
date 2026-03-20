@@ -207,7 +207,6 @@ void DropletSampleSimulation::run() {
 	Vector<3,std::complex<double> > E_tot;
 	std::complex<double> I(0., 1.);
 
-	unsigned int node_idx = 0;
 	for(int k=0; k<this->N_lc_steps; k++) {
 		std::cout <<
 			"Step " << k+1 << "/" << this->N_lc_steps << ":" << std::endl;

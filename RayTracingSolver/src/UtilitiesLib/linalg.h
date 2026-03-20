@@ -265,8 +265,8 @@ MultiDimIndex<dim>::MultiDimIndex(
 		const Vector<dim,long> &n_points_per_dim,
 		const Vector<dim,long> &shift,
 		bool last_idx_fastest) :
-	n_points_per_dim(n_points_per_dim),
 	idx_vector(shift),
+	n_points_per_dim(n_points_per_dim),
 	shift(shift),
 	last_idx_fastest(last_idx_fastest) {
 

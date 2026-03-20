@@ -32,7 +32,7 @@ double PhysicsCoefficients::get_ne(double wavelength) const {
 		p.SetExpr(ne_expression);
 		return p.Eval();
 	}
-	catch(mu::Parser::exception_type &e) {
+	catch(mu::Parser::exception_type &/*e*/) {
 		throw std::string("Wrong expression for ne");
 	}
 }
@@ -45,7 +45,7 @@ double PhysicsCoefficients::get_ne_imag(double wavelength) const {
 		p.SetExpr(ne_imag_expression);
 		return p.Eval();
 	}
-	catch(mu::Parser::exception_type &e) {
+	catch(mu::Parser::exception_type &/*e*/) {
 		throw std::string("Wrong expression for ne_imag");
 	}
 }
@@ -58,7 +58,7 @@ double PhysicsCoefficients::get_no(double wavelength) const {
 		p.SetExpr(no_expression);
 		return p.Eval();
 	}
-	catch(mu::Parser::exception_type &e) {
+	catch(mu::Parser::exception_type &/*e*/) {
 		throw std::string("Wrong expression for no");
 	}
 }
@@ -71,7 +71,7 @@ double PhysicsCoefficients::get_nhost(double wavelength) const {
 		p.SetExpr(nhost_expression);
 		return p.Eval();
 	}
-	catch(mu::Parser::exception_type &e) {
+	catch(mu::Parser::exception_type &/*e*/) {
 		throw std::string("Wrong expression for nhost");
 	}
 }
@@ -84,7 +84,7 @@ double PhysicsCoefficients::get_nin(double wavelength) const {
 		p.SetExpr(nin_expression);
 		return p.Eval();
 	}
-	catch(mu::Parser::exception_type &e) {
+	catch(mu::Parser::exception_type &/*e*/) {
 		throw std::string("Wrong expression for nin");
 	}
 }
@@ -97,7 +97,7 @@ double PhysicsCoefficients::get_nout(double wavelength) const {
 		p.SetExpr(nout_expression);
 		return p.Eval();
 	}
-	catch(mu::Parser::exception_type &e) {
+	catch(mu::Parser::exception_type &/*e*/) {
 		throw std::string("Wrong expression for nin");
 	}
 }

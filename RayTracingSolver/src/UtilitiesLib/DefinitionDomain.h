@@ -20,6 +20,7 @@ public:
 	 * Constructor.
 	 */
 	DefinitionDomain() {}; 
+	virtual ~DefinitionDomain() {}
 
 	/**
 	 * Return true (false) if <tt>pos</tt> is inside (outside) the

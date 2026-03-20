@@ -25,6 +25,7 @@ public:
 	 * object specifying the domain of definition of this mapping.
 	 */
 	Mapping(const std::shared_ptr<DefinitionDomain<dim1> > &def_domain);
+	virtual ~Mapping() {}
 
 	/**
 	 * Clone method, which returns a shared_ptr pointing to a copy of

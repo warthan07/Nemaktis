@@ -14,6 +14,7 @@ public:
 	Simulation(
 		json settings, double lc_thickness, unsigned int N_lc_steps,
 		std::shared_ptr<CubicInterpolatedMapping<dim,3,double> > &n_field);
+	virtual ~Simulation() {}
 
 	virtual void run() = 0;
 

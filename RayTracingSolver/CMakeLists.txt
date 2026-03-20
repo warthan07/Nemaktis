@@ -2,8 +2,8 @@
 # Project settings
 ##################
 
+cmake_minimum_required(VERSION 3.15)
 project(rt-solver)
-cmake_minimum_required(VERSION 3.11.2)
 
 # generate json file for completion with YCM
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 
@@ -11,8 +11,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 if(DEFINED ENV{MYROOT})
 	link_directories($ENV{MYROOT}/lib)
 endif()
-if(DEFINED ENV{PREFIX})
-	set(CMAKE_INSTALL_PREFIX $ENV{PREFIX})
+# if(DEFINED ENV{PREFIX})
+# 	set(CMAKE_INSTALL_PREFIX $ENV{PREFIX})
+# endif()
+if(DEFINED ENV{CONDA_PREFIX})
+	set(CMAKE_PREFIX_PATH $ENV{CONDA_PREFIX})
+	include_directories($ENV{CONDA_PREFIX}/include)
+	link_directories($ENV{CONDA_PREFIX}/lib)
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
@@ -20,7 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 # Necessary libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/scripts)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3 REQUIRED)
 
 if(WIN32)
 	set(FFTW_USE_STATIC_LIBS ON)
@@ -30,16 +35,13 @@ find_package(FFTW REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.82 EXACT REQUIRED COMPONENTS filesystem regex)
+find_package(Boost 1.82.0 CONFIG EXACT REQUIRED COMPONENTS filesystem regex system)
 if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
 
 find_package(OpenMP REQUIRED)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOXML)
 
@@ -125,7 +127,6 @@ INCLUDE_DIRECTORIES(
 #################
 
 add_executable(${PROJECT_NAME} src/main.cpp)
-
 set_property(
 	TARGET ${PROJECT_NAME}
 	PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -142,25 +143,21 @@ add_custom_target(run
 # The library targets
 #####################
 
-add_library(Utilities ${UTILITIESLIB_CPP})
-add_library(Propagation ${PROPAGATIONLIB_CPP})
-add_library(Mapping ${MAPPINGLIB_CPP})
-add_library(Simulation ${SIMULATIONLIB_CPP})
+add_library(Utilities STATIC ${UTILITIESLIB_CPP})
+add_library(Propagation STATIC ${PROPAGATIONLIB_CPP})
+add_library(Mapping STATIC ${MAPPINGLIB_CPP})
+add_library(Simulation STATIC ${SIMULATIONLIB_CPP})
 
 
 ###########################################
 # We link the main target and the libraries
 ###########################################
 
-target_link_libraries(${PROJECT_NAME} Simulation)
+target_link_libraries(${PROJECT_NAME} Simulation Eigen3::Eigen)
 target_link_libraries(Simulation Propagation Mapping  ${Boost_LIBRARIES} ${FFTW_LIBRARIES})
 target_link_libraries(Mapping Utilities)
 target_link_libraries(Propagation Utilities)
 target_link_libraries(Utilities ${VTK_LIBRARIES})
-vtk_module_autoinit(
-	TARGETS Utilities
-	MODULES ${VKT_LIBRARIES}
-)
 
 
 #################

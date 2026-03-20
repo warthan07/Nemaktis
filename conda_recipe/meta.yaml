@@ -1,56 +1,55 @@
 package:
-    name: nemaktis 
-    version: "1.4.9"
-
+  name: nemaktis 
+  version: "1.4.9"
 source:
-    - path: ../BeamPropagationSolver
-      folder: bpm
-    - path: ../RayTracingSolver
-      folder: rtm
-    - path: ../HighLevelPythonInterface
-      folder: nemaktis
-    - git_url: https://github.com/IJSComplexMatter/dtmm.git
-      folder: dtmm
-
+  - path: ../BeamPropagationSolver
+    folder: bpm
+  - path: ../RayTracingSolver
+    folder: rtm
+  - path: ../HighLevelPythonInterface
+    folder: nemaktis
+  - git_url: https://github.com/IJSComplexMatter/dtmm.git
+    folder: dtmm
 requirements:
-    build:
-        - cmake
-        - {{ compiler('cxx') }} # [not win]
-        - {{ compiler('win_cxx') }} # [win]
-        - vs2015_runtime # [win]
-    host:
-        - pkgconfig
-        - muparser
-        - pyfftw 0.12.*
-        - fftw
-        - boost 1.82.*
-        - openmp
-        - vtk 9.*
-        - eigen
-        - tbb-devel
-        - swig
-        - numpy 1.21.*
-        - numba
-        - scipy
-        - matplotlib-base
-        - pyqt
-        - setuptools
-        - python 3.9.*
-    run:
-        - muparser
-        - pyfftw 0.12.*
-        - fftw
-        - libboost 1.82.*
-        - openmp
-        - vtk 9.*
-        - eigen
-        - {{ pin_compatible('numpy',min_pin="1.20",max_pin="1.22") }}
-        - numba
-        - scipy
-        - matplotlib-base
-        - pyqt
-        - python  3.9.*
-        - ipython
-        - traits
-        - traitsui
-        - vs2015_runtime # [win]
+  build:
+    - cmake
+    - ninja
+    - {{ compiler('cxx') }} # [not win]
+    - {{ compiler('win_cxx') }} # [win]
+    - vs2015_runtime # [win]
+  host:
+    - pkgconfig
+    - muparser
+    - pyfftw 0.12.*
+    - fftw
+    - boost 1.82.*
+    - openmp
+    - vtk 9.*
+    - eigen
+    - tbb-devel
+    - swig
+    - numpy 1.21.*
+    - numba
+    - scipy
+    - matplotlib-base
+    - pyqt
+    - setuptools
+    - python 3.9.*
+  run:
+    - muparser
+    - pyfftw 0.12.*
+    - fftw
+    - libboost 1.82.*
+    - openmp
+    - vtk 9.*
+    - eigen
+    - {{ pin_compatible('numpy',min_pin="1.20",max_pin="1.22") }}
+    - numba
+    - scipy
+    - matplotlib-base
+    - pyqt
+    - python  3.9.*
+    - ipython
+    - traits
+    - traitsui
+    - vc14_runtime # [win]

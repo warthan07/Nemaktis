@@ -49,16 +49,16 @@ void ScreenOutput::apply(ScreenOpticalFieldCollection &screen_optical_fields) {
 	delta_y = mesh.delta_y;
 
 	// We create the FFTW plans for the forward and backward transform
-	std::cout << "    Accumulating FFTW wisdom..." << std::endl;
+	// std::cout << "    Accumulating FFTW wisdom..." << std::endl;
 
-	fftw_complex *in = static_cast<fftw_complex*>(
-		fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-	fftw_complex *out = static_cast<fftw_complex*>(
-		fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
-	fftw_plan forward_plan =
-		fftw_plan_dft_2d(Ny, Nx, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan backward_plan =
-		fftw_plan_dft_2d(Ny, Nx, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
+	// fftw_complex *in = static_cast<fftw_complex*>(
+	// 	fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
+	// fftw_complex *out = static_cast<fftw_complex*>(
+	// 	fftw_malloc(sizeof(fftw_complex) * Nx*Ny));
+	// fftw_plan forward_plan =
+	// 	fftw_plan_dft_2d(Ny, Nx, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+	// fftw_plan backward_plan =
+	// 	fftw_plan_dft_2d(Ny, Nx, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	// Array of pointers for the vti data structures
 	std::vector<vtkSmartPointer<vtkDoubleArray> > vti_data_arrays(

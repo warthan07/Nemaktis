@@ -14,6 +14,7 @@ enum class BeamProfileType {
 class BeamProfile {
 public:
 	BeamProfile(const PhysicsCoefficients &coefs, double pol_angle, double wavelength);
+	virtual ~BeamProfile() {}
 
 	virtual std::complex<double> get_Ex(double x, double y) = 0;
 	virtual std::complex<double> get_Ey(double x, double y) = 0;
@@ -46,6 +47,7 @@ public:
 	GaussianBeam(
 		const PhysicsCoefficients &coefs, double waist, 
 		double pol_angle, double wavelength);
+	virtual ~GaussianBeam() {}
 
 	virtual std::complex<double> get_Ex(double x, double y);
 	virtual std::complex<double> get_Ey(double x, double y);
@@ -60,6 +62,7 @@ private:
 class UniformBeam : public BeamProfile {
 public:
 	UniformBeam(const PhysicsCoefficients &coefs, double pol_angle, double wavelength);
+	virtual ~UniformBeam() {}
 
 	virtual std::complex<double> get_Ex(double x, double y);
 	virtual std::complex<double> get_Ey(double x, double y);

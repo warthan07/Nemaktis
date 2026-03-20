@@ -1,4 +1,6 @@
 #include <boost/regex.hpp>
+#include <sstream>
+#include <string>
 #include <iostream>
 
 #include "BaseSettings.h"

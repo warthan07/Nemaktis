@@ -191,7 +191,6 @@ bool RayStepper<dim>::update_step_size(
 	ray.cur_pos += step_size * pos_derivative[0];
 	ray.cur_moment += step_size * moment_derivative[0];
 
-	bool increase_step = false;
 	double error = std::abs(2.*ode_function->hamiltonian_value(ray)-1.);
 	if(error>threshold)
 		while(error>threshold) {

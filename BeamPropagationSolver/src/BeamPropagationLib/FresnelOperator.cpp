@@ -5,8 +5,8 @@ FresnelOperator::FresnelOperator(
 		double refractive_index) :
 	Nx(eps.mesh.Nx),
 	Ny(eps.mesh.Ny),
-	eps(eps),
-	niso(refractive_index) {}
+	niso(refractive_index),
+	eps(eps) {}
 
 InputFresnelOperator::InputFresnelOperator(
 		const PermittivityTensorField &eps,
@@ -14,8 +14,6 @@ InputFresnelOperator::InputFresnelOperator(
 	FresnelOperator(eps, input_refractive_index) {}
 
 void InputFresnelOperator::apply(TransverseOpticalField &src) const {
-
-	const std::complex<double> I(0,1.);
 
 	// Parallel loop which applies the Fresnel boudary conditions
 	// at the input interface
@@ -46,7 +44,6 @@ OutputFresnelOperator::OutputFresnelOperator(
 
 void OutputFresnelOperator::apply(TransverseOpticalField &src) const {
 
-	const std::complex<double> I(0,1.);
 	int Nz = eps.mesh.Nz;
 
 	// Parallel loop which applies the Fresnel boudary conditions

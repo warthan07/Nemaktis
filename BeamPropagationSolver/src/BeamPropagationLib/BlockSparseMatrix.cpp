@@ -21,12 +21,12 @@ void BlockSparseMatrix<T,S>::update_pointers() {
 	int xwrap = Nx-2;
 	int ywrap = Nx*(Ny-2);
 
-	int mesh_idx_row, flattened_shift, block_idx;
+	int flattened_shift, block_idx;
 	Shift shift_idx;
 	for(Eigen::Index k=0; k<matrix.outerSize(); k++) {
 		for(typename Eigen::SparseMatrix<T,S>::InnerIterator it(matrix,k); it; ++it) {
-			block_idx = (it.col()/N) + 2*(it.row()/N);
-			flattened_shift = (it.col()%N) - (it.row()%N);
+			block_idx = static_cast<int>( (it.col()/N) + 2*(it.row()/N) );
+			flattened_shift = static_cast<int>( (it.col()%N) - (it.row()%N) );
 
 			if((it.row()%N)/Nx == (it.col()%N)/Nx) { // shifts along x
 				if(flattened_shift==0)
@@ -158,8 +158,6 @@ void BlockSparseMatrixDX<T,S>::shifted_block_vmult(
 		TransverseOpticalField &dst, int dst_comp,
 		TransverseOpticalField &src, int src_comp,
 		bool add) const {
-
-	std::complex<double> val;
 
 	if(add) {
 		if(this->Nx>3) {
@@ -351,8 +349,6 @@ void BlockSparseMatrixDY<T,S>::shifted_block_vmult(
 		TransverseOpticalField &dst, int dst_comp,
 		TransverseOpticalField &src, int src_comp,
 		bool add) const {
-
-	std::complex<double> val;
 
 	if(add) {
 		if(this->Ny>3) {

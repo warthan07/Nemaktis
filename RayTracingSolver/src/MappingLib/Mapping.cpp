@@ -47,10 +47,10 @@ InterpolatedMapping<dim1,dim2,T>::InterpolatedMapping(
 		const std::shared_ptr<DefinitionDomain<dim1> > &def_domain,
 		int pol_order) :
 	Mapping<dim1,dim2,T>::Mapping(def_domain),
-	values(values),
-	mesh(mesh),
 	pol_order(pol_order),
-	last_cell_origin_idx(-1) {
+	values(values),
+	last_cell_origin_idx(-1),
+	mesh(mesh) {
 
 	Assert(
 		values.use_count()>0,
@@ -112,10 +112,8 @@ bool InterpolatedMapping<dim1,dim2,T>::get_value(
 		cell_origin_indices(d) = long(floor(x_mesh_indices(d)));
 	}
 	x_cell_coords = x_mesh_indices - cell_origin_indices.get();
-	
-	bool same_cell = true;
+
 	if(cell_origin_indices()!=last_cell_origin_idx) {
-		same_cell = false;
 		last_cell_origin_idx = cell_origin_indices();
 		this->assemble_pol_weights(cell_origin_indices);
 	}
@@ -168,9 +166,7 @@ bool InterpolatedMapping<dim1,dim2,T>::get_gradient(
 	}
 	x_cell_coords = x_mesh_indices - cell_origin_indices.get();
 
-	bool same_cell = true;
 	if(cell_origin_indices()!=last_cell_origin_idx) {
-		same_cell = false;
 		last_cell_origin_idx = cell_origin_indices();
 		this->assemble_pol_weights(cell_origin_indices);
 	}

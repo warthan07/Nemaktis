@@ -24,7 +24,7 @@ public:
 
 	~TransverseOpticalField() {
 		if(own_data)
-			delete raw_data;
+			delete[] raw_data;
 	}
 
 	const auto& operator()() const {

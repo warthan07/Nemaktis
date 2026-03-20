@@ -10,3 +10,4 @@ dev/envs
 **/*.*~
 **/*.vti
 __pycache__
+conda_recipe/output

@@ -9,6 +9,7 @@ public:
 	SimpleShiftOperator(
 		const PermittivityTensorField& eps, double wavelength,
 		const std::pair<double,double> &q_val, const RootSettings &settings);
+	virtual ~SimpleShiftOperator() {}
 
 	/**
 	 * Apply this operator to a transverse optical field.
