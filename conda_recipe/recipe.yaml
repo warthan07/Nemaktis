@@ -2,7 +2,7 @@ schema_version: 1
 
 package:
   name: nemaktis
-  version: "1.4.9"
+  version: "1.4.10"
 
 source:
   - path: ../BeamPropagationSolver
