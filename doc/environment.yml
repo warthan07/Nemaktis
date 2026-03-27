@@ -4,8 +4,8 @@ channels:
     - conda-forge
     - nodefaults
 dependencies:
-    - sphinx=1.7.5
+    - sphinx=9.1.0
     - sphinx_rtd_theme
     - pip:
-      - jinja2==3.1.6
+      - jinja2
       - pyyaml
