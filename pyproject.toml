@@ -1,0 +1,35 @@
+[project]
+name = "nemaktis"
+dynamic = ["version"]
+description = "An open-source platform for light propagation in birefringent media"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Guilhem Poy", email = "guilhem.poy@umontpellier.fr" },
+]
+classifiers = [
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+]
+
+[project.urls]
+Homepage = "https://github.com/warthan07/nemaktis"
+
+[build-system]
+requires = ["scikit-build-core", "swig"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+logging.level = "INFO"
+build.verbose = false
+build-dir = "bin"
+cmake.args = ["-GNinja"]
+cmake.build-type = "Release"
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "conda_recipe/recipe.yaml"
+regex = '(?i)^\s+version:\s+"(?P<value>.+)"\s+'

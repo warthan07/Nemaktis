@@ -7,4 +7,5 @@ dependencies:
     - sphinx=1.7.5
     - sphinx_rtd_theme
     - pip:
-      - jinja2==3.0.0
+      - jinja2==3.1.6
+      - pyyaml

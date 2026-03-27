@@ -255,7 +255,6 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	Eigen::initParallel();
 	json j;
 
 	try {

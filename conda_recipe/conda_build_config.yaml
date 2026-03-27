@@ -8,5 +8,3 @@ cxx_compiler_version: # [linux]
 c_stdlib:
   - vs      # [win]
   - sysroot # [linux]
-numpy:
-  - 1.21

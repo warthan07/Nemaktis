@@ -12,7 +12,7 @@
 #
 
 from unittest.mock import MagicMock, Mock, patch
-import sys, os, six
+import sys, os, six, yaml
 sys.path.insert(0, os.path.abspath("../../HighLevelPythonInterface/"))
 
 # Modules that we need to mock
@@ -134,7 +134,9 @@ copyright = '2019, Guilhem Poy, Andrej Petelin'
 author = 'Guilhem Poy, Andrej Petelin'
 
 # The full version, including alpha/beta/rc tags
-release = '1.4.9'
+with open("../../conda_recipe/recipe.yaml") as f:
+    conda_recipe = yaml.safe_load(f)
+release = conda_recipe["package"]["version"]
 
 
 # -- General configuration ---------------------------------------------------
