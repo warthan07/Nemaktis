@@ -1,6 +1,5 @@
 name: build 
 channels:
-    - anaconda
     - conda-forge
     - nodefaults
 dependencies:
