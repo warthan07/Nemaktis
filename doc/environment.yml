@@ -6,6 +6,5 @@ channels:
 dependencies:
     - sphinx=9.1.0
     - sphinx_rtd_theme
-    - pip:
-      - jinja2
-      - pyyaml
+    - jinja2
+    - pyyaml
