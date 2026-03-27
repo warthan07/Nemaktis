@@ -134,7 +134,7 @@ class LightPropagator:
         elif method=="dtmm":
             return self._dtmm_propagation(bulk_filename)
         else:
-            match = re.compile("dtmm\((\d+)\)").match(method)
+            match = re.compile(r"dtmm\((\d+)\)").match(method)
             if match:
                 return self._dtmm_propagation(
                     bulk_filename, diffraction=int(match.group(1)))

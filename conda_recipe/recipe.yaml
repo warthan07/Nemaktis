@@ -37,24 +37,32 @@ build:
         if %ERRORLEVEL% neq 0 exit 1
 
         cd dtmm
-        pip install . -v
+        python -m pip install . -vv
         if %ERRORLEVEL% neq 0 exit 1
+    - if: linux
+      then: |      
+        echo $CMAKE_ARGS
+        python -m pip install . -vv
+
+        cd dtmm
+        python -m pip install . -vv
 
 requirements:
   build:
     - cmake >= 3.15
     - ninja
     - ${{ compiler('cxx') }}
-    - ${{ compiler('clang-cl') if win }}
     - ${{ stdlib('c') }}
-    - vc14_runtime
+    - if: win
+      then:
+        - ${{ compiler('clang-cl') }}
+        - vc14_runtime
   host:
     - pkgconfig
     - muparser
     - pyfftw
     - fftw
     - boost 1.85.*
-    - openmp
     - vtk
     - eigen
     - swig
@@ -65,14 +73,20 @@ requirements:
     - pip
     - scikit-build-core
     - hatch
-    - setuptools
     - python 3.12.*
+    - if: win
+      then:
+        - vc14_runtime
+        - llvm-openmp
+    - if: linux
+      then:
+        - libstdcxx
+        - libgomp
   run:
     - muparser
     - pyfftw
     - fftw
     - libboost 1.85.*
-    - openmp
     - vtk
     - eigen
     - ${{ pin_compatible('numpy',lower_bound="1.20") }}
@@ -85,4 +99,10 @@ requirements:
     - traits
     - traitsui
     - if: win
-      then: vc14_runtime
+      then:
+        - vc14_runtime
+        - llvm-openmp
+    - if: linux
+      then:
+        - libstdcxx
+        - libgomp

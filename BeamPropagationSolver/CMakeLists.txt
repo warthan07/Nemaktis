@@ -51,6 +51,7 @@ add_custom_target(run-bpm
 
 add_library(bpm-lib STATIC ${BPMLIB_CPP} ${PHYSICSLIB_CPP} ${POSTPROCESSORLIB_CPP}
 	${SETTINGSLIB_CPP} ${UTILITIESLIB_CPP})
+set_property(TARGET bpm-lib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set(SWIG_USE_SWIG_DEPENDENCIES true)
 swig_add_library(bpm_backend LANGUAGE python
@@ -69,13 +70,11 @@ endif()
 # We link the main targets and the libraries
 ############################################
 
-target_link_libraries(bpm-solver
-	PRIVATE bpm-lib OpenMP::OpenMP_CXX)
-target_link_libraries(bpm_backend
-	PRIVATE bpm-lib OpenMP::OpenMP_CXX Python::NumPy)
+target_link_libraries(bpm-solver PRIVATE bpm-lib)
+target_link_libraries(bpm_backend PRIVATE bpm-lib Python::NumPy)
 target_link_libraries(bpm-lib PUBLIC
 	VTK::CommonCore VTK::CommonDataModel VTK::IOXML
-	Boost::filesystem Boost::regex Eigen3::Eigen
+	Boost::filesystem Boost::regex Eigen3::Eigen OpenMP::OpenMP_CXX 
 	${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES})
 
 install(FILES ${PYTHONBACKEND_PY} DESTINATION ${SKBUILD_PLATLIB_DIR})

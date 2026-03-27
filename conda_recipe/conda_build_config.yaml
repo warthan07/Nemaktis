@@ -3,8 +3,8 @@ cxx_compiler:
   - gcc    # [linux]
 target_platform:  # [win]
   - win-64        # [win]
-cxx_compiler_version: # [linux]
-  - 10.3              # [linux]
+# cxx_compiler_version: # [linux]
+#   - 10.3              # [linux]
 c_stdlib:
   - vs      # [win]
   - sysroot # [linux]

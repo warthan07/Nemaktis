@@ -710,7 +710,7 @@ class QTensorField(TensorField):
 
     .. math::
 
-        Q_{ij} = \\left(3n_in_j-\delta_{ij}\\right)/2
+        Q_{ij} = \\left(3n_in_j-\\delta_{ij}\\right)/2
 
     The two versions of the constructor of the parent class TensorField are simplified since
     we do not need the parameters 'tensor_order' (always 2 for Q-tensor) or 'vti_array'

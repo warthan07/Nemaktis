@@ -26,7 +26,7 @@ build-backend = "scikit_build_core.build"
 logging.level = "INFO"
 build.verbose = false
 build-dir = "bin"
-cmake.args = ["-GNinja"]
+cmake.args = ["-GNinja", "--no-warn-unused-cli"]
 cmake.build-type = "Release"
 
 [tool.scikit-build.metadata.version]

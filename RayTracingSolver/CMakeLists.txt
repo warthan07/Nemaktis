@@ -41,6 +41,7 @@ add_custom_target(run-rt
 add_library(rt-lib STATIC
     ${UTILITIESLIB_CPP} ${PROPAGATIONLIB_CPP}
     ${MAPPINGLIB_CPP} ${SIMULATIONLIB_CPP})
+set_property(TARGET rt-lib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 
 ###########################################
@@ -50,7 +51,8 @@ add_library(rt-lib STATIC
 target_link_libraries(rt-solver PRIVATE rt-lib)
 target_link_libraries(rt-lib PUBLIC
 	VTK::CommonCore VTK::CommonDataModel VTK::IOXML
-	Boost::filesystem Boost::regex Eigen3::Eigen ${FFTW_LIBRARIES})
+	Boost::filesystem Boost::regex Eigen3::Eigen
+    OpenMP::OpenMP_CXX ${FFTW_LIBRARIES})
 
 
 #################
