@@ -71,21 +71,18 @@ apologize for this current limitation, which mostly stems from my inexperience a
 packaging with complex dependencies. 
 
 In this case, how can you safely update Nemaktis? The simplest way is to fully remove the
-mamba environment *nm*, either by removing the folder "envs/nm" inside the root folder of
+mamba environment ``nm``, either by removing the folder "envs/nm" inside the root folder of
 Miniforge or by opening a terminal ("Miniforge prompt" for windows, any terminal for linux)
 and typing: ::
 
   mamba remove --name nm --all 
 
-Then, simply repeat the installation step b1 or b2 above, eventually adjusting the version
-number of Nemaktis (it can be obtained from https://anaconda.org/warthan07/nemaktis/files)
-inside the commands or script if I forgot to do it :)
+Then, simply repeat the installation step b above.
 
-Another possibility is to repeat the installation step b1/b2 with a different environment
-name than *nm* (for the windows script method, you need to manually edit the script file),
-for example *nm[version number]*. Although this method is probably fine to test new features
-of the software without removing the old version , it is probably not very good in the long
-term since each mamba environment takes a non-negligible portion of disk space. 
+Another possibility is to repeat the installation step b with a different environment name
+than ``nm``, for example ``nm[version number]``. Although this method is probably fine to
+test new features of the software without removing the old version , it is probably not very
+good in the long term since each mamba environment takes a non-negligible portion of disk space. 
 
 Developper method
 -----------------
