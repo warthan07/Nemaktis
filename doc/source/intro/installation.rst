@@ -34,50 +34,35 @@ files of ``Miniforge`` for Windows/Linux are available at this address (be caref
 ``Miniforge`` distribution, not the ``Miniforge-pypy3`` distribution):
 https://github.com/conda-forge/miniforge#miniforge3
 
-b1. (Windows) Install Nemaktis automatically
-............................................
+b. Install Nemaktis on the command line
+.......................................
 
-If you are a Windows 10 user and do not want to copy-paste commands in a terminal, the next
-step is as simple as running the following installation script 
-
-https://github.com/warthan07/Nemaktis/releases/download/v1.4.9/Install_Nemaktis-1.4.9.cmd
-
-This script will ask for the root path of the ``Miniforge`` distribution installed in step a,
-create a special environment for ``Nemaktis`` named *nm* and will install everything needed
-in it. It will also install the python editor ``Spyder`` and create a shortcut named *Spyder
-(Nemakis environment)* for it on your Desktop (this is necessary even if you already
-installed Spyder, since it has to be run from inside the mamba environment *nm*).
-
-b2. (Windows/Linux) Install Nemaktis on the command line
-........................................................
-
-Alternatively, if you are a Linux user or want to type the installation commands yourself
-(they are not very complicated after all!), open a terminal (Windows: application "Miniforge
-prompt" installed with Miniforge, Linux: any terminal) and type the following command: ::
+Open a terminal (Windows: application "Miniforge prompt" installed with Miniforge, Linux: any
+terminal) and type the following command: ::
   
-  mamba create -n nm -c conda-forge -c warthan07 -c anaconda -y nemaktis=1.4.9
+  mamba create -n nm -c warthan07 -y nemaktis
 
-(Optional) If you want to use your favourite python editor when using ``Nemaktis``, you have
-to install and run it from the same mamba environment. You can search https://anaconda.org/
-to find the associated package and installation command. For example, to install ``Spyder``
-you just need to type: ::
+(Optional) If you want a python editor (e.g. ``spyder``), you have to also type the following
+commands: ::
 
   mamba activate nm
-  mamba install -c conda-forge spyder
+  conda install spyder
 
-Note that when you want to run python scripts using nemaktis, the installed python editor
-should always be run from inside the *nm* environment. For example, to run ``Spyder``, you
-should type in the terminal: ::
+The above command should have automatically created a shortcut for ``Spyder`` (there is currently
+a bug in mamba for creating it, which is why the above command uses conda), usually named
+``Spyder (nm)`` to make it clear that it will automatically activate the newly created ``nm``
+environment. Always use this shortcut when using nemaktis (it can be searched quickly on windows
+with the shortcut ``Win`` + ``S``, or ``Win`` on Ubuntu) or alternatively type the following
+command in a terminal: ::
 
   mamba activate nm
   spyder
 
-The advantage of step b1 is that it creates a shortcut for Spyder which automatically does
-this activation step for you. 
+You can also, of course, run directly your python scripts in the terminal after activating the ``nm``
+environment.
 
-
-c. (Windows/Linux) How to update
-................................
+c. How to update
+................
 
 I do not recommend updating nematkis using the command ``mamba update``, since I do not
 compile Nematkis sufficiently often for a correct update of all dependencies. In other
@@ -102,8 +87,8 @@ for example *nm[version number]*. Although this method is probably fine to test 
 of the software without removing the old version , it is probably not very good in the long
 term since each mamba environment takes a non-negligible portion of disk space. 
 
-Developper method (only linux)
-------------------------------
+Developper method
+-----------------
 
 If you want to be able to modify the code, but still want to enjoy the simplicity of mamba
 packages (no relative paths to manage, everything works as with a system package), you can build
@@ -120,17 +105,15 @@ yourselves the nemaktis package for Linux:
 2. In a terminal, go to the subfolder **conda_recipe** of the ``Nemaktis`` repository and type
    the following (the first line is only needed if the build environment does not exist yet): ::
      
-     mamba create -n build -c conda-forge -c anaconda -y boa conda-verify anaconda-client
+     mamba create -n build -y rattler-build
      mamba activate build
 
-3. Run the following command, which will create a sub-environment, install all dependencies
-   listed in meta.yaml, and compile/package everything (it should take between 5 and 10
-   minutes): ::
+3. Run the following command, which will create an ``output`` folder in which the conda package
+   is built: ::
 
-     conda mambabuild . -c conda-forge -c anaconda
+     rattler-build build
 
-4. Once the package is built, you can install it in your current environment by typing: ::
+4. Once the package is built, you can install it in a new ``nm`` environment by typing: ::
 
-     conda install -c conda-forge -c anaconda -c ${CONDA_PREFIX}/conda-bld/ nemaktis
-
+     mamba create -n nm -c file://{ full path to output folder } nemaktis
 
