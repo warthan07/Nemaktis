@@ -2,11 +2,14 @@
 #include "ScreenOutput.h"
 #include "VolumeOutput.h"
 
+#include <omp.h>
+
 void run_backend_without_mask(
 		std::string json_str,
 		double* lc_field_vals, int n_lc_vals,
 		std::complex<double>* E_field_vals, int n_E_vals) {
 
+	omp_set_num_threads(omp_get_num_procs());
 	try {
 		std::cout <<
 			"Setting up the director field..." << std::endl;

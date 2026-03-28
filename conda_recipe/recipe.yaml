@@ -56,16 +56,14 @@ requirements:
     - if: win
       then:
         - ${{ compiler('clang-cl') }}
-        - vc14_runtime
   host:
-    - pkgconfig
+    - python 3.12.*
+    - boost 1.85.*
     - muparser
     - pyfftw
     - fftw
-    - boost 1.85.*
     - vtk
     - eigen
-    - swig
     - numpy
     - numba
     - scipy
@@ -73,7 +71,8 @@ requirements:
     - pip
     - scikit-build-core
     - hatch
-    - python 3.12.*
+    - pkgconfig
+    - swig
     - if: win
       then:
         - vc14_runtime
@@ -83,10 +82,11 @@ requirements:
         - libstdcxx
         - libgomp
   run:
+    - python 3.12.*
+    - libboost 1.85.*
     - muparser
     - pyfftw
     - fftw
-    - libboost 1.85.*
     - vtk
     - eigen
     - ${{ pin_compatible('numpy',lower_bound="1.20") }}
@@ -94,10 +94,9 @@ requirements:
     - scipy
     - matplotlib-base
     - pyqt
-    - python 3.12.*
-    - ipython
     - traits
     - traitsui
+    - ipython
     - if: win
       then:
         - vc14_runtime
