@@ -23,7 +23,8 @@ jobs:
       uses: prefix-dev/rattler-build-action@v0.2.36
       with:
         setup-only: true
-    - name: Build and upload
+    - name: Build and upload (Unix)
+      if: ${{ runner.os != 'Windows' }}
       run: |
         rattler-build build --recipe conda_recipe/recipe.yaml
         rattler-build upload anaconda -o warthan07 output/${{ matrix.target-platform }}/*.conda
@@ -31,4 +32,14 @@ jobs:
         ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
         RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
         RATTLER_BUILD_COLOR: 'always'
+    - name: Build and upload (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: |
+        rattler-build build --recipe conda_recipe/recipe.yaml
+        rattler-build upload anaconda -o warthan07 (get-item output/${{ matrix.target-platform }}/*.conda).FullName
+      env:
+        ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
+        RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
+        RATTLER_BUILD_COLOR: 'always'
+
 
