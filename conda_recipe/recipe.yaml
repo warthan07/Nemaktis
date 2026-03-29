@@ -39,7 +39,7 @@ build:
         cd dtmm
         python -m pip install . -vv
         if %ERRORLEVEL% neq 0 exit 1
-    - if: linux
+    - if: linux or osx
       then: |      
         echo $CMAKE_ARGS
         python -m pip install . -vv
