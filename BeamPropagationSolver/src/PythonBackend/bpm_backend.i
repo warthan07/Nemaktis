@@ -2,6 +2,7 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
+#define SWIG_HAVE_SNPRINTF
 #include "bpm_backend.h"
 %}
 
