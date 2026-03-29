@@ -1,0 +1,29 @@
+name: Package
+
+on: [release]
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target-platform: linux-64
+          - os: windows-latest
+            target-platform: win-64
+          - os: macos-13
+            target-platform: osx-64
+          - os: macos-latest
+            target-platform: osx-arm64
+    steps:
+    - uses: actions/checkout@v6
+    - name: Build conda package
+      uses: prefix-dev/rattler-build-action@v0.2.36
+      with:
+        # needs to be unique for each matrix entry
+        artifact-name: nemaktis-${{ matrix.target-platform }}
+        build-args: --target-platform ${{ matrix.target-platform }}
+        recipe-path: conda_recipe/recipe.yaml
+
