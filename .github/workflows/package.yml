@@ -1,6 +1,6 @@
 name: Package
 
-on: [release]
+on: [workflow_dispatch]
 
 jobs:
   build:
