@@ -1,4 +1,4 @@
-name: Package
+name: RattlerBuild
 
 on: [workflow_dispatch]
 
