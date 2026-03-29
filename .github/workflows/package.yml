@@ -9,14 +9,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            target-platform: linux-64
+          #- os: ubuntu-latest
+          #  target-platform: linux-64
           - os: windows-latest
             target-platform: win-64
-          - os: macos-26-intel
-            target-platform: osx-64
-          - os: macos-latest
-            target-platform: osx-arm64
+          #- os: macos-26-intel
+          #  target-platform: osx-64
+          #- os: macos-latest
+          #  target-platform: osx-arm64
     steps:
     - uses: actions/checkout@v6
     - name: Setup rattler-build
@@ -26,7 +26,8 @@ jobs:
     - name: Build and upload
       run: |
         rattler-build build --recipe conda_recipe/recipe.yaml
-        rattler-build upload anaconda -o warthan07 output/${{ matrix.target-platform }}/*.conda
+        ls "output/${{ matrix.target-platform }}/*.conda"
+        rattler-build upload anaconda -o warthan07 "output/${{ matrix.target-platform }}/*.conda"
       env:
         ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
 
