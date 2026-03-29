@@ -25,7 +25,8 @@ jobs:
         setup-only: true
     - name: Build and upload
       run: |
-        rattler-build publish conda_recipe/recipe.yaml --to https://anaconda.org/warthan07
+        rattler-build build --recipe conda_recipe/recipe.yaml
+        rattler-build upload anaconda -o warthan07 output/${{ matrix.target-platform }}/*.conda
       env:
         ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
 
