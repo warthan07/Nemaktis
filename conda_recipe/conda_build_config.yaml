@@ -1,10 +1,10 @@
 cxx_compiler:
-  - vs2022 # [win]
-  - gcc    # [linux]
+  - gxx     # [linux]
+  - clangxx # [osx]
+  - vs2022  # [win]
+c_stdlib:
+  - sysroot                  # [linux]
+  - macosx_deployment_target # [osx]
+  - vs                       # [win]
 target_platform:  # [win]
   - win-64        # [win]
-# cxx_compiler_version: # [linux]
-#   - 10.3              # [linux]
-c_stdlib:
-  - vs      # [win]
-  - sysroot # [linux]
