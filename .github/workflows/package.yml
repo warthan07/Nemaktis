@@ -19,11 +19,13 @@ jobs:
             target-platform: osx-arm64
     steps:
     - uses: actions/checkout@v6
-    - name: Build conda package
+    - name: Setup rattler-build
       uses: prefix-dev/rattler-build-action@v0.2.36
       with:
-        # needs to be unique for each matrix entry
-        artifact-name: nemaktis-${{ matrix.target-platform }}
-        build-args: --target-platform ${{ matrix.target-platform }}
-        recipe-path: conda_recipe/recipe.yaml
+        setup-only: true
+    - name: Build and upload
+      run: |
+        rattler-build publish conda_recipe/recipe.yaml --to https://anaconda.org/warthan07
+      env:
+        ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
 
