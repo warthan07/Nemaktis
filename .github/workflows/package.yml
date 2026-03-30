@@ -1,0 +1,45 @@
+name: RattlerBuild
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target-platform: linux-64
+          - os: windows-latest
+            target-platform: win-64
+          - os: macos-26-intel
+            target-platform: osx-64
+          - os: macos-latest
+            target-platform: osx-arm64
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup rattler-build
+      uses: prefix-dev/rattler-build-action@v0.2.36
+      with:
+        setup-only: true
+    - name: Build and upload (Unix)
+      if: ${{ runner.os != 'Windows' }}
+      run: |
+        rattler-build build --recipe conda_recipe/recipe.yaml
+        rattler-build upload anaconda -o warthan07 output/${{ matrix.target-platform }}/*.conda
+      env:
+        ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
+        RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
+        RATTLER_BUILD_COLOR: 'always'
+    - name: Build and upload (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: |
+        rattler-build build --recipe conda_recipe/recipe.yaml
+        rattler-build upload anaconda -o warthan07 (get-item output/${{ matrix.target-platform }}/*.conda).FullName
+      env:
+        ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
+        RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
+        RATTLER_BUILD_COLOR: 'always'
+
+

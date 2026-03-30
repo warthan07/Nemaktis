@@ -39,7 +39,7 @@ build:
         cd dtmm
         python -m pip install . -vv
         if %ERRORLEVEL% neq 0 exit 1
-    - if: linux
+    - if: linux or osx
       then: |      
         echo $CMAKE_ARGS
         python -m pip install . -vv
@@ -73,14 +73,17 @@ requirements:
     - hatch
     - pkgconfig
     - swig
-    - if: win
-      then:
-        - vc14_runtime
-        - llvm-openmp
     - if: linux
       then:
         - libstdcxx
         - libgomp
+    - if: osx
+      then:
+        - llvm-openmp
+    - if: win
+      then:
+        - vc14_runtime
+        - llvm-openmp
   run:
     - python 3.12.*
     - libboost 1.85.*
@@ -97,11 +100,14 @@ requirements:
     - traits
     - traitsui
     - ipython
-    - if: win
-      then:
-        - vc14_runtime
-        - llvm-openmp
     - if: linux
       then:
         - libstdcxx
         - libgomp
+    - if: osx
+      then:
+        - llvm-openmp
+    - if: win
+      then:
+        - vc14_runtime
+        - llvm-openmp
