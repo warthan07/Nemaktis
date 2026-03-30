@@ -76,6 +76,7 @@ requirements:
     - if: osx or win
       then: llvm-openmp
   run:
+    - python 3.12.*
     - libboost 1.85.*
     - pyfftw
     - numba
