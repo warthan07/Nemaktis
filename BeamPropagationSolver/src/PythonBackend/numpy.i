@@ -40,6 +40,7 @@
 #define NO_IMPORT_ARRAY
 #endif
 #include "stdio.h"
+#include <string.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 %}
@@ -48,7 +49,7 @@
 
 %fragment("NumPy_Backward_Compatibility", "header")
 {
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
 %#define NPY_ARRAY_DEFAULT NPY_DEFAULT
 %#define NPY_ARRAY_FARRAY  NPY_FARRAY
 %#define NPY_FORTRANORDER  NPY_FORTRAN
@@ -69,7 +70,7 @@
 {
 /* Macros to extract array attributes.
  */
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
 %#define is_array(a)            ((a) && PyArray_Check((PyArrayObject*)a))
 %#define array_type(a)          (int)(PyArray_TYPE((PyArrayObject*)a))
 %#define array_numdims(a)       (((PyArrayObject*)a)->nd)
@@ -165,13 +166,11 @@
     return PyArray_EquivTypenums(actual_type, desired_type);
   }
 
-%#ifdef SWIGPY_USE_CAPSULE
-  void free_cap(PyObject * cap)
+void free_cap(PyObject * cap)
   {
     void* array = (void*) PyCapsule_GetPointer(cap,SWIGPY_CAPSULE_NAME);
     if (array != NULL) free(array);
   }
-%#endif
 
 
 }
@@ -293,7 +292,7 @@
       Py_INCREF(array_descr(ary));
       result = (PyArrayObject*) PyArray_FromArray(ary,
                                                   array_descr(ary),
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
                                                   NPY_FORTRANORDER);
 %#else
                                                   NPY_ARRAY_F_CONTIGUOUS);
@@ -459,11 +458,11 @@
     {
       for (i = 0; i < n-1; i++)
       {
-        sprintf(s, "%d, ", exact_dimensions[i]);
-        strcat(dims_str,s);
+        snprintf(s, sizeof(s), "%d, ", exact_dimensions[i]);
+        strncat(dims_str, s, sizeof(dims_str) - strlen(dims_str) - 1);
       }
-      sprintf(s, " or %d", exact_dimensions[n-1]);
-      strcat(dims_str,s);
+      snprintf(s, sizeof(s), " or %d", exact_dimensions[n-1]);
+      strncat(dims_str, s, sizeof(dims_str) - strlen(dims_str) - 1);
       PyErr_Format(PyExc_TypeError,
                    "Array must have %s dimensions.  Given array has %d dimensions",
                    dims_str,
@@ -499,20 +498,20 @@
       {
         if (size[i] == -1)
         {
-          sprintf(s, "*,");
+          snprintf(s, sizeof(s), "*,");
         }
         else
         {
-          sprintf(s, "%ld,", (long int)size[i]);
+          snprintf(s, sizeof(s), "%ld,", (long int)size[i]);
         }
-        strcat(desired_dims,s);
+        strncat(desired_dims, s, sizeof(desired_dims) - strlen(desired_dims) - 1);
       }
       len = strlen(desired_dims);
       desired_dims[len-1] = ']';
       for (i = 0; i < n; i++)
       {
-        sprintf(s, "%ld,", (long int)array_size(ary,i));
-        strcat(actual_dims,s);
+        snprintf(s, sizeof(s), "%ld,", (long int)array_size(ary,i));
+        strncat(actual_dims, s, sizeof(actual_dims) - strlen(actual_dims) - 1);
       }
       len = strlen(actual_dims);
       actual_dims[len-1] = ']';
@@ -524,7 +523,7 @@
     return success;
   }
 
-  /* Require the given PyArrayObject to to be Fortran ordered.  If the
+  /* Require the given PyArrayObject to be Fortran ordered.  If the
    * the PyArrayObject is already Fortran ordered, do nothing.  Else,
    * set the Fortran ordering flag and recompute the strides.
    */
@@ -1991,7 +1990,7 @@
 %typemap(argout)
   (DATA_TYPE ARGOUT_ARRAY1[ANY])
 {
-  $result = SWIG_Python_AppendOutput($result,(PyObject*)array$argnum);
+  $result = SWIG_AppendOutput($result,(PyObject*)array$argnum);
 }
 
 /* Typemap suite for (DATA_TYPE* ARGOUT_ARRAY1, DIM_TYPE DIM1)
@@ -2020,7 +2019,7 @@
 %typemap(argout)
   (DATA_TYPE* ARGOUT_ARRAY1, DIM_TYPE DIM1)
 {
-  $result = SWIG_Python_AppendOutput($result,(PyObject*)array$argnum);
+  $result = SWIG_AppendOutput($result,(PyObject*)array$argnum);
 }
 
 /* Typemap suite for (DIM_TYPE DIM1, DATA_TYPE* ARGOUT_ARRAY1)
@@ -2049,7 +2048,7 @@
 %typemap(argout)
   (DIM_TYPE DIM1, DATA_TYPE* ARGOUT_ARRAY1)
 {
-  $result = SWIG_Python_AppendOutput($result,(PyObject*)array$argnum);
+  $result = SWIG_AppendOutput($result,(PyObject*)array$argnum);
 }
 
 /* Typemap suite for (DATA_TYPE ARGOUT_ARRAY2[ANY][ANY])
@@ -2067,7 +2066,7 @@
 %typemap(argout)
   (DATA_TYPE ARGOUT_ARRAY2[ANY][ANY])
 {
-  $result = SWIG_Python_AppendOutput($result,(PyObject*)array$argnum);
+  $result = SWIG_AppendOutput($result,(PyObject*)array$argnum);
 }
 
 /* Typemap suite for (DATA_TYPE ARGOUT_ARRAY3[ANY][ANY][ANY])
@@ -2085,7 +2084,7 @@
 %typemap(argout)
   (DATA_TYPE ARGOUT_ARRAY3[ANY][ANY][ANY])
 {
-  $result = SWIG_Python_AppendOutput($result,(PyObject*)array$argnum);
+  $result = SWIG_AppendOutput($result,(PyObject*)array$argnum);
 }
 
 /* Typemap suite for (DATA_TYPE ARGOUT_ARRAY4[ANY][ANY][ANY][ANY])
@@ -2103,7 +2102,7 @@
 %typemap(argout)
   (DATA_TYPE ARGOUT_ARRAY4[ANY][ANY][ANY][ANY])
 {
-  $result = SWIG_Python_AppendOutput($result,(PyObject*)array$argnum);
+  $result = SWIG_AppendOutput($result,(PyObject*)array$argnum);
 }
 
 /*****************************/
@@ -2128,7 +2127,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DATA_TYPE** ARGOUTVIEW_ARRAY1)
@@ -2149,7 +2148,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEW_ARRAY2, DIM_TYPE* DIM1, DIM_TYPE* DIM2)
@@ -2171,7 +2170,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DATA_TYPE** ARGOUTVIEW_ARRAY2)
@@ -2193,7 +2192,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEW_FARRAY2, DIM_TYPE* DIM1, DIM_TYPE* DIM2)
@@ -2215,7 +2214,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array || !require_fortran(array)) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DATA_TYPE** ARGOUTVIEW_FARRAY2)
@@ -2237,7 +2236,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array || !require_fortran(array)) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEW_ARRAY3, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2261,7 +2260,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3,
@@ -2285,7 +2284,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEW_FARRAY3, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2309,7 +2308,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array || !require_fortran(array)) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3,
@@ -2333,7 +2332,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array || !require_fortran(array)) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEW_ARRAY4, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2358,7 +2357,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3, DIM_TYPE* DIM4,
@@ -2383,7 +2382,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEW_FARRAY4, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2408,7 +2407,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array || !require_fortran(array)) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3, DIM_TYPE* DIM4,
@@ -2433,7 +2432,7 @@
   PyArrayObject* array = (PyArrayObject*) obj;
 
   if (!array || !require_fortran(array)) SWIG_fail;
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /*************************************/
@@ -2459,19 +2458,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DATA_TYPE** ARGOUTVIEWM_ARRAY1)
@@ -2493,19 +2488,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$2), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$2), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$2), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEWM_ARRAY2, DIM_TYPE* DIM1, DIM_TYPE* DIM2)
@@ -2528,19 +2519,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DATA_TYPE** ARGOUTVIEWM_ARRAY2)
@@ -2563,19 +2550,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$3), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$3), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$3), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEWM_FARRAY2, DIM_TYPE* DIM1, DIM_TYPE* DIM2)
@@ -2598,19 +2581,15 @@
 
   if (!array || !require_fortran(array)) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DATA_TYPE** ARGOUTVIEWM_FARRAY2)
@@ -2633,19 +2612,15 @@
 
   if (!array || !require_fortran(array)) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$3), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$3), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$3), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEWM_ARRAY3, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2670,19 +2645,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3,
@@ -2707,19 +2678,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$4), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$4), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$4), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEWM_FARRAY3, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2744,19 +2711,15 @@
 
   if (!array || !require_fortran(array)) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3,
@@ -2781,19 +2744,15 @@
 
   if (!array || !require_fortran(array)) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$4), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$4), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$4), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEWM_ARRAY4, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2819,19 +2778,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3, DIM_TYPE* DIM4,
@@ -2857,19 +2812,15 @@
 
   if (!array) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$5), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$5), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$5), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DATA_TYPE** ARGOUTVIEWM_FARRAY4, DIM_TYPE* DIM1, DIM_TYPE* DIM2,
@@ -2895,19 +2846,15 @@
 
   if (!array || !require_fortran(array)) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$1), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$1), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /* Typemap suite for (DIM_TYPE* DIM1, DIM_TYPE* DIM2, DIM_TYPE* DIM3, DIM_TYPE* DIM4,
@@ -2933,19 +2880,15 @@
 
   if (!array || !require_fortran(array)) SWIG_fail;
 
-%#ifdef SWIGPY_USE_CAPSULE
-    PyObject* cap = PyCapsule_New((void*)(*$5), SWIGPY_CAPSULE_NAME, free_cap);
-%#else
-    PyObject* cap = PyCObject_FromVoidPtr((void*)(*$5), free);
-%#endif
+PyObject* cap = PyCapsule_New((void*)(*$5), SWIGPY_CAPSULE_NAME, free_cap);
 
-%#if NPY_API_VERSION < 0x00000007
+%#if NPY_API_VERSION < NPY_1_7_API_VERSION
   PyArray_BASE(array) = cap;
 %#else
   PyArray_SetBaseObject(array,cap);
 %#endif
 
-  $result = SWIG_Python_AppendOutput($result,obj);
+  $result = SWIG_AppendOutput($result,obj);
 }
 
 /**************************************/
