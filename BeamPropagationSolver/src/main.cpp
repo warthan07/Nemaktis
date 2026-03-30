@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <signal.h>
+#include <omp.h>
 #include <boost/regex.hpp>
 
 #include "RootSettings.h"
@@ -168,6 +168,7 @@ std::string minify_json(std::string filename) {
 
 int main(int argc, char *argv[]) {
 
+	omp_set_num_threads(omp_get_num_procs());
 	std::string param_file_name;
 	std::string log_file_name = "log.txt";
 

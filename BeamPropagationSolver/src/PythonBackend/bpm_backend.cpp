@@ -88,6 +88,7 @@ void run_backend_with_mask(
 		double* mask_vals, int n_mask,
 		std::complex<double>* E_field_vals, int n_E_vals) {
 
+	omp_set_num_threads(omp_get_num_procs());
 	try {
 		std::cout <<
 			"Setting up the director field..." << std::endl;

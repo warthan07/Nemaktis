@@ -73,26 +73,11 @@ requirements:
     - hatch
     - pkgconfig
     - swig
-    - if: linux
-      then:
-        - libstdcxx
-        - libgomp
-    - if: osx
-      then:
-        - llvm-openmp
-    - if: win
-      then:
-        - vc14_runtime
-        - llvm-openmp
+    - if: osx or win
+      then: llvm-openmp
   run:
-    - python 3.12.*
     - libboost 1.85.*
-    - muparser
     - pyfftw
-    - fftw
-    - vtk
-    - eigen
-    - ${{ pin_compatible('numpy',lower_bound="1.20") }}
     - numba
     - scipy
     - matplotlib-base
@@ -101,13 +86,4 @@ requirements:
     - traitsui
     - ipython
     - if: linux
-      then:
-        - libstdcxx
-        - libgomp
-    - if: osx
-      then:
-        - llvm-openmp
-    - if: win
-      then:
-        - vc14_runtime
-        - llvm-openmp
+      then: libgomp

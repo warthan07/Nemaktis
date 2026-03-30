@@ -8,6 +8,8 @@
 
 #include <Eigen/Core>
 
+#include <omp.h>
+
 #include <vtkDataArraySelection.h>
 #include <vtkXMLImageDataReader.h>
 
@@ -218,6 +220,7 @@ void create_default_settings_file(std::string filename) {
 
 int main(int argc, char *argv[]) {
 
+	omp_set_num_threads(omp_get_num_procs());
 	std::string param_file_name;
 
 	bool failed_parsing = (argc>1) ? false : true;
