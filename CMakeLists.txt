@@ -8,6 +8,14 @@ project(nemaktis)
 # generate json file for completion with YCM
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 
 
+# compile flags
+if(WIN32)
+	set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+else()
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+	set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
+endif()
+
 if(DEFINED ENV{Python_NumPy_INCLUDE_DIR})
 	set(Python_NumPy_INCLUDE_DIR $ENV{Python_NumPy_INCLUDE_DIR})
 endif()
@@ -44,28 +52,6 @@ find_package(SWIG REQUIRED)
 include(UseSWIG)
 
 find_package(Python 3.12 EXACT REQUIRED COMPONENTS Interpreter Development.Module NumPy)
-
-
-###########################################################################
-# Custom targets to ease the switching between debug or release compilation
-###########################################################################
-
-if(WIN32)
-	set(CMAKE_CXX_FLAGS_RELEASE "/O2")
-else()
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-	set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
-endif()
-add_custom_target(debug
-	COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-	COMMAND +${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
-	COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
-)
-add_custom_target(release
-	COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-	COMMAND +${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
-	COMMENT "Switch CMAKE_BUILD_TYPE to Release"
-)
 
 
 ##########################################

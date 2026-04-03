@@ -16,7 +16,14 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/warthan07/nemaktis"
+Homepage = "https://nemaktis.readthedocs.io/en/latest"
+Documentation = "https://nemaktis.readthedocs.io/en/latest"
+Repository = "https://github.com/warthan07/nemaktis"
+
+
+######################################
+# Build wheel with scikit-build-core #
+######################################
 
 [build-system]
 requires = ["scikit-build-core"]
@@ -34,6 +41,11 @@ wheel.packages = ["HighLevelPythonInterface/nemaktis", "dtmm/dtmm"]
 provider = "scikit_build_core.metadata.regex"
 input = "conda_recipe/recipe.yaml"
 regex = '(?i)^\s+version:\s+"(?P<value>.+)"\s+'
+
+
+###########################
+# Dev workspace with pixi #
+###########################
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
