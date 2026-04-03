@@ -1,6 +1,6 @@
-##############################
-# Definition of dirs and files
-##############################
+#######################
+# Define dirs and files
+#######################
 
 set(UTILITIESLIB_DIR src/UtilitiesLib)
 file(GLOB UTILITIESLIB_CPP ${UTILITIESLIB_DIR}/*.cpp)
@@ -19,34 +19,20 @@ INCLUDE_DIRECTORIES(
     ${MAPPINGLIB_DIR} ${SIMULATIONLIB_DIR})
 
 
-#################
-# The main target
-#################
+################
+# Define targets
+################
 
 add_executable(rt-solver src/main.cpp)
-set_property(
-	TARGET rt-solver
-	PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-add_custom_target(run-rt
-	COMMAND ./rt-solver
-	DEPENDS rt-solver
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration")
-
-
-#####################
-# The library targets
-#####################
-
 add_library(rt-lib STATIC
     ${UTILITIESLIB_CPP} ${PROPAGATIONLIB_CPP}
     ${MAPPINGLIB_CPP} ${SIMULATIONLIB_CPP})
 set_property(TARGET rt-lib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 
-###########################################
-# We link the main target and the libraries
-###########################################
+##############
+# Link targets
+##############
 
 target_link_libraries(rt-solver PRIVATE rt-lib)
 target_link_libraries(rt-lib PUBLIC

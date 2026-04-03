@@ -30,22 +30,7 @@ source:
     target_directory: dtmm
 
 build:
-  script:
-    - if: win
-      then: |      
-        python -m pip install . -vv --config-settings=cmake.define.CMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX%
-        if %ERRORLEVEL% neq 0 exit 1
-
-        cd dtmm
-        python -m pip install . -vv
-        if %ERRORLEVEL% neq 0 exit 1
-    - if: linux or osx
-      then: |      
-        echo $CMAKE_ARGS
-        python -m pip install . -vv
-
-        cd dtmm
-        python -m pip install . -vv
+  script: python -m pip install . -vv
 
 requirements:
   build:

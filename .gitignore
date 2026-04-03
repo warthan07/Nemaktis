@@ -9,5 +9,8 @@ dev/envs
 **/Session.vim
 **/*.*~
 **/*.vti
+**/__pycache__
 __pycache__
 conda_recipe/output
+.pixi/*
+!.pixi/config.toml

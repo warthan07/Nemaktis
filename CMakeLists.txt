@@ -8,17 +8,9 @@ project(nemaktis)
 # generate json file for completion with YCM
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 
 
-if(DEFINED ENV{MYROOT})
-	link_directories($ENV{MYROOT}/lib)
+if(DEFINED ENV{Python_NumPy_INCLUDE_DIR})
+	set(Python_NumPy_INCLUDE_DIR $ENV{Python_NumPy_INCLUDE_DIR})
 endif()
-# if(DEFINED ENV{PREFIX})
-# 	set(CMAKE_INSTALL_PREFIX $ENV{PREFIX})
-# endif()
-# if(DEFINED ENV{CONDA_PREFIX})
-# 	set(CMAKE_PREFIX_PATH $ENV{CONDA_PREFIX})
-# 	include_directories($ENV{CONDA_PREFIX}/include)
-# 	link_directories($ENV{CONDA_PREFIX}/lib)
-# endif()
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
@@ -82,4 +74,3 @@ add_custom_target(release
 
 add_subdirectory(BeamPropagationSolver)
 add_subdirectory(RayTracingSolver)
-add_subdirectory(HighLevelPythonInterface)

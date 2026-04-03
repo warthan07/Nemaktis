@@ -19,7 +19,7 @@ classifiers = [
 Homepage = "https://github.com/warthan07/nemaktis"
 
 [build-system]
-requires = ["scikit-build-core", "swig"]
+requires = ["scikit-build-core"]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
@@ -28,8 +28,44 @@ build.verbose = false
 build-dir = "bin"
 cmake.args = ["-GNinja", "--no-warn-unused-cli"]
 cmake.build-type = "Release"
+wheel.packages = ["HighLevelPythonInterface/nemaktis", "dtmm/dtmm"]
 
 [tool.scikit-build.metadata.version]
 provider = "scikit_build_core.metadata.regex"
 input = "conda_recipe/recipe.yaml"
 regex = '(?i)^\s+version:\s+"(?P<value>.+)"\s+'
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.dependencies]
+cmake = ">=3.15"
+python = "3.12.*"
+boost = "1.85.*"
+compilers = "*"
+ipython = "*"
+ninja = "*"
+pip = "*"
+scikit-build-core = "*"
+muparser = "*"
+pyfftw = "*"
+fftw = "*"
+vtk = "*"
+eigen = "*"
+numpy = "*"
+numba = "*"
+scipy = "*"
+matplotlib = "*"
+hatch = "*"
+pkgconfig = "*"
+swig = "*"
+traits = "*"
+traitsui = "*"
+pyqt = "*"
+
+[tool.pixi.activation.env]
+Python_NumPy_INCLUDE_DIR = "$(python -c 'import numpy; print(numpy.get_include())')"
+
+[tool.pixi.tasks]
+build = "pip install --no-build-isolation --config-settings=editable.rebuild=true -ve$PIXI_PROJECT_ROOT"

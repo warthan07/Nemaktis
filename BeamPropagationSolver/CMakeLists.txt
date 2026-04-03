@@ -1,6 +1,6 @@
-##############################
-# Definition of dirs and files
-##############################
+#######################
+# Define dirs and files
+#######################
 
 set(BPMLIB_DIR src/BeamPropagationLib)
 file(GLOB BPMLIB_CPP ${BPMLIB_DIR}/*.cpp)
@@ -29,26 +29,11 @@ include_directories(
 )
 
 
-##################
-# The main targets
-##################
+################
+# Define targets
+################
 
 add_executable(bpm-solver src/main.cpp)
-set_property(
-	TARGET bpm-solver
-	PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
-add_custom_target(run-bpm
-	COMMAND ./bpm-solver
-	DEPENDS bpm-solver
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration"
-)
-
-#####################
-# The library targets
-#####################
-
 add_library(bpm-lib STATIC ${BPMLIB_CPP} ${PHYSICSLIB_CPP} ${POSTPROCESSORLIB_CPP}
 	${SETTINGSLIB_CPP} ${UTILITIESLIB_CPP})
 set_property(TARGET bpm-lib PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -66,9 +51,9 @@ else()
 endif()
 
 
-############################################
-# We link the main targets and the libraries
-############################################
+##############
+# Link targets
+##############
 
 target_link_libraries(bpm-solver PRIVATE bpm-lib)
 target_link_libraries(bpm_backend PRIVATE bpm-lib Python::NumPy)
@@ -76,6 +61,11 @@ target_link_libraries(bpm-lib PUBLIC
 	VTK::CommonCore VTK::CommonDataModel VTK::IOXML
 	Boost::filesystem Boost::regex Eigen3::Eigen OpenMP::OpenMP_CXX 
 	${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES})
+
+
+#################
+# Install targets
+#################
 
 install(FILES ${PYTHONBACKEND_PY} DESTINATION ${SKBUILD_PLATLIB_DIR})
 install(TARGETS bpm_backend DESTINATION ${SKBUILD_PLATLIB_DIR})
