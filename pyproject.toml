@@ -77,7 +77,8 @@ traitsui = "*"
 pyqt = "*"
 
 [tool.pixi.activation.env]
-Python_NumPy_INCLUDE_DIR = "$(python -c 'import numpy; print(numpy.get_include())')"
+NUMPY_INCLUDE_DIR = "$(python -c 'import numpy; print(numpy.get_include())')"
+OMP_INCLUDE_DIR = "$(ls -d ${CONDA_PREFIX}/lib/gcc/x86_64-conda-linux-gnu/*)/include"
 
 [tool.pixi.tasks]
 build = "pip install --no-build-isolation --config-settings=editable.rebuild=true -ve$PIXI_PROJECT_ROOT"

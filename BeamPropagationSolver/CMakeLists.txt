@@ -38,17 +38,10 @@ add_library(bpm-lib STATIC ${BPMLIB_CPP} ${PHYSICSLIB_CPP} ${POSTPROCESSORLIB_CP
 	${SETTINGSLIB_CPP} ${UTILITIESLIB_CPP})
 set_property(TARGET bpm-lib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-set(SWIG_USE_SWIG_DEPENDENCIES true)
 swig_add_library(bpm_backend LANGUAGE python
 	SOURCES ${PYTHONBACKEND_SWIG} ${PYTHONBACKEND_CPP})
+set_property(TARGET bpm_backend PROPERTY SUFFIX ${SWIG_MODULE_SUFFIX})
 get_property(PYTHONBACKEND_PY TARGET bpm_backend PROPERTY SWIG_SUPPORT_FILES)
-if(WIN32)
-	set_property(TARGET bpm_backend
-		PROPERTY SUFFIX ".${Python_SOABI}.pyd")
-else()
-	set_property(TARGET bpm_backend
-		PROPERTY SUFFIX ".${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}")
-endif()
 
 
 ##############

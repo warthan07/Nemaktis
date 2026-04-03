@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(nemaktis)
 
-# generate json file for completion with YCM
+# generate json file for LSP
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 
 
 # compile flags
@@ -16,8 +16,12 @@ else()
 	set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
 endif()
 
-if(DEFINED ENV{Python_NumPy_INCLUDE_DIR})
-	set(Python_NumPy_INCLUDE_DIR $ENV{Python_NumPy_INCLUDE_DIR})
+# fix pixi dev env (omp path for clangd and numpy path)
+if(DEFINED ENV{OMP_INCLUDE_DIR})
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I$ENV{OMP_INCLUDE_DIR}")
+endif()
+if(DEFINED ENV{NUMPY_INCLUDE_DIR})
+	set(Python_NumPy_INCLUDE_DIR $ENV{NUMPY_INCLUDE_DIR})
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
@@ -42,16 +46,22 @@ if (WIN32)
 	add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
 
-find_package(OpenMP REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOXML)
+
+find_package(Python 3.12 EXACT REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
 cmake_policy(SET CMP0078 NEW)
 cmake_policy(SET CMP0086 NEW)
 find_package(SWIG REQUIRED)
 include(UseSWIG)
-
-find_package(Python 3.12 EXACT REQUIRED COMPONENTS Interpreter Development.Module NumPy)
+set(SWIG_USE_SWIG_DEPENDENCIES true)
+if (WIN32)
+	set(SWIG_MODULE_SUFFIX .${Python_SOABI}.pyd)
+else()
+	set(SWIG_MODULE_SUFFIX .${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX})
+endif()
 
 
 ##########################################
