@@ -30,19 +30,14 @@ add_library(rt-lib STATIC
 set_property(TARGET rt-lib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 
-##############
-# Link targets
-##############
+##########################
+# Link and install targets
+##########################
 
 target_link_libraries(rt-solver PRIVATE rt-lib)
 target_link_libraries(rt-lib PUBLIC
 	VTK::CommonCore VTK::CommonDataModel VTK::IOXML
 	Boost::filesystem Boost::regex Eigen3::Eigen
     OpenMP::OpenMP_CXX ${FFTW_LIBRARIES})
-
-
-#################
-# Install targets
-#################
 
 install(TARGETS rt-solver DESTINATION ${SKBUILD_SCRIPTS_DIR})

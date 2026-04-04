@@ -134,7 +134,7 @@ copyright = '2019, Guilhem Poy, Andrej Petelin'
 author = 'Guilhem Poy, Andrej Petelin'
 
 # The full version, including alpha/beta/rc tags
-with open("../../conda_recipe/recipe.yaml") as f:
+with open("../../recipe/recipe.yaml") as f:
     conda_recipe = yaml.safe_load(f)
 release = conda_recipe["package"]["version"]
 

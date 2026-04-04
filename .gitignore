@@ -11,6 +11,6 @@ dev/envs
 **/*.vti
 **/__pycache__
 __pycache__
-conda_recipe/output
+recipe/output
 .pixi/*
 !.pixi/config.toml
