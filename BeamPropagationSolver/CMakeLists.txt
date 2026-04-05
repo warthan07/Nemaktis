@@ -55,6 +55,6 @@ target_link_libraries(bpm-lib PUBLIC
 	Boost::filesystem Boost::regex Eigen3::Eigen OpenMP::OpenMP_CXX 
 	${FFTW_LIBRARIES} ${MUPARSER_LIBRARIES})
 
-install(FILES ${PYTHONBACKEND_PY} DESTINATION ${SKBUILD_PLATLIB_DIR})
-install(TARGETS bpm_backend DESTINATION ${SKBUILD_PLATLIB_DIR})
+install(FILES ${PYTHONBACKEND_PY} DESTINATION .)
+install(TARGETS bpm_backend DESTINATION .)
 install(TARGETS bpm-solver DESTINATION ${SKBUILD_SCRIPTS_DIR})

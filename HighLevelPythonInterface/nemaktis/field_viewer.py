@@ -1,13 +1,8 @@
 from .light_propagator import OpticalFields
-from .field_viewer_ui import *
 from dtmm import color
 
 import os
 import numpy as np
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 
 from scipy.interpolate import RectBivariateSpline
 
@@ -103,6 +98,11 @@ class FieldViewer:
         """Run a graphical user interface allowing to dynamically adjust
         the attributes of this class and visualize the associated
         micrographs in real-time."""
+        
+        import matplotlib as mpl
+        import matplotlib.pyplot as plt
+        from matplotlib.figure import Figure
+        from .field_viewer_ui import FieldViewerUI
 
         print("{ Running field viewer graphical interface }")
         mpl.rcParams["toolbar"] = "None"

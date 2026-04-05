@@ -1,7 +1,4 @@
-__version__ = "1.4.9"
-
-import matplotlib
-matplotlib.use("Qt5Agg")
+__version__ = "${version}"
 
 from .lc_material import LCMaterial, TensorField, QTensorField, DirectorField
 from .light_propagator import LightPropagator, OpticalFields

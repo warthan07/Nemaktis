@@ -1,6 +1,3 @@
-RayTracingSolver/rt-solver
-BeamPropagationSolver/bpm-solver
-dev/envs
 **/.cache
 **/bin
 **/data
@@ -10,7 +7,6 @@ dev/envs
 **/*.*~
 **/*.vti
 **/__pycache__
-__pycache__
-recipe/output
+**/*.conda
 .pixi/*
 !.pixi/config.toml

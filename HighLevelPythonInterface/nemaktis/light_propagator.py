@@ -3,10 +3,6 @@ import os
 
 from json import JSONEncoder
 from .lc_material import LCMaterial
-import bpm_backend as bpm
-
-import dtmm
-dtmm.conf.set_verbose(2)
 
 from vtk import vtkImageData, vtkXMLImageDataReader, vtkXMLImageDataWriter
 from vtk.util import numpy_support as vn
@@ -144,6 +140,8 @@ class LightPropagator:
     def _bpm_propagation(self, bulk_filename, input_field_vals=None):
         print("{ Running beam propagation backend }\n")
 
+        import bpm_backend as bpm
+
         lc_field = self._material.lc_field
         dims = lc_field.get_mesh_dimensions()
         lengths = lc_field.get_mesh_lengths()
@@ -234,6 +232,12 @@ class LightPropagator:
     def _dtmm_propagation(self, bulk_filename, diffraction=1):
         print("{ Running diffraction transfer matrix backend }\n")
 
+        from dtmm.data import director2data, eps2epsva
+        from dtmm.field import illumination_data
+        from dtmm.transfer import transfer_field
+        import dtmm.conf as dconf
+        dconf.set_verbose(2)
+
         lc_field = self._material.lc_field
         dims = lc_field.get_mesh_dimensions()
         lengths = lc_field.get_mesh_lengths()
@@ -291,7 +295,7 @@ class LightPropagator:
         else:
             mask_vals = None
         if lc_field._Nv==3:
-            optical_data = dtmm.director2data(
+            optical_data = director2data(
                 lc_field.vals, mask = mask_vals,
                 no = no, ne = ne, nhost = nhost,
                 thickness = spacings[2]/spacings[0]*np.ones(dims[2]))
@@ -310,7 +314,7 @@ class LightPropagator:
                 eps_vals[:,:,:,0:3] = e_iso+ea_eff*lc_field.vals[:,:,:,0:3]
                 eps_vals[:,:,:,3:6] = ea_eff*lc_field.vals[:,:,:,3:6]
 
-            epsv,epsa = dtmm.data.eps2epsva(eps_vals)
+            epsv,epsa = eps2epsva(eps_vals)
             optical_data = (spacings[2]/spacings[0]*np.ones(dims[2]),epsv,epsa)
 
         wavelengths = 1000*np.array(self._wavelengths)
@@ -328,10 +332,10 @@ class LightPropagator:
         else:
             nout = self._material.nout
 
-        field_data_in = dtmm.illumination_data(
+        field_data_in = illumination_data(
             (dims[1],dims[0]), wavelengths, pixelsize=1000*spacings[0], n=nin,
             beta=beta, phi=phi, intensity=intensity)
-        field_data_out = dtmm.transfer_field(
+        field_data_out = transfer_field(
             field_data_in, optical_data, nin=nin, nout=nout, eff_data="uniaxial",
             betamax=self._max_NA_objective, diffraction=diffraction,
             method = "4x4",

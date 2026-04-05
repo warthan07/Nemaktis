@@ -52,8 +52,8 @@ find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOXML)
 
 find_package(Python 3.12 EXACT REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
-cmake_policy(SET CMP0078 NEW)
-cmake_policy(SET CMP0086 NEW)
+# cmake_policy(SET CMP0078 NEW)
+# cmake_policy(SET CMP0086 NEW)
 find_package(SWIG REQUIRED)
 include(UseSWIG)
 set(SWIG_USE_SWIG_DEPENDENCIES true)

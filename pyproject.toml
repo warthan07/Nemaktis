@@ -1,6 +1,6 @@
 [project]
 name = "nemaktis"
-dynamic = ["version"]
+version = "1.4.10"
 description = "An open-source platform for light propagation in birefringent media"
 readme = "README.md"
 license = "MIT"
@@ -31,16 +31,16 @@ build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
 logging.level = "INFO"
-build.verbose = false
+editable.rebuild = true
 build-dir = "bin"
+build.verbose = false
 cmake.args = ["-GNinja", "--no-warn-unused-cli"]
 cmake.build-type = "Release"
 wheel.packages = ["HighLevelPythonInterface/nemaktis", "dtmm/dtmm"]
 
-[tool.scikit-build.metadata.version]
-provider = "scikit_build_core.metadata.regex"
-input = "recipe/recipe.yaml"
-regex = '(?i)^\s+version:\s+"(?P<value>.+)"\s+'
+[[tool.scikit-build.generate]]
+path = "nemaktis/__init__.py"
+template-path = "HighLevelPythonInterface/nemaktis/__init__.py"
 
 
 ###########################
@@ -49,36 +49,69 @@ regex = '(?i)^\s+version:\s+"(?P<value>.+)"\s+'
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
-platforms = ["linux-64"]
+platforms = ["linux-64", "win-64", "osx-64", "osx-arm64"]
+preview = ["pixi-build"]
 
-[tool.pixi.dependencies]
+[tool.pixi.package.build]
+backend = { name = "pixi-build-python", version = "*", channels = ["https://prefix.dev/conda-forge"] }
+config = { compilers = ["cxx"] }
+target.win-64.config = { compilers = ["clang-cl"] }
+
+[tool.pixi.workspace.target.linux.build-variants]
+cxx_compiler = ["gxx"]
+cxx_compiler_version = ["14"]
+c_stdlib = ["sysroot"]
+c_stdlib_version = ["2.17"]
+
+[tool.pixi.workspace.target.osx.build-variants]
+cxx_compiler = ["clangxx"]
+cxx_compiler_version = ["19"]
+c_stdlib = ["macosx_deployment_target"]
+c_stdlib_version = ["11.0"]
+llvm_openmp = ["19"]
+
+[tool.pixi.workspace.target.win.build-variants]
+cxx_compiler = ["vs2022"]
+c_stdlib = ["vs"]
+
+[tool.pixi.package.build-dependencies]
 cmake = ">=3.15"
-python = "3.12.*"
-boost = "1.85.*"
-compilers = "*"
-ipython = "*"
 ninja = "*"
-pip = "*"
+
+[tool.pixi.package.host-dependencies]
+python = "3.12.*"
 scikit-build-core = "*"
+boost = "1.85.*"
 muparser = "*"
 pyfftw = "*"
 fftw = "*"
 vtk = "*"
 eigen = "*"
 numpy = "*"
-numba = "*"
-scipy = "*"
-matplotlib = "*"
-hatch = "*"
 pkgconfig = "*"
 swig = "*"
+
+[tool.pixi.package.run-dependencies]
+python = "3.12.*"
+libboost = "1.85.*"
+pyfftw = "*"
+numba = "*"
+scipy = "*"
+matplotlib-base = "*"
+pyqt = "*"
 traits = "*"
 traitsui = "*"
-pyqt = "*"
+ipython = "*"
 
-[tool.pixi.activation.env]
+[tool.pixi.dev]
+nemaktis = { path = "." }
+
+[tool.pixi.dependencies]
+pip = "*"
+
+[tool.pixi.target.linux.activation.env]
 NUMPY_INCLUDE_DIR = "$(python -c 'import numpy; print(numpy.get_include())')"
 OMP_INCLUDE_DIR = "$(ls -d ${CONDA_PREFIX}/lib/gcc/x86_64-conda-linux-gnu/*)/include"
 
 [tool.pixi.tasks]
-build = "pip install --no-build-isolation --config-settings=editable.rebuild=true -ve$PIXI_PROJECT_ROOT"
+build-editable = "pip install --no-build-isolation -ve $PIXI_PROJECT_ROOT"
