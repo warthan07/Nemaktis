@@ -707,6 +707,7 @@ class OpticalFields:
     def update_NA_objective(self, new_NA):
         self._NA = max(0,min(self._max_NA_objective,new_NA))
         self._objective_mask = (self._kSqr<(self._k0*self._NA)**2).astype(float)
+        self.focus_fields()
 
 
     def focus_fields(self, z_focus=None):

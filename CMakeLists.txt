@@ -57,6 +57,7 @@ find_package(Python 3.12 EXACT REQUIRED COMPONENTS Interpreter Development.Modul
 find_package(SWIG REQUIRED)
 include(UseSWIG)
 set(SWIG_USE_SWIG_DEPENDENCIES true)
+set(CMAKE_SWIG_FLAGS "-doxygen")
 if (WIN32)
 	set(SWIG_MODULE_SUFFIX .${Python_SOABI}.pyd)
 else()

@@ -37,6 +37,8 @@ class LCMaterial(object):
         along the optical axis. A default value of 0 is assumed
     """
     def __init__(self, *, lc_field, ne, no, nhost = 1, nin = 1, nout = 1, ne_imag = 0):
+        if not isinstance(lc_field, DirectorField) and not isinstance(lc_field, QTensorField):
+            raise TypeError("lc_field should be a DirectorField or QTensorField object")
         self.lc_field = lc_field
         self.ne = ne
         self.ne_imag = ne_imag
@@ -45,7 +47,8 @@ class LCMaterial(object):
         self.nin = nin
         self.nout = nout
         self.iso_layer_indices = [] 
-        self.iso_layer_thicknesses = [] 
+        self.iso_layer_thicknesses = []
+        self._zfoc_NA_corr = 0
 
 
     def add_isotropic_layer(self, *, nlayer, thickness):
@@ -63,7 +66,7 @@ class LCMaterial(object):
         """
         self.iso_layer_indices.append(nlayer)
         self.iso_layer_thicknesses.append(thickness)
-
+        self._zfoc_NA_corr += 3*self.nout*thickness / (14*nlayer) * (1/self.nout**2 - 1/nlayer**2)
 
 
 class TensorField:
@@ -75,8 +78,9 @@ class TensorField:
     - Vector field n: (nx,ny,nz)
     - Symmetric second-order tensor field Q: (Qxx,Qyy,Qzz,Qxy,Qxz,Qyz)
 
-    This class is initialized given either the lengths and dimensions of the associated 3D
-    mesh or a path to a vti file containing the tensor field and mesh details.
+    The DirectorField and QTensorField child classes inherit all methods and properties of 
+    this class. This class is initialized given either the lengths and dimensions of the 
+    associated 3D mesh or a path to a vti file containing the tensor field and mesh details.
 
     In the first version of this constructor:
 
@@ -96,7 +100,7 @@ class TensorField:
         field = TensorField(vti_file="path to vti file", vti_array="name of tensor array")
 
     the values of the tensor field and the details of the mesh are automatically assigned
-    from the given vti file and array name. 
+    from the given vti file and array name.    
     """
 
     _mask_type = None
@@ -169,7 +173,74 @@ class TensorField:
 
         else:
             raise Exception("Could not parse the constructor parameters of TensorField")
+        
+        if self._Nv==3:
+            self._tensor_type_str = "director"
+        elif self._Nv==6:
+            self._tensor_type_str = "q-tensor"
+    
+    
+    def init_from_funcs(self, *funcs):
+        """Initialize the tensor field from separate functions for each of its components (3
+        for a DirectorField, 6 for a Q-TensorField). The functions must depend on the space
+        variables ``x``, ``y`` and ``z``. We recall that the mesh is centered on the origin.
 
+        If the given functions are numpy-vectorizable, this function should be pretty fast. If
+        not, a warning will be printed and the faulty function(s) will be vectorized with the
+        numpy method ``vectorize`` (in which case you should expect a much slower execution
+        time).
+        """
+
+        print(f"Calculating {self._tensor_type_str} values from user functions")
+        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
+                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
+                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
+                                 indexing="ij")
+        
+        assert len(funcs)==self._Nv, "You should give exactly "+str(self._Nv)+" functions as input"
+
+        # We verify if the user functions are vectorizable, using np.vectorize as fallback
+        vect_funcs = []
+        dummy_arr = np.ones((2,2,2))
+        for i, func in enumerate(funcs):
+            try:
+                assert func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
+            except:
+                print(f"\tInput function no.{i} is not vectorized, using a non-optimized version instead.")
+                func = np.vectorize(func)
+            vect_funcs.append(func)
+
+        self._vals = np.concatenate(
+            [np.expand_dims(func(xx, yy, zz), axis=3) for func in vect_funcs], axis=3)
+
+
+    def init_from_func(self, func):
+        """Initialize the tensor field from a single function returning an array whose last
+        axis is associated with each each tensor components (3 for a DirectorField, 6 for a
+        Q-TensorField). The function must depend on the space variables ``x``, ``y`` and 
+        ``z``. We recall that the mesh is centered on the origin.
+
+        If the given function is numpy-vectorizable, this function should be pretty fast. If
+        not, a warning will be printed and the input function will be vectorized with the
+        numpy method ``vectorize`` (in which case you should expect a much slower execution
+        time).
+        """
+
+        print(f"Calculating {self._tensor_type_str} values from user function ")
+        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
+                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
+                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
+                                 indexing="ij")
+
+        # We verify if the user function is vectorizable
+        dummy_arr = np.ones((2,2,2))
+        try:
+            assert func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape+(self._Nv,)
+        except:
+            print("\tInput function is not vectorized, using a non-optimized version instead.")
+            func = np.vectorize(func)
+
+        self._vals = func(xx, yy, zz)
 
 
     def set_mask(self, *,  mask_type, mask_formula = None, mask_ndarray = None):
@@ -239,7 +310,7 @@ class TensorField:
 
     @property
     def mask_vals(self):
-        """Returns the mask boolean array."""
+        """Returns the mask array."""
         if self._mask_type=="raw":
             return self._mask_vals
         elif self._mask_type=="formula" or self._mask_type=="droplet":
@@ -425,16 +496,16 @@ class TensorField:
         
         u = np.zeros(3)
         u[ax] = 1
-        rot_mat_inv = R.from_rotvec(-angle*np.pi/180*u).as_dcm()
+        rot_mat_inv = R.from_rotvec(-angle*np.pi/180*u).as_matrix()
 
         # For vector field, the transformation operator is simply the rotation matrix. For
         # symmetric second-order tensor field, the transformation operator can be obtained
         # in Mathematica with appropriate cartesian product and slicing operations (which we
         # compact based on roll and flip matrix operations)
         if self._Nv==3:
-            transf_op = R.from_rotvec(angle*np.pi/180*u).as_dcm()
+            transf_op = R.from_rotvec(angle*np.pi/180*u).as_matrix()
         if self._Nv==6:
-            G = R.from_rotvec(angle*np.pi/180*u).as_dcm()
+            G = R.from_rotvec(angle*np.pi/180*u).as_matrix()
             transf_op = np.zeros((6,6))
             transf_op[0:3,0:3] = np.power(G,2)
             transf_op[0:3,3:6] = 2*np.flip(np.roll(G,1,axis=1)*np.roll(G,2,axis=1),axis=1)
@@ -572,10 +643,10 @@ class DirectorField(TensorField):
             vti_file="path to vti file", vti_array="name of tensor array")
 
     In addition to all the methods of the parent class for initializing and manipulating 
-    the field values, we specialize the "save_to_vti" method (imposing that the exported vti
-    array name is always "n") and provide additional methods for initializing the
-    director field values from theoretical functions, exporting a q-tensor field from the
-    director field, and normalizing the director field to unit norm.
+    the field values (please look above for the documentation of these methods), we specialize
+    the "save_to_vti" method (imposing that the exported vti array name is always "n") and
+    provide additional methods for exporting a q-tensor field from the director field and
+    normalizing the director field to unit norm.
     """
     def __init__(self, **kwargs):
         if "vti_file" in kwargs:
@@ -585,74 +656,6 @@ class DirectorField(TensorField):
         else:
             raise Exception("Could not parse the constructor parameters of DirectorField")
         super().__init__(**kwargs)
-    
-
-    def init_from_funcs(self, nx_func, ny_func, nz_func):
-        """Initialize the director field from three functions for each of its component. The
-        functions must depend on the space variables ``x``, ``y`` and ``z``. We recall that
-        the mesh is centered on the origin.
-
-        If the given functions are numpy-vectorizable, this function should be pretty fast. If
-        not, a warning will be printed and the faulty function(s) will be vectorized with the
-        numpy method ``vectorize`` (in which case you should expect a much slower execution
-        time).
-        """
-
-        print("{ Calculating director values from user functions }")
-        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
-                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
-                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
-                                 indexing="ij")
-
-        # We verify if the user functions are vectorizable
-        dummy_arr = np.ones((2,2,2))
-        try:
-            assert nx_func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
-        except:
-            print("\tnx_func is not vectorized, using a non-optimized version instead.")
-            nx_func = np.vectorize(nx_func)
-        try:
-            assert ny_func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
-        except:
-            print("\tny_func is not vectorized, using a non-optimized version instead.")
-            ny_func = np.vectorize(ny_func)
-        try:
-            assert nz_func(dummy_arr,dummy_arr,dummy_arr).shape==dummy_arr.shape
-        except:
-            print("\tnz_func is not vectorized, using a non-optimized version instead.")
-            nz_func = np.vectorize(nz_func)
-
-        self._vals = np.concatenate((np.expand_dims(nx_func(xx, yy, zz), axis=3),
-                                       np.expand_dims(ny_func(xx, yy, zz), axis=3),
-                                       np.expand_dims(nz_func(xx, yy, zz), axis=3)), 3)
-
-    def init_from_func(self, n_func):
-        """Initialize the director field from a single function returning an array whose
-        last axis is associated with each director components. The function must depend on
-        the space variables ``x``, ``y`` and ``z``. We recall that the mesh is centered on
-        the origin.
-
-        If the given functions are numpy-vectorizable, this function should be pretty fast. If
-        not, a warning will be printed and the faulty function(s) will be vectorized with the
-        numpy method ``vectorize`` (in which case you should expect a much slower execution
-        time).
-        """
-
-        print("{ Calculating director values from user function }")
-        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
-                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
-                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
-                                 indexing="ij")
-
-        # We verify if the user function is vectorizable
-        dummy_arr = np.ones((2,2,2))
-        try:
-            n_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tn_func is not vectorized, using a non-optimized version instead.")
-            n_func = np.vectorize(n_func)
-
-        self._vals = n_func(xx, yy, zz)
 
 
     def normalize(self):
@@ -726,10 +729,10 @@ class QTensorField(TensorField):
             vti_file="path to vti file", vti_array="name of tensor array")
 
     In addition to all the methods of the parent class for initializing and manipulating 
-    the field values, we specialize the "save_to_vti" method (imposing that the exported vti
-    array name is always "Q") and provide addional methods for initializing the
-    Q-tensor field values from theoretical functions, exporting a director field from a
-    q-tensor field, and imposing the traceless constraint Tr(Q)=0.
+    the field values (please look above for the documentation of these methods), we specialize
+    the "save_to_vti" method (imposing that the exported vti array name is always "Q") and
+    provide addional methods for exporting a director field from a q-tensor field, and 
+    imposing the traceless constraint Tr(Q)=0.
     """
     def __init__(self, **kwargs):
         if "vti_file" in kwargs:
@@ -739,92 +742,6 @@ class QTensorField(TensorField):
         else:
             raise Exception("Could not parse the constructor parameters of QTensorField")
         super().__init__(**kwargs)
-
-
-    def init_from_funcs(self, Qxx_func, Qyy_func, Qzz_func, Qxy_func, Qxz_func, Qyz_func):
-        """Initialize the Q-tensor field from six functions for each of its component (xx,
-        yy, zz, xy, xz, yz). The functions must depend on the space variables ``x``, ``y``
-        and ``z``. We recall that the mesh is centered on the origin.
-
-        If the given functions are numpy-vectorizable, this function should be pretty fast.
-        If not, a warning will be printed and the faulty function(s) will be vectorized with the
-        numpy method ``vectorize`` (in which case you should expect a much slower execution
-        time).
-        """
-
-        print("{ Calculating Q-tensor values from user functions }")
-
-        # We verify if the user functions are vectorizable
-        dummy_arr = np.ones((2,2,2))
-        try:
-            Qxx_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQxx_func is not vectorized, using a non-optimized version instead.")
-            Qxx_func = np.vectorize(nz_func)
-        try:
-            Qyy_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQyy_func is not vectorized, using a non-optimized version instead.")
-            Qyy_func = np.vectorize(nz_func)
-        try:
-            Qzz_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQzz_func is not vectorized, using a non-optimized version instead.")
-            Qzz_func = np.vectorize(nz_func)
-        try:
-            Qxy_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQxy_func is not vectorized, using a non-optimized version instead.")
-            Qxy_func = np.vectorize(nz_func)
-        try:
-            Qxz_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQxz_func is not vectorized, using a non-optimized version instead.")
-            Qxz_func = np.vectorize(nz_func)
-        try:
-            Qyz_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQyz_func is not vectorized, using a non-optimized version instead.")
-            Qyz_func = np.vectorize(nz_func)
-
-        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
-                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
-                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
-                                 indexing="ij")
-        self._vals = np.concatenate((np.expand_dims(Qxx_func(xx, yy, zz), axis=3),
-                                     np.expand_dims(Qyy_func(xx, yy, zz), axis=3),
-                                     np.expand_dims(Qzz_func(xx, yy, zz), axis=3),
-                                     np.expand_dims(Qxy_func(xx, yy, zz), axis=3),
-                                     np.expand_dims(Qxz_func(xx, yy, zz), axis=3),
-                                     np.expand_dims(Qyz_func(xx, yy, zz), axis=3)), 3)
-
-    def init_from_func(self, Q_func):
-        """Initialize the Q-tensor field from a single function returning an array whose
-        last axis is associated with each Q-tensor components (xx, yy, zz, xy, xz, yz). The
-        function must depend on the space variables ``x``, ``y`` and ``z``. We recall that
-        the mesh is centered on the origin.
-
-        If the given functions are numpy-vectorizable, this function should be pretty fast. If
-        not, a warning will be printed and the faulty function(s) will be vectorized with the
-        numpy method ``vectorize`` (in which case you should expect a much slower execution
-        time).
-        """
-
-        print("{ Calculating Q-tensor values from user function }")
-        zz, yy, xx = np.meshgrid(np.linspace(-self._Lz/2, self._Lz/2, self._Nz),
-                                 np.linspace(-self._Ly/2, self._Ly/2, self._Ny),
-                                 np.linspace(-self._Lx/2, self._Lx/2, self._Nx),
-                                 indexing="ij")
-
-        # We verify if the user function is vectorizable
-        dummy_arr = np.ones((2,2,2))
-        try:
-            Q_func(dummy_arr,dummy_arr,dummy_arr)
-        except:
-            print("\tQ_func is not vectorized, using a non-optimized version instead.")
-            Q_func = np.vectorize(Q_func)
-
-        self._vals = Q_func(xx, yy, zz)
 
 
     def apply_traceless_constraint(self):

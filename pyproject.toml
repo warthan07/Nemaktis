@@ -42,6 +42,10 @@ wheel.packages = ["HighLevelPythonInterface/nemaktis", "dtmm/dtmm"]
 path = "nemaktis/__init__.py"
 template-path = "HighLevelPythonInterface/nemaktis/__init__.py"
 
+[tool.pytest]
+addopts = ["-x", "-v"]
+testpaths = ["HighLevelPythonInterface/tests"]
+
 
 ###########################
 # Dev workspace with pixi #
@@ -108,6 +112,7 @@ nemaktis = { path = "." }
 
 [tool.pixi.dependencies]
 pip = "*"
+pytest = "*"
 
 [tool.pixi.target.linux.activation.env]
 NUMPY_INCLUDE_DIR = "$(python -c 'import numpy; print(numpy.get_include())')"
